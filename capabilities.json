@@ -1,0 +1,642 @@
+{
+  "dataRoles": [
+    {
+      "displayName": "Value",
+      "displayNameKey": "Role_Value",
+      "name": "measure",
+      "kind": "Measure",
+      "description": "Current period value (required). One measure only.",
+      "descriptionKey": "Role_Value_Description"
+    },
+    {
+      "displayName": "Prior Period",
+      "displayNameKey": "Role_PriorPeriod",
+      "name": "priorPeriod",
+      "kind": "Measure",
+      "description": "Prior period value for variance calculation (optional).",
+      "descriptionKey": "Role_PriorPeriod_Description"
+    },
+    {
+      "displayName": "Target",
+      "displayNameKey": "Role_Target",
+      "name": "target",
+      "kind": "Measure",
+      "description": "Target or budget value for goal tracking (optional).",
+      "descriptionKey": "Role_Target_Description"
+    },
+    {
+      "displayName": "Category",
+      "displayNameKey": "Role_Category",
+      "name": "category",
+      "kind": "Grouping",
+      "description": "Dimension for sparkline trend chart (optional).",
+      "descriptionKey": "Role_Category_Description"
+    },
+    {
+      "displayName": "Tooltips",
+      "displayNameKey": "Role_Tooltips",
+      "name": "tooltips",
+      "kind": "Measure",
+      "description": "Additional measures for report page tooltip or custom tooltip payload (optional).",
+      "descriptionKey": "Role_Tooltips_Description"
+    }
+  ],
+  "dataViewMappings": [
+    {
+      "conditions": [
+        {
+          "measure": {
+            "max": 1
+          },
+          "priorPeriod": {
+            "max": 1
+          },
+          "target": {
+            "max": 1
+          },
+          "category": {
+            "max": 1
+          },
+          "tooltips": {
+            "max": 10
+          }
+        }
+      ],
+      "categorical": {
+        "categories": {
+          "select": [
+            {
+              "for": {
+                "in": "category"
+              }
+            }
+          ],
+          "dataReductionAlgorithm": {
+            "top": {
+              "count": 100
+            }
+          }
+        },
+        "values": {
+          "select": [
+            {
+              "bind": {
+                "to": "measure"
+              }
+            },
+            {
+              "bind": {
+                "to": "priorPeriod"
+              }
+            },
+            {
+              "bind": {
+                "to": "target"
+              }
+            },
+            {
+              "bind": {
+                "to": "tooltips"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "objects": {
+    "card": {
+      "displayName": "Card",
+      "displayNameKey": "Object_Card",
+      "properties": {
+        "background": {
+          "displayName": "Background Color",
+          "displayNameKey": "Prop_Card_Background",
+          "type": {
+            "fill": {
+              "solid": {
+                "color": true
+              }
+            }
+          }
+        },
+        "borderColor": {
+          "displayName": "Border Color",
+          "displayNameKey": "Prop_Card_BorderColor",
+          "type": {
+            "fill": {
+              "solid": {
+                "color": true
+              }
+            }
+          }
+        },
+        "borderWidth": {
+          "displayName": "Border Width",
+          "displayNameKey": "Prop_Card_BorderWidth",
+          "type": {
+            "numeric": true
+          }
+        },
+        "borderRadius": {
+          "displayName": "Border Radius",
+          "displayNameKey": "Prop_Card_BorderRadius",
+          "type": {
+            "numeric": true
+          }
+        },
+        "padding": {
+          "displayName": "Padding",
+          "displayNameKey": "Prop_Card_Padding",
+          "type": {
+            "numeric": true
+          }
+        },
+        "shadow": {
+          "displayName": "Drop Shadow",
+          "displayNameKey": "Prop_Card_Shadow",
+          "type": {
+            "bool": true
+          }
+        }
+      }
+    },
+    "mainValue": {
+      "displayName": "Main Value",
+      "displayNameKey": "Object_MainValue",
+      "properties": {
+        "fontSize": {
+          "displayName": "Font Size",
+          "displayNameKey": "Prop_FontSize",
+          "type": {
+            "formatting": {
+              "fontSize": true
+            }
+          }
+        },
+        "fontFamily": {
+          "displayName": "Font Family",
+          "displayNameKey": "Prop_FontFamily",
+          "type": {
+            "formatting": {
+              "fontFamily": true
+            }
+          }
+        },
+        "bold": {
+          "displayName": "Bold",
+          "displayNameKey": "Prop_Bold",
+          "type": {
+            "bool": true
+          }
+        },
+        "color": {
+          "displayName": "Color",
+          "displayNameKey": "Prop_Color",
+          "type": {
+            "fill": {
+              "solid": {
+                "color": true
+              }
+            }
+          }
+        },
+        "displayUnit": {
+          "displayName": "Display Units",
+          "displayNameKey": "Prop_DisplayUnit",
+          "type": {
+            "enumeration": [
+              {
+                "value": "auto",
+                "displayName": "Auto",
+                "displayNameKey": "DisplayUnit_Auto"
+              },
+              {
+                "value": "none",
+                "displayName": "None",
+                "displayNameKey": "DisplayUnit_None"
+              },
+              {
+                "value": "thousands",
+                "displayName": "Thousands",
+                "displayNameKey": "DisplayUnit_Thousands"
+              },
+              {
+                "value": "millions",
+                "displayName": "Millions",
+                "displayNameKey": "DisplayUnit_Millions"
+              },
+              {
+                "value": "billions",
+                "displayName": "Billions",
+                "displayNameKey": "DisplayUnit_Billions"
+              }
+            ]
+          }
+        },
+        "decimalPlaces": {
+          "displayName": "Decimal Places",
+          "displayNameKey": "Prop_DecimalPlaces",
+          "type": {
+            "numeric": true
+          }
+        },
+        "prefix": {
+          "displayName": "Prefix",
+          "displayNameKey": "Prop_Prefix",
+          "type": {
+            "text": true
+          }
+        },
+        "suffix": {
+          "displayName": "Suffix",
+          "displayNameKey": "Prop_Suffix",
+          "type": {
+            "text": true
+          }
+        }
+      }
+    },
+    "label": {
+      "displayName": "Label",
+      "displayNameKey": "Object_Label",
+      "properties": {
+        "show": {
+          "displayName": "Show",
+          "displayNameKey": "Prop_Show",
+          "type": {
+            "bool": true
+          }
+        },
+        "text": {
+          "displayName": "Custom Text",
+          "displayNameKey": "Prop_Label_Text",
+          "type": {
+            "text": true
+          }
+        },
+        "fontSize": {
+          "displayName": "Font Size",
+          "displayNameKey": "Prop_FontSize",
+          "type": {
+            "formatting": {
+              "fontSize": true
+            }
+          }
+        },
+        "color": {
+          "displayName": "Color",
+          "displayNameKey": "Prop_Color",
+          "type": {
+            "fill": {
+              "solid": {
+                "color": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "variance": {
+      "displayName": "Variance",
+      "displayNameKey": "Object_Variance",
+      "properties": {
+        "show": {
+          "displayName": "Show",
+          "displayNameKey": "Prop_Show",
+          "type": {
+            "bool": true
+          }
+        },
+        "mode": {
+          "displayName": "Variance Mode",
+          "displayNameKey": "Prop_Variance_Mode",
+          "type": {
+            "enumeration": [
+              {
+                "value": "vsPrior",
+                "displayName": "vs Prior Period",
+                "displayNameKey": "VarianceMode_vsPrior"
+              },
+              {
+                "value": "vsTarget",
+                "displayName": "vs Target",
+                "displayNameKey": "VarianceMode_vsTarget"
+              },
+              {
+                "value": "both",
+                "displayName": "Both",
+                "displayNameKey": "VarianceMode_Both"
+              }
+            ]
+          }
+        },
+        "positiveColor": {
+          "displayName": "Positive Color",
+          "displayNameKey": "Prop_Variance_PositiveColor",
+          "type": {
+            "fill": {
+              "solid": {
+                "color": true
+              }
+            }
+          }
+        },
+        "negativeColor": {
+          "displayName": "Negative Color",
+          "displayNameKey": "Prop_Variance_NegativeColor",
+          "type": {
+            "fill": {
+              "solid": {
+                "color": true
+              }
+            }
+          }
+        },
+        "neutralColor": {
+          "displayName": "Neutral Color",
+          "displayNameKey": "Prop_Variance_NeutralColor",
+          "type": {
+            "fill": {
+              "solid": {
+                "color": true
+              }
+            }
+          }
+        },
+        "invertColors": {
+          "displayName": "Invert (Lower is Better)",
+          "displayNameKey": "Prop_Variance_Invert",
+          "type": {
+            "bool": true
+          }
+        },
+        "showArrow": {
+          "displayName": "Show Arrow",
+          "displayNameKey": "Prop_Variance_Arrow",
+          "type": {
+            "bool": true
+          }
+        },
+        "showPill": {
+          "displayName": "Show as Pill",
+          "displayNameKey": "Prop_Variance_Pill",
+          "type": {
+            "bool": true
+          }
+        },
+        "fontSize": {
+          "displayName": "Font Size",
+          "displayNameKey": "Prop_FontSize",
+          "type": {
+            "formatting": {
+              "fontSize": true
+            }
+          }
+        }
+      }
+    },
+    "sparkline": {
+      "displayName": "Sparkline",
+      "displayNameKey": "Object_Sparkline",
+      "properties": {
+        "show": {
+          "displayName": "Show",
+          "displayNameKey": "Prop_Show",
+          "type": {
+            "bool": true
+          }
+        },
+        "type": {
+          "displayName": "Chart Type",
+          "displayNameKey": "Prop_Sparkline_Type",
+          "type": {
+            "enumeration": [
+              {
+                "value": "line",
+                "displayName": "Line",
+                "displayNameKey": "SparklineType_Line"
+              },
+              {
+                "value": "area",
+                "displayName": "Area",
+                "displayNameKey": "SparklineType_Area"
+              },
+              {
+                "value": "bar",
+                "displayName": "Bar",
+                "displayNameKey": "SparklineType_Bar"
+              }
+            ]
+          }
+        },
+        "color": {
+          "displayName": "Color",
+          "displayNameKey": "Prop_Color",
+          "type": {
+            "fill": {
+              "solid": {
+                "color": true
+              }
+            }
+          }
+        },
+        "areaOpacity": {
+          "displayName": "Area Opacity",
+          "displayNameKey": "Prop_Sparkline_Opacity",
+          "type": {
+            "numeric": true
+          }
+        },
+        "lineWidth": {
+          "displayName": "Line Width",
+          "displayNameKey": "Prop_Sparkline_LineWidth",
+          "type": {
+            "numeric": true
+          }
+        },
+        "showDot": {
+          "displayName": "Show Last Point Dot",
+          "displayNameKey": "Prop_Sparkline_Dot",
+          "type": {
+            "bool": true
+          }
+        },
+        "height": {
+          "displayName": "Height (px)",
+          "displayNameKey": "Prop_Sparkline_Height",
+          "type": {
+            "numeric": true
+          }
+        }
+      }
+    },
+    "target": {
+      "displayName": "Target",
+      "displayNameKey": "Object_Target",
+      "properties": {
+        "show": {
+          "displayName": "Show",
+          "displayNameKey": "Prop_Show",
+          "type": {
+            "bool": true
+          }
+        },
+        "color": {
+          "displayName": "Line Color",
+          "displayNameKey": "Prop_Target_Color",
+          "type": {
+            "fill": {
+              "solid": {
+                "color": true
+              }
+            }
+          }
+        },
+        "lineStyle": {
+          "displayName": "Line Style",
+          "displayNameKey": "Prop_Target_LineStyle",
+          "type": {
+            "enumeration": [
+              {
+                "value": "solid",
+                "displayName": "Solid",
+                "displayNameKey": "LineStyle_Solid"
+              },
+              {
+                "value": "dashed",
+                "displayName": "Dashed",
+                "displayNameKey": "LineStyle_Dashed"
+              },
+              {
+                "value": "dotted",
+                "displayName": "Dotted",
+                "displayNameKey": "LineStyle_Dotted"
+              }
+            ]
+          }
+        },
+        "showLabel": {
+          "displayName": "Show Label",
+          "displayNameKey": "Prop_Target_ShowLabel",
+          "type": {
+            "bool": true
+          }
+        },
+        "labelText": {
+          "displayName": "Label Text",
+          "displayNameKey": "Prop_Target_LabelText",
+          "type": {
+            "text": true
+          }
+        }
+      }
+    },
+    "metrics": {
+      "displayName": "Metrics Layout",
+      "displayNameKey": "Object_Metrics",
+      "properties": {
+        "layout": {
+          "displayName": "Layout",
+          "displayNameKey": "Prop_Metrics_Layout",
+          "type": {
+            "enumeration": [
+              {
+                "value": "single",
+                "displayName": "Single",
+                "displayNameKey": "Layout_Single"
+              },
+              {
+                "value": "grid2",
+                "displayName": "2-Column Grid",
+                "displayNameKey": "Layout_Grid2"
+              },
+              {
+                "value": "grid3",
+                "displayName": "3-Column Grid",
+                "displayNameKey": "Layout_Grid3"
+              },
+              {
+                "value": "horizontal",
+                "displayName": "Horizontal Strip",
+                "displayNameKey": "Layout_Horizontal"
+              }
+            ]
+          }
+        },
+        "dividerShow": {
+          "displayName": "Show Dividers",
+          "displayNameKey": "Prop_Metrics_Divider",
+          "type": {
+            "bool": true
+          }
+        },
+        "dividerColor": {
+          "displayName": "Divider Color",
+          "displayNameKey": "Prop_Metrics_DividerColor",
+          "type": {
+            "fill": {
+              "solid": {
+                "color": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "accessibility": {
+      "displayName": "Accessibility",
+      "displayNameKey": "Object_Accessibility",
+      "properties": {
+        "highContrast": {
+          "displayName": "High Contrast Mode",
+          "displayNameKey": "Prop_Accessibility_HighContrast",
+          "type": {
+            "bool": true
+          }
+        },
+        "visualTitle": {
+          "displayName": "Visual Title (ARIA)",
+          "displayNameKey": "Prop_Accessibility_Title",
+          "type": {
+            "text": true
+          }
+        }
+      }
+    },
+    "license": {
+      "displayName": "License",
+      "displayNameKey": "Object_License",
+      "properties": {
+        "show": {
+          "displayName": "Show License Info",
+          "displayNameKey": "Prop_License_Show",
+          "type": {
+            "bool": true
+          }
+        }
+      }
+    }
+  },
+  "privileges": [
+    {
+      "name": "ExportContent",
+      "essential": false,
+      "description": "Export underlying data for accessibility.",
+      "descriptionKey": "Privilege_ExportContent"
+    }
+  ],
+  "supportsLandingPage": false,
+  "supportsEmptyDataView": true,
+  "supportsMultiVisualSelection": true,
+  "supportsSynchronizingFilterState": true,
+  "tooltips": {
+    "supportedTypes": {
+      "default": true,
+      "canvas": true
+    },
+    "roles": [
+      "tooltips"
+    ]
+  }
+}

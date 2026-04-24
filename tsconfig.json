@@ -1,0 +1,21 @@
+{
+    "compilerOptions": {
+        "target": "ES2022",
+        "module": "CommonJS",
+        "lib": ["ES2022", "DOM"],
+        "strict": false,
+        "noImplicitAny": false,
+        "noUnusedLocals": false,
+        "experimentalDecorators": true,
+        "sourceMap": true,
+        "outDir": ".tmp/build/src",
+        "moduleResolution": "node",
+        "allowJs": false,
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+        "resolveJsonModule": true,
+        "declaration": false
+    },
+    "files": ["src/visual.ts"],
+    "exclude": ["node_modules", ".tmp", "dist"]
+}
