@@ -2,7 +2,7 @@
     "visual": {
         "name": "KPI Card Pro",
         "displayName": "KPI Card Pro",
-        "guid": "kpiCardProTCViz1A2B3C4D5E6F7890",
+        "guid": "kpiCardProTCViz",
         "visualClassName": "Visual",
         "version": "1.0.0.0",
         "description": "Multi-metric KPI card with trend, target and variance for Power BI executive dashboards.",

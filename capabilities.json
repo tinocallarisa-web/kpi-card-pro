@@ -5,7 +5,7 @@
       "displayNameKey": "Role_Value",
       "name": "measure",
       "kind": "Measure",
-      "description": "Current period value (required). One measure only.",
+      "description": "Current period value (required).",
       "descriptionKey": "Role_Value_Description"
     },
     {
@@ -21,23 +21,23 @@
       "displayNameKey": "Role_Target",
       "name": "target",
       "kind": "Measure",
-      "description": "Target or budget value for goal tracking (optional).",
+      "description": "Target or budget value (optional).",
       "descriptionKey": "Role_Target_Description"
     },
     {
-      "displayName": "Category",
-      "displayNameKey": "Role_Category",
-      "name": "category",
+      "displayName": "Small Multiples",
+      "displayNameKey": "Role_SmallMultiples",
+      "name": "smallMultiples",
       "kind": "Grouping",
-      "description": "Dimension for sparkline trend chart (optional).",
-      "descriptionKey": "Role_Category_Description"
+      "description": "Dimension to split into multiple KPI cards (optional, Pro).",
+      "descriptionKey": "Role_SmallMultiples_Description"
     },
     {
       "displayName": "Tooltips",
       "displayNameKey": "Role_Tooltips",
       "name": "tooltips",
       "kind": "Measure",
-      "description": "Additional measures for report page tooltip or custom tooltip payload (optional).",
+      "description": "Additional measures for tooltip (optional, Pro).",
       "descriptionKey": "Role_Tooltips_Description"
     }
   ],
@@ -51,29 +51,29 @@
           "priorPeriod": {
             "max": 1
           },
-          "target": {
-            "max": 1
-          },
-          "category": {
+          "smallMultiples": {
             "max": 1
           },
           "tooltips": {
             "max": 10
+          },
+          "target": {
+            "max": 1
           }
         }
       ],
-      "categorical": {
-        "categories": {
+      "matrix": {
+        "rows": {
           "select": [
             {
               "for": {
-                "in": "category"
+                "in": "smallMultiples"
               }
             }
           ],
           "dataReductionAlgorithm": {
             "top": {
-              "count": 100
+              "count": 50
             }
           }
         },
@@ -86,12 +86,12 @@
             },
             {
               "bind": {
-                "to": "priorPeriod"
+                "to": "target"
               }
             },
             {
               "bind": {
-                "to": "target"
+                "to": "priorPeriod"
               }
             },
             {
@@ -165,21 +165,21 @@
       "displayName": "Main Value",
       "displayNameKey": "Object_MainValue",
       "properties": {
-        "fontSize": {
-          "displayName": "Font Size",
-          "displayNameKey": "Prop_FontSize",
-          "type": {
-            "formatting": {
-              "fontSize": true
-            }
-          }
-        },
         "fontFamily": {
           "displayName": "Font Family",
           "displayNameKey": "Prop_FontFamily",
           "type": {
             "formatting": {
               "fontFamily": true
+            }
+          }
+        },
+        "fontSize": {
+          "displayName": "Font Size",
+          "displayNameKey": "Prop_FontSize",
+          "type": {
+            "formatting": {
+              "fontSize": true
             }
           }
         },
@@ -208,28 +208,23 @@
             "enumeration": [
               {
                 "value": "auto",
-                "displayName": "Auto",
-                "displayNameKey": "DisplayUnit_Auto"
+                "displayName": "Auto"
               },
               {
                 "value": "none",
-                "displayName": "None",
-                "displayNameKey": "DisplayUnit_None"
+                "displayName": "None"
               },
               {
                 "value": "thousands",
-                "displayName": "Thousands",
-                "displayNameKey": "DisplayUnit_Thousands"
+                "displayName": "Thousands"
               },
               {
                 "value": "millions",
-                "displayName": "Millions",
-                "displayNameKey": "DisplayUnit_Millions"
+                "displayName": "Millions"
               },
               {
                 "value": "billions",
-                "displayName": "Billions",
-                "displayNameKey": "DisplayUnit_Billions"
+                "displayName": "Billions"
               }
             ]
           }
@@ -268,13 +263,6 @@
             "bool": true
           }
         },
-        "text": {
-          "displayName": "Custom Text",
-          "displayNameKey": "Prop_Label_Text",
-          "type": {
-            "text": true
-          }
-        },
         "fontSize": {
           "displayName": "Font Size",
           "displayNameKey": "Prop_FontSize",
@@ -306,29 +294,6 @@
           "displayNameKey": "Prop_Show",
           "type": {
             "bool": true
-          }
-        },
-        "mode": {
-          "displayName": "Variance Mode",
-          "displayNameKey": "Prop_Variance_Mode",
-          "type": {
-            "enumeration": [
-              {
-                "value": "vsPrior",
-                "displayName": "vs Prior Period",
-                "displayNameKey": "VarianceMode_vsPrior"
-              },
-              {
-                "value": "vsTarget",
-                "displayName": "vs Target",
-                "displayNameKey": "VarianceMode_vsTarget"
-              },
-              {
-                "value": "both",
-                "displayName": "Both",
-                "displayNameKey": "VarianceMode_Both"
-              }
-            ]
           }
         },
         "positiveColor": {
@@ -379,7 +344,7 @@
           }
         },
         "showPill": {
-          "displayName": "Show as Pill",
+          "displayName": "Show as Pill (Pro)",
           "displayNameKey": "Prop_Variance_Pill",
           "type": {
             "bool": true
@@ -389,191 +354,46 @@
           "displayName": "Font Size",
           "displayNameKey": "Prop_FontSize",
           "type": {
-            "formatting": {
-              "fontSize": true
-            }
-          }
-        }
-      }
-    },
-    "sparkline": {
-      "displayName": "Sparkline",
-      "displayNameKey": "Object_Sparkline",
-      "properties": {
-        "show": {
-          "displayName": "Show",
-          "displayNameKey": "Prop_Show",
-          "type": {
-            "bool": true
-          }
-        },
-        "type": {
-          "displayName": "Chart Type",
-          "displayNameKey": "Prop_Sparkline_Type",
-          "type": {
-            "enumeration": [
-              {
-                "value": "line",
-                "displayName": "Line",
-                "displayNameKey": "SparklineType_Line"
-              },
-              {
-                "value": "area",
-                "displayName": "Area",
-                "displayNameKey": "SparklineType_Area"
-              },
-              {
-                "value": "bar",
-                "displayName": "Bar",
-                "displayNameKey": "SparklineType_Bar"
-              }
-            ]
-          }
-        },
-        "color": {
-          "displayName": "Color",
-          "displayNameKey": "Prop_Color",
-          "type": {
-            "fill": {
-              "solid": {
-                "color": true
-              }
-            }
-          }
-        },
-        "areaOpacity": {
-          "displayName": "Area Opacity",
-          "displayNameKey": "Prop_Sparkline_Opacity",
-          "type": {
-            "numeric": true
-          }
-        },
-        "lineWidth": {
-          "displayName": "Line Width",
-          "displayNameKey": "Prop_Sparkline_LineWidth",
-          "type": {
-            "numeric": true
-          }
-        },
-        "showDot": {
-          "displayName": "Show Last Point Dot",
-          "displayNameKey": "Prop_Sparkline_Dot",
-          "type": {
-            "bool": true
-          }
-        },
-        "height": {
-          "displayName": "Height (px)",
-          "displayNameKey": "Prop_Sparkline_Height",
-          "type": {
             "numeric": true
           }
         }
       }
     },
-    "target": {
-      "displayName": "Target",
-      "displayNameKey": "Object_Target",
+    "smallMultiplesLayout": {
+      "displayName": "Small Multiples",
+      "displayNameKey": "Object_SmallMultiples",
       "properties": {
-        "show": {
-          "displayName": "Show",
-          "displayNameKey": "Prop_Show",
+        "columns": {
+          "displayName": "Columns",
+          "displayNameKey": "Prop_SM_Columns",
+          "type": {
+            "numeric": true
+          }
+        },
+        "gap": {
+          "displayName": "Gap (px)",
+          "displayNameKey": "Prop_SM_Gap",
+          "type": {
+            "numeric": true
+          }
+        },
+        "showTitle": {
+          "displayName": "Show Category Title",
+          "displayNameKey": "Prop_SM_ShowTitle",
           "type": {
             "bool": true
           }
         },
-        "color": {
-          "displayName": "Line Color",
-          "displayNameKey": "Prop_Target_Color",
+        "titleFontSize": {
+          "displayName": "Title Font Size",
+          "displayNameKey": "Prop_SM_TitleFontSize",
           "type": {
-            "fill": {
-              "solid": {
-                "color": true
-              }
-            }
+            "numeric": true
           }
         },
-        "lineStyle": {
-          "displayName": "Line Style",
-          "displayNameKey": "Prop_Target_LineStyle",
-          "type": {
-            "enumeration": [
-              {
-                "value": "solid",
-                "displayName": "Solid",
-                "displayNameKey": "LineStyle_Solid"
-              },
-              {
-                "value": "dashed",
-                "displayName": "Dashed",
-                "displayNameKey": "LineStyle_Dashed"
-              },
-              {
-                "value": "dotted",
-                "displayName": "Dotted",
-                "displayNameKey": "LineStyle_Dotted"
-              }
-            ]
-          }
-        },
-        "showLabel": {
-          "displayName": "Show Label",
-          "displayNameKey": "Prop_Target_ShowLabel",
-          "type": {
-            "bool": true
-          }
-        },
-        "labelText": {
-          "displayName": "Label Text",
-          "displayNameKey": "Prop_Target_LabelText",
-          "type": {
-            "text": true
-          }
-        }
-      }
-    },
-    "metrics": {
-      "displayName": "Metrics Layout",
-      "displayNameKey": "Object_Metrics",
-      "properties": {
-        "layout": {
-          "displayName": "Layout",
-          "displayNameKey": "Prop_Metrics_Layout",
-          "type": {
-            "enumeration": [
-              {
-                "value": "single",
-                "displayName": "Single",
-                "displayNameKey": "Layout_Single"
-              },
-              {
-                "value": "grid2",
-                "displayName": "2-Column Grid",
-                "displayNameKey": "Layout_Grid2"
-              },
-              {
-                "value": "grid3",
-                "displayName": "3-Column Grid",
-                "displayNameKey": "Layout_Grid3"
-              },
-              {
-                "value": "horizontal",
-                "displayName": "Horizontal Strip",
-                "displayNameKey": "Layout_Horizontal"
-              }
-            ]
-          }
-        },
-        "dividerShow": {
-          "displayName": "Show Dividers",
-          "displayNameKey": "Prop_Metrics_Divider",
-          "type": {
-            "bool": true
-          }
-        },
-        "dividerColor": {
-          "displayName": "Divider Color",
-          "displayNameKey": "Prop_Metrics_DividerColor",
+        "titleColor": {
+          "displayName": "Title Color",
+          "displayNameKey": "Prop_SM_TitleColor",
           "type": {
             "fill": {
               "solid": {
@@ -603,33 +423,12 @@
           }
         }
       }
-    },
-    "license": {
-      "displayName": "License",
-      "displayNameKey": "Object_License",
-      "properties": {
-        "show": {
-          "displayName": "Show License Info",
-          "displayNameKey": "Prop_License_Show",
-          "type": {
-            "bool": true
-          }
-        }
-      }
     }
   },
-  "privileges": [
-    {
-      "name": "ExportContent",
-      "essential": false,
-      "description": "Export underlying data for accessibility.",
-      "descriptionKey": "Privilege_ExportContent"
-    }
-  ],
+  "privileges": [],
   "supportsLandingPage": false,
   "supportsEmptyDataView": true,
   "supportsMultiVisualSelection": true,
-  "supportsSynchronizingFilterState": true,
   "tooltips": {
     "supportedTypes": {
       "default": true,

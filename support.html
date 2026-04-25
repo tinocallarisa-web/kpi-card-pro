@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Support — KPI Card Pro | TCViz</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --text: #1a1a1a;
+      --muted: #555;
+      --accent: #0078D4;
+      --border: #e8e8e8;
+      --bg: #ffffff;
+    }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      font-size: 15px;
+      line-height: 1.7;
+      color: var(--text);
+      background: var(--bg);
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 48px 24px 80px;
+    }
+    header {
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 24px;
+      margin-bottom: 40px;
+    }
+    .brand {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      text-decoration: none;
+    }
+    h1 {
+      font-size: 28px;
+      font-weight: 700;
+      margin-top: 12px;
+      line-height: 1.2;
+    }
+    .meta {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+    h2 {
+      font-size: 17px;
+      font-weight: 600;
+      margin-top: 36px;
+      margin-bottom: 10px;
+    }
+    p { margin-bottom: 14px; }
+    ul {
+      margin: 0 0 14px 20px;
+      padding: 0;
+    }
+    li { margin-bottom: 6px; }
+    a { color: var(--accent); }
+    .contact-card {
+      background: #f5f9ff;
+      border: 1px solid #d0e4f7;
+      border-radius: 8px;
+      padding: 20px 24px;
+      margin-top: 24px;
+    }
+    .contact-card p { margin-bottom: 6px; }
+    footer {
+      margin-top: 64px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+      font-size: 13px;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="brand" href="https://tcviz.com">TCViz</a>
+    <h1>Support</h1>
+    <p class="meta">KPI Card Pro &nbsp;·&nbsp; tcviz.com</p>
+  </header>
+
+  <main>
+    <h2>Getting Started</h2>
+    <p>
+      KPI Card Pro requires at least one measure in the <strong>Value</strong> field well.
+      Add an optional measure to <strong>Prior Period</strong> to enable variance calculation,
+      and a date/time dimension to <strong>Category</strong> to enable the sparkline trend chart.
+    </p>
+
+    <h2>Field Wells</h2>
+    <ul>
+      <li><strong>Value</strong> — Current period KPI value (required)</li>
+      <li><strong>Prior Period</strong> — Previous period value for variance (optional)</li>
+      <li><strong>Target</strong> — Goal or budget value (optional, Pro)</li>
+      <li><strong>Category</strong> — Time dimension for sparkline (optional)</li>
+      <li><strong>Tooltips</strong> — Additional drill-through fields (optional, Pro)</li>
+    </ul>
+
+    <h2>Free vs Pro</h2>
+    <ul>
+      <li><strong>Free:</strong> 1 KPI metric, basic sparkline, fixed colors, variance text</li>
+      <li><strong>Pro:</strong> Sparkline type selector, variance pill, custom colors, target line, tooltip drill-through, custom prefix/suffix and card styling</li>
+    </ul>
+    <p>
+      Upgrade to Pro via <a href="https://appsource.microsoft.com" target="_blank" rel="noopener">Microsoft AppSource</a>.
+    </p>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <p><strong>The sparkline is not showing — why?</strong><br/>
+    The sparkline requires a field in the <strong>Category</strong> well (e.g. Month, Quarter, Year).
+    Without it, there is only one data point and no trend to draw.</p>
+
+    <p><strong>The variance shows the same value for both periods.</strong><br/>
+    Make sure your Prior Period measure filters a different time period than your Value measure.
+    Use <code>CALCULATE(..., tabla[Year] = MAX(tabla[Year]) - 1)</code> as a starting point.</p>
+
+    <p><strong>I upgraded to Pro but features are still locked.</strong><br/>
+    Sign out of Power BI Service and sign back in to refresh your license.
+    If the issue persists, contact us at the email below.</p>
+
+    <p><strong>The visual is not rendering in Power BI Desktop.</strong><br/>
+    Make sure you are using Power BI Desktop April 2024 or later.
+    Re-import the <code>.pbiviz</code> file via Visualizations → … → Import a visual from a file.</p>
+
+    <h2>Contact Support</h2>
+    <div class="contact-card">
+      <p><strong>TCViz Support</strong></p>
+      <p>📧 <a href="mailto:info@tcviz.com">info@tcviz.com</a></p>
+      <p>🌐 <a href="https://tcviz.com" target="_blank" rel="noopener">tcviz.com</a></p>
+      <p>🐛 <a href="https://github.com/tinocallarisa-web/kpi-card-pro/issues" target="_blank" rel="noopener">GitHub Issues</a></p>
+      <p style="margin-top:12px; font-size:13px; color:#666;">
+        We typically respond within 1–2 business days.
+      </p>
+    </div>
+  </main>
+
+  <footer>
+    &copy; 2025 TCViz. All rights reserved. &nbsp;·&nbsp;
+    <a href="privacy.html">Privacy Policy</a> &nbsp;·&nbsp;
+    <a href="terms.html">Terms of Use</a>
+  </footer>
+</body>
+</html>
