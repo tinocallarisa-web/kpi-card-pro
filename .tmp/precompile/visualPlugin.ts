@@ -9,7 +9,7 @@ var kpiCardProTCViz: IVisualPlugin = {
     name: 'kpiCardProTCViz',
     displayName: 'KPI Card Pro',
     class: 'Visual',
-    apiVersion: '5.10.0',
+    apiVersion: '5.11.0',
     create: (options?: VisualConstructorOptions) => {
         if (Visual) {
             return new Visual(options);

@@ -3,16 +3,6 @@
  * TCViz | tcviz.com
  * pbiviz tools v7.0.3 | powerbi-visuals-api ~5.10.0
  * powerbi-visuals-utils-formattingmodel ^6.2.2 | TypeScript ES2022
- *
- * Features:
- *   F01 – Single KPI (Free) + Small Multiples by dimension (Pro)
- *   F02 – Variance pill with conditional colors (Pro)
- *   F03 – High-contrast mode and accessibility
- *   F04 – Tooltip drill-through (Pro)
- *   F05 – Documented measure contract
- *   F06 – Formatting pane parity Desktop & Service
- *   F07 – Bookmark persistence
- *   F08 – Context menu on empty space
  */
 
 "use strict";
@@ -29,8 +19,6 @@ import VisualUpdateOptions = powerbi.extensibility.visual.VisualUpdateOptions;
 import ISelectionManager = powerbi.extensibility.ISelectionManager;
 import IVisualLicenseManager = powerbi.extensibility.IVisualLicenseManager;
 
-// ─── Types ───────────────────────────────────────────────────────────────────
-
 interface MetricData {
     name: string;
     value: number | null;
@@ -44,8 +32,6 @@ type DisplayUnit = "auto" | "none" | "thousands" | "millions" | "billions";
 
 const CONTEXT_MENU_DEBOUNCE = 200;
 
-// ─── Visual ──────────────────────────────────────────────────────────────────
-
 export class Visual implements IVisual {
     private host: IVisualHost;
     private container: HTMLElement;
@@ -53,6 +39,7 @@ export class Visual implements IVisual {
     private formattingSettingsService: FormattingSettingsService;
     private selectionManager: ISelectionManager;
     private licenseManager: IVisualLicenseManager;
+    private events: powerbi.extensibility.IVisualEventService;
     private isPro: boolean = false;
     private lastContextMenuTime: number = 0;
 
@@ -60,13 +47,15 @@ export class Visual implements IVisual {
         this.host = options.host;
         this.selectionManager = this.host.createSelectionManager();
         this.formattingSettingsService = new FormattingSettingsService();
+        this.events = options.host.eventService;
 
         // ── IVisualLicenseManager ─────────────────────────────────────────
+        this.isPro = false;
         this.licenseManager = this.host.licenseManager;
         this.licenseManager.getAvailableServicePlans().then(result => {
             const plans = result.plans ?? [];
             this.isPro = plans.some(p =>
-                p.spIdentifier === "kpiCardProTCViz" && p.state === 1
+                p.spIdentifier === "kpi-card-pro-tcviz" && p.state === 1
             );
             const existing = this.container.querySelector(".kpi-root");
             if (existing) { existing.remove(); }
@@ -98,17 +87,25 @@ export class Visual implements IVisual {
     // ─── Update ─────────────────────────────────────────────────────────────
 
     public update(options: VisualUpdateOptions): void {
-        const dataView = options?.dataViews?.[0];
-        this.formattingSettings = this.formattingSettingsService.populateFormattingSettingsModel(
-            VisualFormattingSettingsModel,
-            dataView
-        ) as VisualFormattingSettingsModel;
+        this.events.renderingStarted(options);
 
-        const ariaTitle = this.formattingSettings.accessibility.visualTitle.value || "KPI Card Pro";
-        this.container.setAttribute("aria-label", ariaTitle);
+        try {
+            const dataView = options?.dataViews?.[0];
+            this.formattingSettings = this.formattingSettingsService.populateFormattingSettingsModel(
+                VisualFormattingSettingsModel,
+                dataView
+            ) as VisualFormattingSettingsModel;
 
-        const metrics = this.parseDataView(dataView);
-        this.render(metrics);
+            const ariaTitle = this.formattingSettings.accessibility.visualTitle.value || "KPI Card Pro";
+            this.container.setAttribute("aria-label", ariaTitle);
+
+            const metrics = this.parseDataView(dataView);
+            this.render(metrics);
+
+            this.events.renderingFinished(options);
+        } catch (error) {
+            this.events.renderingFailed(options);
+        }
     }
 
     // ─── Parse DataView (Matrix) ─────────────────────────────────────────────
@@ -120,7 +117,6 @@ export class Visual implements IVisual {
         const rows = matrix.rows;
         const cols = matrix.columns;
 
-        // Find value column indices by role
         let measureIdx = -1;
         let priorIdx = -1;
         let targetIdx = -1;
@@ -143,9 +139,9 @@ export class Visual implements IVisual {
             const rootValues = matrix.rows?.root?.values ?? matrix.columns?.root?.values ?? {};
             const value = this.getMatrixValue(rootValues, measureIdx);
             const prior = priorIdx >= 0 ? this.getMatrixValue(rootValues, priorIdx) : null;
+            const target = targetIdx >= 0 ? this.getMatrixValue(rootValues, targetIdx) : null;
             const measureName = cols?.levels?.[0]?.sources?.[measureIdx]?.displayName ?? "Value";
 
-            const target = targetIdx >= 0 ? this.getMatrixValue(rootValues, targetIdx) : null;
             return [{
                 name: measureName,
                 value,
@@ -232,11 +228,9 @@ export class Visual implements IVisual {
         if (metrics.length === 0) {
             this.renderEmpty(root, hc);
         } else if (metrics.length === 1) {
-            // Single card
             const cell = this.buildMetricCell(metrics[0], hc, true);
             root.appendChild(cell);
         } else {
-            // Small multiples grid (Pro)
             this.renderGrid(root, metrics, hc);
         }
 
@@ -263,7 +257,7 @@ export class Visual implements IVisual {
             overflow: auto;
         `;
 
-        metrics.forEach((metric, idx) => {
+        metrics.forEach((metric) => {
             const s2 = this.formattingSettings;
             const cardBg = hc ? "#000000" : (s2.card.background.value?.value ?? "#FFFFFF");
             const cardBorder = hc ? "#FFFFFF" : (s2.card.borderColor.value?.value ?? "#E0E0E0");
@@ -334,13 +328,11 @@ export class Visual implements IVisual {
         cell.setAttribute("aria-label", metric.name);
         cell.style.cssText = "display: flex; flex-direction: column; flex: 1; min-width: 0; gap: 2px; cursor: default;";
 
-        // Context menu per cell
         cell.addEventListener("contextmenu", (e: MouseEvent) => {
             e.preventDefault(); e.stopPropagation();
             this.selectionManager.showContextMenu(metric.selectionId, { x: e.clientX, y: e.clientY });
         });
 
-        // Click to cross-filter
         cell.addEventListener("click", (e: MouseEvent) => {
             e.stopPropagation();
             if (metric.selectionId) {
@@ -388,7 +380,7 @@ export class Visual implements IVisual {
             if (pill) cell.appendChild(pill);
         }
 
-        // ── Prior value ────────────────────────────────────────────────────
+        // ── Prior & Target ─────────────────────────────────────────────────
         if (metric.priorPeriod !== null || metric.target !== null) {
             const subRow = document.createElement("div");
             subRow.className = "kpi-sub-row";
@@ -520,7 +512,7 @@ export class Visual implements IVisual {
         const prefix = this.isPro ? (s.prefix.value ?? "") : "";
         const suffix = this.isPro ? (s.suffix.value ?? "") : "";
         const decimals = s.decimalPlaces.value ?? 1;
-        const unit = String(s.displayUnit.value ?? "auto") as DisplayUnit;
+        const unit = String((s.displayUnit.value as any)?.value ?? s.displayUnit.value ?? "auto") as DisplayUnit;
         return `${prefix}${this.applyDisplayUnit(value, unit, decimals)}${suffix}`;
     }
 
@@ -538,7 +530,7 @@ export class Visual implements IVisual {
         return value.toFixed(decimals);
     }
 
-    // ─── Formatting Pane API (F06) ───────────────────────────────────────────
+    // ─── Formatting Pane API ─────────────────────────────────────────────────
 
     public getFormattingModel(): powerbi.visuals.FormattingModel {
         return this.formattingSettingsService.buildFormattingModel(this.formattingSettings);

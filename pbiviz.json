@@ -4,12 +4,13 @@
         "displayName": "KPI Card Pro",
         "guid": "kpiCardProTCViz",
         "visualClassName": "Visual",
-        "version": "1.0.0.0",
+        "version": "1.0.0.1",
         "description": "Multi-metric KPI card with trend, target and variance for Power BI executive dashboards.",
         "supportUrl": "https://tcviz.com",
         "gitHubUrl": "https://github.com/tinocallarisa-web/kpi-card-pro"
     },
-    "apiVersion": "5.10.0",
+    "apiVersion": "5.11.0",
+    "formattingModelSupport": true,
     "author": {
         "name": "TCViz",
         "email": "support@tcviz.com"
