@@ -3,6 +3,21 @@
  * TCViz | tcviz.com
  */
 
+// ─── Keyframes ───────────────────────────────────────────────────────────────
+
+@keyframes kpi-fade-in {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes kpi-value-pop {
+    0%   { transform: scale(1); }
+    40%  { transform: scale(1.04); }
+    100% { transform: scale(1); }
+}
+
+// ─── Container ───────────────────────────────────────────────────────────────
+
 .kpi-card-pro-container {
     width: 100%;
     height: 100%;
@@ -13,6 +28,8 @@
     font-family: 'Segoe UI', wf_segoe-ui_normal, helvetica, arial, sans-serif;
 }
 
+// ─── Root card ───────────────────────────────────────────────────────────────
+
 .kpi-root {
     display: flex;
     flex-direction: column;
@@ -21,6 +38,7 @@
     min-height: 0;
     box-sizing: border-box;
     position: relative;
+    animation: kpi-fade-in 0.2s ease both;
 
     &.high-contrast {
         .kpi-label { color: #FFFFFF !important; }
@@ -32,44 +50,20 @@
             background: transparent !important;
             border-color: currentColor !important;
         }
+        .kpi-progress-track { background: #333333 !important; }
     }
 }
 
-.kpi-metrics {
-    display: flex;
-    flex: 1;
-    min-height: 0;
-    width: 100%;
+// ─── Drill breadcrumb ────────────────────────────────────────────────────────
 
-    &.kpi-layout-single {
-        flex-direction: column;
-        justify-content: center;
-    }
-
-    &.kpi-layout-grid2 {
-        flex-wrap: wrap;
-        .kpi-metric-cell {
-            flex: 0 0 calc(50% - 6px);
-            max-width: calc(50% - 6px);
-        }
-    }
-
-    &.kpi-layout-grid3 {
-        flex-wrap: wrap;
-        .kpi-metric-cell {
-            flex: 0 0 calc(33.333% - 8px);
-            max-width: calc(33.333% - 8px);
-        }
-    }
-
-    &.kpi-layout-horizontal {
-        flex-direction: row;
-        align-items: stretch;
-        .kpi-metric-cell {
-            flex: 1;
-        }
-    }
+.kpi-drill-breadcrumb {
+    font-size: 10px;
+    letter-spacing: 0.2px;
+    user-select: none;
+    flex-shrink: 0;
 }
+
+// ─── Metric cell ─────────────────────────────────────────────────────────────
 
 .kpi-metric-cell {
     display: flex;
@@ -77,6 +71,7 @@
     padding: 4px 0;
     min-width: 0;
     gap: 2px;
+    cursor: pointer;
 
     &:focus {
         outline: 2px solid #0078D4;
@@ -87,8 +82,14 @@
     &:hover {
         background: rgba(0, 0, 0, 0.03);
         border-radius: 4px;
+
+        .kpi-value {
+            animation: kpi-value-pop 0.2s ease both;
+        }
     }
 }
+
+// ─── Label ───────────────────────────────────────────────────────────────────
 
 .kpi-label {
     font-size: 12px;
@@ -99,13 +100,18 @@
     user-select: none;
 }
 
+// ─── Main value ──────────────────────────────────────────────────────────────
+
 .kpi-value {
     line-height: 1.1;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     user-select: none;
+    will-change: transform;
 }
+
+// ─── Variance ────────────────────────────────────────────────────────────────
 
 .kpi-variance-row {
     display: flex;
@@ -125,16 +131,7 @@
     &:empty { display: none; }
 }
 
-.kpi-sub-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    font-size: 11px;
-    line-height: 1.4;
-    user-select: none;
-
-    span { white-space: nowrap; }
-}
+// ─── Sparkline ───────────────────────────────────────────────────────────────
 
 .kpi-sparkline {
     width: 100%;
@@ -149,6 +146,53 @@
     }
 }
 
+// ─── Progress bar ────────────────────────────────────────────────────────────
+
+.kpi-progress-track {
+    width: 100%;
+    height: 4px;
+    border-radius: 2px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.kpi-progress-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.4s ease;
+}
+
+// ─── Sub row (prior + target labels) ─────────────────────────────────────────
+
+.kpi-sub-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 11px;
+    line-height: 1.4;
+    user-select: none;
+
+    span { white-space: nowrap; }
+}
+
+// ─── Grid (Small Multiples) ───────────────────────────────────────────────────
+
+.kpi-grid {
+    display: grid;
+    flex: 1;
+    overflow: auto;
+
+    > div {
+        transition: opacity 0.15s ease, box-shadow 0.15s ease;
+
+        &:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+        }
+    }
+}
+
+// ─── Empty state ─────────────────────────────────────────────────────────────
+
 .kpi-empty {
     display: flex;
     flex: 1;
@@ -159,7 +203,10 @@
     font-size: 13px;
     text-align: center;
     user-select: none;
+    animation: kpi-fade-in 0.3s ease both;
 }
+
+// ─── Free badge ──────────────────────────────────────────────────────────────
 
 .kpi-free-badge {
     position: absolute;
