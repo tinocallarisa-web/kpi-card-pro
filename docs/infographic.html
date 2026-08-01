@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1366">
+<title>KPI Card Pro — Infographic</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #888;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    padding: 24px;
+  }
+
+  /* Download button */
+  #dl-btn {
+    position: fixed; top: 16px; left: 16px; z-index: 999;
+    background: #C96442; color: #fff; border: none;
+    padding: 8px 16px; border-radius: 6px; font-size: 13px;
+    font-family: 'Segoe UI', sans-serif; font-weight: 600;
+    cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  }
+  #dl-btn:hover { background: #B05730; }
+
+  /* Infographic container */
+  #infographic {
+    width: 1366px;
+    background: #FAF9F5;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    overflow: hidden;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 24px;
+    background: #FAF9F5;
+    border-bottom: 2px solid #DAD9D4;
+    padding: 20px 32px;
+  }
+  .header-center h1 {
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 30px;
+    font-weight: 700;
+    color: #3D3929;
+    line-height: 1.1;
+  }
+  .header-center h1 span { color: #C96442; }
+  .header-center p {
+    font-size: 14px;
+    color: #535146;
+    margin-top: 4px;
+    line-height: 1.4;
+  }
+  .header-chart svg { display: block; }
+
+  /* ── USE CASES STRIP ── */
+  .use-cases {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    background: #EDE9DE;
+    border-bottom: 1px solid #DAD9D4;
+    padding: 10px 32px;
+  }
+  .use-cases-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: #83827D;
+    white-space: nowrap;
+    margin-right: 20px;
+    text-transform: uppercase;
+  }
+  .use-cases-icons {
+    display: flex;
+    gap: 20px;
+    flex: 1;
+    align-items: center;
+  }
+  .use-case-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+  }
+  .use-case-item i {
+    font-size: 22px;
+    color: #535146;
+  }
+  .use-case-item span {
+    font-size: 10px;
+    color: #535146;
+    white-space: nowrap;
+  }
+  .use-case-callout {
+    background: #C96442;
+    color: #fff;
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    max-width: 220px;
+    line-height: 1.4;
+    text-align: center;
+    margin-left: 20px;
+  }
+
+  /* ── BODY ── */
+  .body {
+    display: grid;
+    grid-template-columns: 1fr 200px 1fr;
+    gap: 0;
+    padding: 0;
+    min-height: 280px;
+    border-bottom: 1px solid #DAD9D4;
+  }
+  .body-left, .body-right {
+    padding: 20px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .body-left { border-right: 1px solid #DAD9D4; }
+  .body-right { border-left: 1px solid #DAD9D4; }
+
+  .section-title {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #83827D;
+    margin-bottom: 4px;
+  }
+
+  .step-card {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .step-num {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .step-num.orange { background: #C96442; color: #fff; }
+  .step-num.purple { background: #9C87F5; color: #fff; }
+  .step-card-text strong {
+    display: block;
+    font-size: 13px;
+    color: #3D3929;
+    font-weight: 600;
+  }
+  .step-card-text p {
+    font-size: 11px;
+    color: #535146;
+    margin-top: 2px;
+    line-height: 1.4;
+  }
+
+  /* Center column */
+  .body-center {
+    padding: 20px 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+  .pro-badge {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #C96442, #9C87F5);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 1;
+  }
+  .pro-badge span { font-size: 9px; font-weight: 500; letter-spacing: 1px; }
+  .stat-pill {
+    background: #EDE9DE;
+    border: 1px solid #DAD9D4;
+    border-radius: 8px;
+    padding: 8px 12px;
+    width: 100%;
+    text-align: center;
+  }
+  .stat-pill .stat-val {
+    font-size: 20px;
+    font-weight: 700;
+    color: #C96442;
+    line-height: 1;
+  }
+  .stat-pill .stat-label {
+    font-size: 10px;
+    color: #535146;
+    margin-top: 2px;
+  }
+
+  /* ── WORKFLOW ── */
+  .workflow {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    padding: 16px 32px;
+    background: #FAF9F5;
+    border-bottom: 1px solid #DAD9D4;
+  }
+  .workflow-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+  }
+  .workflow-step i {
+    font-size: 22px;
+    color: #C96442;
+  }
+  .workflow-step span {
+    font-size: 10px;
+    color: #3D3929;
+    font-weight: 600;
+    text-align: center;
+  }
+  .workflow-arrow {
+    color: #DAD9D4;
+    font-size: 18px;
+    margin: 0 4px;
+  }
+  .workflow-tagline {
+    font-size: 11px;
+    color: #83827D;
+    font-style: italic;
+    text-align: center;
+    padding: 6px 32px 10px;
+    border-bottom: 1px solid #DAD9D4;
+  }
+
+  /* ── BOTTOM GRID ── */
+  .bottom-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0;
+    min-height: 190px;
+  }
+  .bottom-card {
+    padding: 16px 20px;
+    border-right: 1px solid #DAD9D4;
+  }
+  .bottom-card:last-child { border-right: none; }
+  .bottom-card-title {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #83827D;
+    margin-bottom: 10px;
+  }
+  .benefit-item {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    margin-bottom: 8px;
+  }
+  .benefit-item i {
+    font-size: 16px;
+    color: #C96442;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .benefit-item div strong {
+    display: block;
+    font-size: 12px;
+    color: #3D3929;
+    font-weight: 600;
+  }
+  .benefit-item div p {
+    font-size: 11px;
+    color: #535146;
+    line-height: 1.4;
+    margin-top: 1px;
+  }
+  .tip-item {
+    display: flex;
+    gap: 6px;
+    align-items: flex-start;
+    margin-bottom: 6px;
+    font-size: 11px;
+    color: #3D3929;
+    line-height: 1.4;
+  }
+  .tip-check { color: #107C10; font-weight: 700; flex-shrink: 0; }
+
+  .format-section { margin-bottom: 8px; }
+  .format-section-name {
+    font-size: 11px;
+    font-weight: 700;
+    color: #3D3929;
+    margin-bottom: 3px;
+  }
+  .format-tag {
+    display: inline-block;
+    background: #EDE9DE;
+    border: 1px solid #DAD9D4;
+    border-radius: 4px;
+    font-size: 10px;
+    color: #535146;
+    padding: 1px 6px;
+    margin: 1px 2px 1px 0;
+  }
+  .format-tag.pro {
+    background: #DBD3F0;
+    border-color: #9C87F5;
+    color: #6A52C8;
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 32px;
+    background: #EDE9DE;
+    border-top: 2px solid #DAD9D4;
+    border-bottom: 2px solid #DAD9D4;
+  }
+  .footer-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .footer-visual-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: #3D3929;
+  }
+  .footer-links {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+  }
+  .footer-links a {
+    font-size: 11px;
+    color: #535146;
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .footer-links a:hover { color: #C96442; }
+  .footer-sep { color: #DAD9D4; }
+
+  @media print {
+    @page { size: A4 landscape; margin: 0; }
+    body { background: none; padding: 0; }
+    #dl-btn { display: none; }
+    #infographic { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+
+<button id="dl-btn" onclick="downloadPNG()">⬇ Download PNG</button>
+
+<div id="infographic">
+
+  <!-- ── HEADER ── -->
+  <div class="header">
+    <div>
+      <!-- TCViz Logo -->
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 828 362" width="160" height="70">
+        <defs>
+          <linearGradient id="g" x1="0" y1="1" x2="1" y2="0">
+            <stop offset="0" stop-color="#B05730"/>
+            <stop offset="0.55" stop-color="#C96442"/>
+            <stop offset="1" stop-color="#9C87F5"/>
+          </linearGradient>
+        </defs>
+        <g transform="translate(40,46)">
+          <rect x="22" y="20" width="150" height="150" rx="30" fill="none" stroke="url(#g)" stroke-width="11"/>
+          <g fill="url(#g)">
+            <rect x="42" y="110" width="20" height="58" rx="5"/>
+            <rect x="70" y="86" width="20" height="82" rx="5"/>
+            <rect x="98" y="62" width="20" height="106" rx="5"/>
+            <rect x="126" y="38" width="20" height="130" rx="5"/>
+          </g>
+        </g>
+        <text x="258" y="246" font-family="Poppins,sans-serif" font-weight="700" font-size="196" letter-spacing="-4">
+          <tspan fill="url(#g)">tc</tspan><tspan fill="#3D3929">viz</tspan>
+        </text>
+        <text x="264" y="306" font-family="Poppins,sans-serif" font-weight="500" font-size="31" letter-spacing="6.5" fill="#83827D">VISUALS TO POWER BI</text>
+      </svg>
+    </div>
+
+    <div class="header-center">
+      <h1>KPI Card Pro — <span>Executive KPI Tracking</span></h1>
+      <p>Multi-metric card with variance, target and Small Multiples for Power BI executive dashboards.<br>
+      One visual, any KPI — from a single metric to 50 cards side by side.</p>
+    </div>
+
+    <div class="header-chart">
+      <!-- Illustrative KPI card SVG -->
+      <svg viewBox="0 0 190 100" width="190" height="100" xmlns="http://www.w3.org/2000/svg">
+        <rect x="2" y="2" width="186" height="96" rx="10" fill="#FFFFFF" stroke="#DAD9D4" stroke-width="1.5"/>
+        <text x="14" y="24" font-family="Segoe UI,sans-serif" font-size="9" fill="#83827D">Total Revenue</text>
+        <text x="14" y="50" font-family="Segoe UI,sans-serif" font-size="26" font-weight="700" fill="#3D3929">$4.2M</text>
+        <rect x="14" y="58" width="52" height="17" rx="8" fill="#107C1022"/>
+        <text x="20" y="70" font-family="Segoe UI,sans-serif" font-size="10" font-weight="700" fill="#107C10">▲ 12.4%</text>
+        <text x="76" y="70" font-family="Segoe UI,sans-serif" font-size="10" fill="#83827D">Target: $4.0M</text>
+        <!-- mini cards row -->
+        <rect x="2" y="76" width="56" height="20" rx="5" fill="#EDE9DE"/>
+        <text x="10" y="89" font-family="Segoe UI,sans-serif" font-size="8" fill="#535146">North $1.2M</text>
+        <rect x="66" y="76" width="56" height="20" rx="5" fill="#EDE9DE"/>
+        <text x="74" y="89" font-family="Segoe UI,sans-serif" font-size="8" fill="#535146">South $0.9M</text>
+        <rect x="130" y="76" width="56" height="20" rx="5" fill="#EDE9DE"/>
+        <text x="138" y="89" font-family="Segoe UI,sans-serif" font-size="8" fill="#535146">West $2.1M</text>
+      </svg>
+    </div>
+  </div>
+
+  <!-- ── USE CASES STRIP ── -->
+  <div class="use-cases">
+    <span class="use-cases-label">Use Cases</span>
+    <div class="use-cases-icons">
+      <div class="use-case-item"><i class="ti ti-chart-bar"></i><span>Sales</span></div>
+      <div class="use-case-item"><i class="ti ti-coin"></i><span>Finance</span></div>
+      <div class="use-case-item"><i class="ti ti-users"></i><span>HR</span></div>
+      <div class="use-case-item"><i class="ti ti-truck"></i><span>Operations</span></div>
+      <div class="use-case-item"><i class="ti ti-activity"></i><span>Marketing</span></div>
+      <div class="use-case-item"><i class="ti ti-building-store"></i><span>Retail</span></div>
+      <div class="use-case-item"><i class="ti ti-heart-rate-monitor"></i><span>Healthcare</span></div>
+      <div class="use-case-item"><i class="ti ti-device-analytics"></i><span>Executive</span></div>
+    </div>
+    <div class="use-case-callout">
+      Replace 10 native KPI cards with 1 visual — and keep them in sync.
+    </div>
+  </div>
+
+  <!-- ── BODY ── -->
+  <div class="body">
+
+    <!-- Left: Steps 1–3 (Free) -->
+    <div class="body-left">
+      <div class="section-title">Getting Started (Free)</div>
+
+      <div class="step-card">
+        <div class="step-num orange">1</div>
+        <div class="step-card-text">
+          <strong>Add the visual</strong>
+          <p>Import KPI Card Pro via Insert → More visuals → Import from file.</p>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-num orange">2</div>
+        <div class="step-card-text">
+          <strong>Drop a measure into Value</strong>
+          <p>The card renders immediately with automatic display units (K / M / B).</p>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-num orange">3</div>
+        <div class="step-card-text">
+          <strong>Add Prior Period &amp; Target</strong>
+          <p>Variance % and target tracking appear automatically below the main value.</p>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-num orange">4</div>
+        <div class="step-card-text">
+          <strong>Format in the Format Pane</strong>
+          <p>Adjust font, colors, display units, decimal places, and card style.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Center: Pro badge + stat pills -->
+    <div class="body-center">
+      <div class="pro-badge">PRO<span>PLAN</span></div>
+
+      <div class="stat-pill">
+        <div class="stat-val">50</div>
+        <div class="stat-label">Max Small Multiples</div>
+      </div>
+      <div class="stat-pill">
+        <div class="stat-val">10</div>
+        <div class="stat-label">Custom Tooltip measures</div>
+      </div>
+      <div class="stat-pill">
+        <div class="stat-val">6</div>
+        <div class="stat-label">Display Unit options</div>
+      </div>
+      <div class="stat-pill">
+        <div class="stat-val">5</div>
+        <div class="stat-label">Format Pane sections</div>
+      </div>
+    </div>
+
+    <!-- Right: Steps 5–8 (Pro) -->
+    <div class="body-right">
+      <div class="section-title">Pro Features</div>
+
+      <div class="step-card">
+        <div class="step-num purple">5</div>
+        <div class="step-card-text">
+          <strong>Add Small Multiples</strong>
+          <p>Drop a dimension (Region, Product, Team) to split into up to 50 individual KPI cards.</p>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-num purple">6</div>
+        <div class="step-card-text">
+          <strong>Set columns &amp; layout</strong>
+          <p>Choose 1–6 columns and gap size. Cards reflow automatically.</p>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-num purple">7</div>
+        <div class="step-card-text">
+          <strong>Add Prefix / Suffix</strong>
+          <p>Show $, €, %, pts or any symbol directly on the value without changing the measure.</p>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-num purple">8</div>
+        <div class="step-card-text">
+          <strong>Custom variance colors &amp; pill</strong>
+          <p>Define positive/negative/neutral colors. Enable pill style for a badge look.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── WORKFLOW ── -->
+  <div>
+    <div class="workflow">
+      <div class="workflow-step"><i class="ti ti-database"></i><span>Connect Data</span></div>
+      <span class="workflow-arrow">›</span>
+      <div class="workflow-step"><i class="ti ti-chart-area-line"></i><span>Add Measure</span></div>
+      <span class="workflow-arrow">›</span>
+      <div class="workflow-step"><i class="ti ti-calendar-stats"></i><span>Prior Period</span></div>
+      <span class="workflow-arrow">›</span>
+      <div class="workflow-step"><i class="ti ti-target"></i><span>Set Target</span></div>
+      <span class="workflow-arrow">›</span>
+      <div class="workflow-step"><i class="ti ti-layout-grid"></i><span>Small Multiples</span></div>
+      <span class="workflow-arrow">›</span>
+      <div class="workflow-step"><i class="ti ti-palette"></i><span>Format</span></div>
+      <span class="workflow-arrow">›</span>
+      <div class="workflow-step"><i class="ti ti-device-desktop-analytics"></i><span>Publish</span></div>
+    </div>
+    <div class="workflow-tagline">From raw data to board-ready KPI dashboard in minutes.</div>
+  </div>
+
+  <!-- ── BOTTOM GRID ── -->
+  <div class="bottom-grid">
+
+    <!-- Key Benefits -->
+    <div class="bottom-card">
+      <div class="bottom-card-title">Key Benefits</div>
+
+      <div class="benefit-item">
+        <i class="ti ti-layout-grid"></i>
+        <div>
+          <strong>Small Multiples</strong>
+          <p>Compare KPIs across regions, products or teams — all in one visual.</p>
+        </div>
+      </div>
+      <div class="benefit-item">
+        <i class="ti ti-trending-up"></i>
+        <div>
+          <strong>Auto Variance</strong>
+          <p>Variance % is calculated automatically from Prior Period — no extra measures needed.</p>
+        </div>
+      </div>
+      <div class="benefit-item">
+        <i class="ti ti-accessible"></i>
+        <div>
+          <strong>Accessible</strong>
+          <p>High Contrast mode, ARIA labels and keyboard-aware context menu built in.</p>
+        </div>
+      </div>
+      <div class="benefit-item">
+        <i class="ti ti-adjustments-horizontal"></i>
+        <div>
+          <strong>Fully Formatted</strong>
+          <p>5 Format Pane sections cover every aspect of appearance — no CSS required.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Key Takeaways / Tips -->
+    <div class="bottom-card">
+      <div class="bottom-card-title">Tips &amp; Best Practices</div>
+
+      <div class="tip-item"><span class="tip-check">✓</span><span>Use <strong>Auto</strong> display units to handle values from hundreds to billions without manual config.</span></div>
+      <div class="tip-item"><span class="tip-check">✓</span><span>Enable <strong>Invert (Lower is Better)</strong> for cost or effort metrics where a decrease is positive.</span></div>
+      <div class="tip-item"><span class="tip-check">✓</span><span>In Small Multiples mode, set columns to match the number of categories for a clean single-row layout.</span></div>
+      <div class="tip-item"><span class="tip-check">✓</span><span>Use <strong>Prefix/Suffix</strong> ($, %, pts) for instant value context without modifying the DAX measure.</span></div>
+      <div class="tip-item"><span class="tip-check">✓</span><span>Right-click any card to access drill-through, spotlight and export from the native Power BI context menu.</span></div>
+      <div class="tip-item"><span class="tip-check">✓</span><span>Enable <strong>High Contrast Mode</strong> in Accessibility settings to meet WCAG 2.1 AA requirements.</span></div>
+    </div>
+
+    <!-- Format Pane Reference -->
+    <div class="bottom-card">
+      <div class="bottom-card-title">Format Pane — Quick Reference</div>
+
+      <div class="format-section">
+        <div class="format-section-name">Card</div>
+        <span class="format-tag">Background</span>
+        <span class="format-tag">Border Color</span>
+        <span class="format-tag pro">Border Width ✦</span>
+        <span class="format-tag pro">Border Radius ✦</span>
+        <span class="format-tag pro">Padding ✦</span>
+        <span class="format-tag">Drop Shadow</span>
+      </div>
+      <div class="format-section">
+        <div class="format-section-name">Main Value</div>
+        <span class="format-tag">Font Family</span>
+        <span class="format-tag">Size</span>
+        <span class="format-tag">Bold</span>
+        <span class="format-tag">Color</span>
+        <span class="format-tag">Display Units</span>
+        <span class="format-tag">Decimals</span>
+        <span class="format-tag pro">Prefix ✦</span>
+        <span class="format-tag pro">Suffix ✦</span>
+      </div>
+      <div class="format-section">
+        <div class="format-section-name">Variance</div>
+        <span class="format-tag">Show</span>
+        <span class="format-tag pro">Colors ✦</span>
+        <span class="format-tag">Invert</span>
+        <span class="format-tag">Arrow</span>
+        <span class="format-tag pro">Pill Style ✦</span>
+        <span class="format-tag">Font Size</span>
+      </div>
+      <div class="format-section">
+        <div class="format-section-name">Small Multiples <span style="color:#9C87F5;font-weight:700">✦ Pro</span></div>
+        <span class="format-tag pro">Columns ✦</span>
+        <span class="format-tag pro">Gap ✦</span>
+        <span class="format-tag pro">Title Font &amp; Color ✦</span>
+      </div>
+      <div style="margin-top:4px;font-size:10px;color:#83827D;">✦ Requires Pro license</div>
+    </div>
+  </div>
+
+  <!-- ── FOOTER ── -->
+  <div class="footer">
+    <div class="footer-left">
+      <!-- TCViz Logo small -->
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 828 362" width="70" height="30">
+        <defs>
+          <linearGradient id="gf" x1="0" y1="1" x2="1" y2="0">
+            <stop offset="0" stop-color="#B05730"/>
+            <stop offset="0.55" stop-color="#C96442"/>
+            <stop offset="1" stop-color="#9C87F5"/>
+          </linearGradient>
+        </defs>
+        <g transform="translate(40,46)">
+          <rect x="22" y="20" width="150" height="150" rx="30" fill="none" stroke="url(#gf)" stroke-width="11"/>
+          <g fill="url(#gf)">
+            <rect x="42" y="110" width="20" height="58" rx="5"/>
+            <rect x="70" y="86" width="20" height="82" rx="5"/>
+            <rect x="98" y="62" width="20" height="106" rx="5"/>
+            <rect x="126" y="38" width="20" height="130" rx="5"/>
+          </g>
+        </g>
+        <text x="258" y="246" font-family="Poppins,sans-serif" font-weight="700" font-size="196" letter-spacing="-4">
+          <tspan fill="url(#gf)">tc</tspan><tspan fill="#3D3929">viz</tspan>
+        </text>
+        <text x="264" y="306" font-family="Poppins,sans-serif" font-weight="500" font-size="31" letter-spacing="6.5" fill="#83827D">VISUALS TO POWER BI</text>
+      </svg>
+      <span class="footer-visual-name">KPI Card Pro</span>
+    </div>
+    <div class="footer-links">
+      <a href="https://tcviz.com">Support</a>
+      <span class="footer-sep">·</span>
+      <a href="https://tinocallarisa-web.github.io/kpi-card-pro/privacy.html">Privacy Policy</a>
+      <span class="footer-sep">·</span>
+      <a href="https://tinocallarisa-web.github.io/kpi-card-pro/terms.html">Terms of Use</a>
+      <span class="footer-sep">·</span>
+      <a href="https://github.com/tinocallarisa-web/kpi-card-pro">GitHub</a>
+    </div>
+  </div>
+
+</div><!-- /infographic -->
+
+<script>
+async function downloadPNG() {
+  const btn = document.getElementById('dl-btn');
+  btn.textContent = '⏳ Generating…';
+  btn.disabled = true;
+  try {
+    const el = document.getElementById('infographic');
+    const canvas = await html2canvas(el, {
+      width: 1366,
+      height: el.offsetHeight,
+      scale: 1,
+      useCORS: true,
+      backgroundColor: '#FAF9F5'
+    });
+    const link = document.createElement('a');
+    link.download = 'kpi-card-pro-infographic.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  } finally {
+    btn.textContent = '⬇ Download PNG';
+    btn.disabled = false;
+  }
+}
+</script>
+</body>
+</html>

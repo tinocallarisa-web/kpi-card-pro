@@ -426,9 +426,11 @@
     }
   },
   "privileges": [],
-  "supportsLandingPage": false,
+  "supportsLandingPage": true,
   "supportsEmptyDataView": true,
   "supportsMultiVisualSelection": true,
+  "supportsHighlight": true,
+  "supportsKeyboardFocus": true,
   "tooltips": {
     "supportedTypes": {
       "default": true,
