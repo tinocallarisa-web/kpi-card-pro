@@ -646,6 +646,31 @@ export class Visual implements IVisual {
      * so the level index alone says nothing: with only Trend bound, level 0 is the
      * time axis, and treating its children as cards would render one card per date.
      */
+    /**
+     * A node's measure value, falling back to the sum of its children.
+     *
+     * With Trend bound the values sit on the leaves — one per period — and the
+     * card's own node carries none, so the card rendered a dash where the number
+     * should be. Power BI would supply a proper subtotal through the Total/SubTotal
+     * API; until that is implemented, summing the leaves is the honest
+     * approximation. It is exact for additive measures (sums, counts) and wrong
+     * for averages and ratios, which is why the sum is only a fallback and never
+     * overrides a value Power BI did provide.
+     */
+    private nodeOrChildrenValue(node: powerbi.DataViewMatrixNode | undefined, idx: number): number | null {
+        const own = this.getNodeValue(node?.values ?? {}, idx);
+        if (own !== null) return own;
+        const kids = node?.children ?? [];
+        if (kids.length === 0) return null;
+        let sum = 0;
+        let seen = false;
+        for (const k of kids) {
+            const v = this.getNodeValue(k.values ?? {}, idx);
+            if (v !== null) { sum += v; seen = true; }
+        }
+        return seen ? sum : null;
+    }
+
     private rowRoles(rows: powerbi.DataViewHierarchy | undefined): { sm: number; trend: number } {
         const out = { sm: -1, trend: -1 };
         (rows?.levels ?? []).forEach((lvl, i) => {
@@ -717,10 +742,18 @@ export class Visual implements IVisual {
                 ?? matrix.rows?.root?.values
                 ?? matrix.columns?.root?.values
                 ?? {};
-            const value = this.getNodeValue(rootValues, measureIdx);
+            // With Trend bound and no Small Multiples, root.children are periods,
+            // not cards: anonChild would give January instead of the total.
+            const valueNode = trendBound ? rows?.root : anonChild;
+            const value = this.nodeOrChildrenValue(valueNode, measureIdx)
+                ?? this.getNodeValue(rootValues, measureIdx);
             const highlightValue = hasHighlights ? this.getNodeHighlight(rootValues, measureIdx) : null;
-            const prior = priorIdx >= 0 ? this.getNodeValue(rootValues, priorIdx) : null;
-            const target = targetIdx >= 0 ? this.getNodeValue(rootValues, targetIdx) : null;
+            const prior = priorIdx >= 0
+                ? (this.nodeOrChildrenValue(valueNode, priorIdx) ?? this.getNodeValue(rootValues, priorIdx))
+                : null;
+            const target = targetIdx >= 0
+                ? (this.nodeOrChildrenValue(valueNode, targetIdx) ?? this.getNodeValue(rootValues, targetIdx))
+                : null;
             const measureName = cols?.levels?.[0]?.sources?.[measureIdx]?.displayName ?? "Value";
 
             return [{
@@ -746,17 +779,17 @@ export class Visual implements IVisual {
             const categoryName = child.value != null ? String(child.value) : `Item ${i + 1}`;
             const rowValues = child.values ?? {};
 
-            const value = this.getNodeValue(rowValues, measureIdx);
+            const value = this.nodeOrChildrenValue(child, measureIdx);
             const highlightValue = hasHighlights ? this.getNodeHighlight(rowValues, measureIdx) : null;
-            const prior = priorIdx >= 0 ? this.getNodeValue(rowValues, priorIdx) : null;
-            const target = targetIdx >= 0 ? this.getNodeValue(rowValues, targetIdx) : null;
+            const prior = priorIdx >= 0 ? this.nodeOrChildrenValue(child, priorIdx) : null;
+            const target = targetIdx >= 0 ? this.nodeOrChildrenValue(child, targetIdx) : null;
 
             // Card is highlighted if it has a highlight value or there are no highlights at all
             const isHighlighted = !hasHighlights || highlightValue !== null;
 
             const tooltipFields = tooltipIdxs.map(ti => ({
                 displayName: cols?.levels?.[0]?.sources?.[ti]?.displayName ?? "",
-                value: this.formatValue(this.getNodeValue(rowValues, ti))
+                value: this.formatValue(this.nodeOrChildrenValue(child, ti))
             }));
 
             const selectionId = this.host.createSelectionIdBuilder()
