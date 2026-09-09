@@ -25,19 +25,19 @@ class CardSettings extends FormattingSettingsCard {
         value: { value: "#E0E0E0" }
     });
     borderWidth = new formattingSettings.NumUpDown({
-        name: "borderWidth", displayName: "Border Width", value: 1,
+        name: "borderWidth", displayName: "Border Width (Pro)", value: 1,
         options: { minValue: { type: powerbi.visuals.ValidatorType.Min, value: 0 }, maxValue: { type: powerbi.visuals.ValidatorType.Max, value: 10 } }
     });
     borderRadius = new formattingSettings.NumUpDown({
-        name: "borderRadius", displayName: "Border Radius", value: 8,
+        name: "borderRadius", displayName: "Border Radius (Pro)", value: 8,
         options: { minValue: { type: powerbi.visuals.ValidatorType.Min, value: 0 }, maxValue: { type: powerbi.visuals.ValidatorType.Max, value: 32 } }
     });
     padding = new formattingSettings.NumUpDown({
-        name: "padding", displayName: "Padding", value: 16,
+        name: "padding", displayName: "Padding (Pro)", value: 16,
         options: { minValue: { type: powerbi.visuals.ValidatorType.Min, value: 4 }, maxValue: { type: powerbi.visuals.ValidatorType.Max, value: 48 } }
     });
     shadow = new formattingSettings.ToggleSwitch({
-        name: "shadow", displayName: "Drop Shadow", value: true
+        name: "shadow", displayName: "Drop Shadow (Pro)", value: true
     });
     name = "card";
     displayName = "Card";
@@ -79,10 +79,10 @@ class MainValueSettings extends FormattingSettingsCard {
         options: { minValue: { type: powerbi.visuals.ValidatorType.Min, value: 0 }, maxValue: { type: powerbi.visuals.ValidatorType.Max, value: 6 } }
     });
     prefix = new formattingSettings.TextInput({
-        name: "prefix", displayName: "Prefix", placeholder: "e.g. $", value: ""
+        name: "prefix", displayName: "Prefix (Pro)", placeholder: "e.g. $", value: ""
     });
     suffix = new formattingSettings.TextInput({
-        name: "suffix", displayName: "Suffix", placeholder: "e.g. %", value: ""
+        name: "suffix", displayName: "Suffix (Pro)", placeholder: "e.g. %", value: ""
     });
     name = "mainValue";
     displayName = "Main Value";
@@ -167,7 +167,7 @@ class SmallMultiplesSettings extends FormattingSettingsCard {
         value: { value: "#605E5C" }
     });
     name = "smallMultiplesLayout";
-    displayName = "Small Multiples";
+    displayName = "Small Multiples (Pro)";
     slices = [this.columns, this.gap, this.showTitle, this.titleFontSize, this.titleColor];
 }
 

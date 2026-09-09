@@ -18,6 +18,7 @@ import VisualConstructorOptions = powerbi.extensibility.visual.VisualConstructor
 import VisualUpdateOptions = powerbi.extensibility.visual.VisualUpdateOptions;
 import ISelectionManager = powerbi.extensibility.ISelectionManager;
 import IVisualLicenseManager = powerbi.extensibility.IVisualLicenseManager;
+import LicenseNotificationType = powerbi.LicenseNotificationType;
 
 interface MetricData {
     name: string;
@@ -33,6 +34,7 @@ interface MetricData {
 type DisplayUnit = "auto" | "none" | "thousands" | "millions" | "billions";
 
 const CONTEXT_MENU_DEBOUNCE = 200;
+
 const SERVICE_PLAN_ID = "kpi-card-pro-tcviz";
 
 /**
@@ -43,6 +45,11 @@ const SERVICE_PLAN_ID = "kpi-card-pro-tcviz";
  */
 let licensePromise: Promise<boolean> | null = null;
 let licenseResolved: boolean | null = null;
+/** False in Publish-to-Web, embedded, national clouds and PDF/PPT export. */
+let licenseEnvSupported = true;
+/** False when the licence could not be read: offline, or not signed in. */
+let licenseInfoAvailable = true;
+
 
 function resolveLicense(licenseManager: IVisualLicenseManager): Promise<boolean> {
     if (licenseResolved !== null) return Promise.resolve(licenseResolved);
@@ -55,13 +62,23 @@ function resolveLicense(licenseManager: IVisualLicenseManager): Promise<boolean>
             licenseManager.getAvailableServicePlans().then(
                 (result: any) => {
                     const plans = result?.plans ?? [];
+                    // Microsoft: "only the active and warning states represent a
+                    // usable license". Warning is a payment grace period, so a
+                    // paying customer keeps their features through it.
+                    // ServicePlanState: Active = 1, Warning = 2.
                     licenseResolved = plans.some(
-                        (p: any) => p.spIdentifier === SERVICE_PLAN_ID && p.state === 1
+                        (p: any) => p.spIdentifier === SERVICE_PLAN_ID &&
+                                    (p.state === 1 || p.state === 2)
                     );
+                    // A Pro customer legitimately reads as Free in these cases, so
+                    // they must never be asked to buy what they already own.
+                    licenseEnvSupported  = !result?.isLicenseUnsupportedEnv;
+                    licenseInfoAvailable = result?.isLicenseInfoAvailable !== false;
                     resolve(licenseResolved);
                 },
                 () => {
                     licenseResolved = false;
+                    licenseInfoAvailable = false;
                     resolve(false);
                 }
             );
@@ -86,8 +103,14 @@ export class Visual implements IVisual {
     private lastContextMenuTime: number = 0;
     private lastDataView: DataView | undefined = undefined;
     private hasRenderedData: boolean = false;
+    private viewport: powerbi.IViewport = { width: 0, height: 0 };
+    private layoutRetries: number = 0;
 
     private licenseRequested = false;
+    /** Last set of Pro settings already notified, to avoid nagging. */
+    private lastBlockedNotice = "";
+    /** The persistent icon is a one-shot: it stays until cleared. */
+    private licenseIconShown = false;
 
     constructor(options: VisualConstructorOptions) {
         this.host = options.host;
@@ -100,6 +123,7 @@ export class Visual implements IVisual {
         this.container.classList.add("kpi-card-pro-container");
         this.container.setAttribute("role", "region");
         this.container.setAttribute("aria-label", "KPI Card Pro");
+
 
         // ── IVisualLicenseManager ─────────────────────────────────────────
         // NOTE: the license check is deliberately NOT performed here.
@@ -135,6 +159,15 @@ export class Visual implements IVisual {
         try {
             const dataView = options?.dataViews?.[0];
 
+            // Power BI's viewport is authoritative. Relying on the container being
+            // sized (width/height 100%) fails on page return, where the element can
+            // still have zero dimensions — the content renders but is invisible until
+            // a resize forces a reflow.
+            if (options.viewport && options.viewport.width > 0 && options.viewport.height > 0) {
+                this.viewport = options.viewport;
+            }
+
+
             // Only act on updates that contain real measure data.
             // Power BI sends skeleton/resize/viewport updates (matrix exists but no
             // column sources) especially on page return — we must ignore these to
@@ -142,11 +175,12 @@ export class Visual implements IVisual {
             const hasSources = (dataView?.matrix?.columns?.levels?.[0]?.sources?.length ?? 0) > 0;
 
             if (!hasSources) {
-                // No real data in this update — two cases:
-                // 1. Visual never had data → show landing page
-                // 2. Visual already rendered → keep current display, do nothing
                 if (!this.lastDataView) {
                     this.renderLandingPage();
+                } else if (this.formattingSettings) {
+                    // Resize / viewport update with no new data: repaint from cache so
+                    // the layout picks up the current viewport.
+                    this.render(this.parseDataView(this.lastDataView));
                 }
                 this.events.renderingFinished(options);
                 return;
@@ -212,6 +246,7 @@ export class Visual implements IVisual {
     private applyLicense(isPro: boolean): void {
         if (!isPro || this.isPro) return;             // only ever upgrades Free → Pro
         this.isPro = true;
+        this.clearLicenseNotice();
         if (this.lastDataView && this.formattingSettings) {
             try {
                 this.render(this.parseDataView(this.lastDataView));
@@ -219,10 +254,123 @@ export class Visual implements IVisual {
         }
     }
 
+    /**
+     * Which Pro settings the user has explicitly changed.
+     *
+     * Reads `metadata.objects`, which carries only properties the user actually
+     * set. The settings model is no use here: every Pro property has a default
+     * and several default to a truthy value, so comparing against it would fire
+     * on a report nobody has touched. Presence here is a deliberate action, and
+     * therefore a real moment of purchase intent.
+     */
+    private attemptedProFeatures(): { labels: string[]; signature: string } {
+        const objs = this.lastDataView?.metadata?.objects as any;
+        if (!objs) return { labels: [], signature: "" };
+
+        const groups: [string, string, string[]][] = [
+            ["card styling",   "card",                 ["borderWidth", "borderRadius", "padding", "shadow"]],
+            ["small multiples","smallMultiplesLayout", ["columns", "gap", "showTitle", "titleFontSize", "titleColor"]],
+            ["prefix/suffix",  "mainValue",            ["prefix", "suffix"]],
+            ["the variance pill", "variance",          ["showPill"]],
+        ];
+
+        const labels: string[] = [];
+        const parts:  string[] = [];
+        for (const [label, card, props] of groups) {
+            let touched = false;
+            for (const p of props) {
+                const v = objs?.[card]?.[p];
+                if (v === undefined) continue;
+                touched = true;
+                // The value, not just the name: nudging Columns from 2 to 3 is a
+                // fresh attempt at the same feature. A resize changes neither.
+                parts.push(`${card}.${p}=${JSON.stringify(v)}`);
+            }
+            if (touched) labels.push(label);
+        }
+        return { labels, signature: parts.join("|") };
+    }
+
+    /**
+     * Take the licence notice down: the licence resolved, or the user removed
+     * every Pro setting. Both notifications live for the visual's lifetime until
+     * cleared, so leaving one up would tell a paying customer to buy what they
+     * have just bought.
+     */
+    private clearLicenseNotice(): void {
+        this.lastBlockedNotice = "";
+        if (!this.licenseIconShown) return;
+        this.licenseIconShown = false;
+        try {
+            (this.licenseManager as any)?.clearLicenseNotification?.();
+        } catch (_) { /* best-effort */ }
+    }
+
+    /**
+     * Power BI's own notifications, which carry the purchase path.
+     *
+     * This replaces the "Free" badge the visual used to draw. Microsoft is
+     * explicit that a visual "shouldn't display its own licensing UX, instead
+     * use one of Power BI supported predefined notifications" — and that badge
+     * put its only explanation in a `title` attribute on an element with
+     * `pointer-events: none`, so it could never be hovered and never appeared.
+     */
+    private notifyProFeatureBlocked(): void {
+        if (this.isPro) { this.clearLicenseNotice(); return; }
+
+        // The licence resolves after the first paint, so isPro is false on the way
+        // in for everyone, a Pro customer included. Saying anything before the
+        // answer arrives would flash "you need a licence" at someone who has one.
+        // applyLicense() re-renders once it resolves, and this runs again then.
+        if (licenseResolved === null) return;
+
+        const { labels: wanted, signature } = this.attemptedProFeatures();
+        if (wanted.length === 0) { this.clearLicenseNotice(); return; }
+
+        // Licence unreadable, or an environment without licence enforcement:
+        // a Pro customer lands here too, so say nothing.
+        if (!licenseEnvSupported || !licenseInfoAvailable) return;
+
+        // The persistent icon covers the state, not the action — chiefly a trial
+        // that has run out. The user's Pro settings stay saved, so the cards
+        // silently lose their styling and drop to a single column with nothing to
+        // explain it. The banner below is no help there: it only fires on a
+        // change, and this user changed nothing. Power BI shows the icon in Edit
+        // mode only, so report consumers see nothing.
+        if (!this.licenseIconShown) {
+            this.licenseIconShown = true;
+            try {
+                // const enum: TypeScript inlines General to 0. Referencing the
+                // enum object at runtime would give undefined.
+                (this.licenseManager as any)?.notifyLicenseRequired?.(
+                    LicenseNotificationType.General
+                );
+            } catch (_) { /* best-effort */ }
+        }
+
+        // Fires on each fresh change and only then: update() also runs on resize,
+        // selection and data refresh, and the banner must not reappear for those.
+        if (signature === this.lastBlockedNotice) return;
+        this.lastBlockedNotice = signature;
+
+        const list = wanted.length === 1
+            ? wanted[0]
+            : wanted.slice(0, -1).join(", ") + " and " + wanted[wanted.length - 1];
+
+        try {
+            (this.licenseManager as any)?.notifyFeatureBlocked?.(
+                `KPI Card Pro: ${list} ${wanted.length === 1 ? "is" : "are"} part of the Pro plan. ` +
+                `Get a licence to enable ${wanted.length === 1 ? "it" : "them"}.`
+            );
+        } catch (_) { /* notification is best-effort; never break the render */ }
+    }
+
     // ─── Landing Page ────────────────────────────────────────────────────────
 
     private renderLandingPage(): void {
-        // Use host color palette for theme-aware landing page
+        // Never replace already-painted data with the landing page.
+        if (this.hasRenderedData) return;
+
         const palette = this.host.colorPalette;
         const isHC = palette.isHighContrast;
         const fg = isHC ? "#FFFFFF" : (palette.foreground?.value ?? "#3D3929");
@@ -233,10 +381,13 @@ export class Visual implements IVisual {
         const landing = document.createElement("div");
         landing.setAttribute("role", "region");
         landing.setAttribute("aria-label", "KPI Card Pro — Add data to get started");
+        const lvW = this.viewport.width  > 0 ? `${this.viewport.width}px`  : "100%";
+        const lvH = this.viewport.height > 0 ? `${this.viewport.height}px` : "100%";
+
         landing.style.cssText = `
             display: flex; flex-direction: column;
             align-items: center; justify-content: center;
-            width: 100%; height: 100%;
+            width: ${lvW}; height: ${lvH};
             background: ${bg};
             font-family: 'Segoe UI', sans-serif;
             text-align: center;
@@ -420,6 +571,13 @@ export class Visual implements IVisual {
     // ─── Render ─────────────────────────────────────────────────────────────
 
     private render(metrics: MetricData[]): void {
+        // INVARIANT: once real data has been painted, never repaint an empty state.
+        // Power BI emits partial updates (e.g. only the Prior Period role, with no
+        // Value role) and re-entrant repaints come from several places: the layout
+        // retry, resize updates with no sources, and the license callback. Enforcing
+        // this here means every caller is covered, not just the ones we remembered.
+        if (metrics.length === 0 && this.hasRenderedData) return;
+
         const s = this.formattingSettings;
         const palette = this.host.colorPalette;
 
@@ -441,13 +599,17 @@ export class Visual implements IVisual {
         const pad = this.isPro ? (s.card.padding.value ?? 16) : 16;
         const shadow = this.isPro ? s.card.shadow.value : true;
 
+        // Explicit pixel sizing from the Power BI viewport, with a 100% fallback.
+        const vpW = this.viewport.width  > 0 ? `${this.viewport.width}px`  : "100%";
+        const vpH = this.viewport.height > 0 ? `${this.viewport.height}px` : "100%";
+
         root.style.cssText = `
             background: ${cardBg};
             border: ${bw}px solid ${cardBorder};
             border-radius: ${br}px;
             padding: ${pad}px;
             box-shadow: ${shadow ? "0 2px 8px rgba(0,0,0,0.10)" : "none"};
-            width: 100%; height: 100%;
+            width: ${vpW}; height: ${vpH};
             box-sizing: border-box;
             display: flex; flex-direction: column;
             overflow: hidden; position: relative;
@@ -462,9 +624,12 @@ export class Visual implements IVisual {
             this.renderGrid(root, metrics, hc, themeFg, themeMuted);
         }
 
-        if (!this.isPro) {
-            this.renderFreeBadge(root);
-        }
+        // The "Free" badge used to be drawn here. Removed: Microsoft's guidance is
+        // that a visual "shouldn't display its own licensing UX", and this one put
+        // its whole explanation in a title attribute on an element with
+        // pointer-events: none, so it could never be hovered and never showed.
+        // Power BI's own notifications replace it, and they carry a purchase path.
+        this.notifyProFeatureBlocked();
 
         // ── Atomic swap: clear ONLY after building succeeded ──────────────
         // If anything above threw, the container keeps its previous content.
@@ -472,7 +637,36 @@ export class Visual implements IVisual {
             this.container.removeChild(this.container.firstChild);
         }
         this.container.appendChild(root);
+
         this.setupTooltips(root, metrics);
+
+        this.ensureLaidOut();
+    }
+
+    /**
+     * Power BI can render the visual while the page is still transitioning, when the
+     * host element has no layout box yet. The DOM is correct but nothing is painted
+     * until something forces a reflow — which is why a manual resize "fixes" it.
+     * This reads a layout property to force the reflow, and if the element still has
+     * no size, repaints on the next frame (bounded, so it can never spin).
+     */
+    private ensureLaidOut(): void {
+        // Reading a layout property forces a synchronous reflow.
+        const laidOut = this.container.offsetHeight > 0 && this.container.offsetWidth > 0;
+
+        if (laidOut) {
+            this.layoutRetries = 0;
+            return;
+        }
+        if (this.layoutRetries >= 10) return;
+        this.layoutRetries++;
+
+        requestAnimationFrame(() => {
+            if (!this.lastDataView || !this.formattingSettings) return;
+            try {
+                this.render(this.parseDataView(this.lastDataView));
+            } catch (_) { /* keep current display */ }
+        });
     }
 
     private renderGrid(root: HTMLElement, metrics: MetricData[], hc: boolean, themeFg: string, themeMuted: string): void {
@@ -737,19 +931,6 @@ export class Visual implements IVisual {
 
     // ─── Free Badge ──────────────────────────────────────────────────────────
 
-    private renderFreeBadge(root: HTMLElement): void {
-        const badge = document.createElement("div");
-        badge.className = "kpi-free-badge";
-        badge.textContent = "Free";
-        badge.title = "KPI Card Pro — Free tier. Upgrade to Pro for Small Multiples, custom colors and more.";
-        badge.style.cssText = `
-            position: absolute; bottom: 6px; right: 8px;
-            font-family: 'Segoe UI', sans-serif; font-size: 9px; font-weight: 600;
-            color: #A19F9D; letter-spacing: 0.5px;
-            pointer-events: none; user-select: none;
-        `;
-        root.appendChild(badge);
-    }
 
     // ─── Tooltips ────────────────────────────────────────────────────────────
 

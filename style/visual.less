@@ -38,7 +38,15 @@
     min-height: 0;
     box-sizing: border-box;
     position: relative;
-    animation: kpi-fade-in 0.2s ease both;
+
+    // NOTE: no `fill-mode: both` here. `both` applies the `from` keyframe
+    // (opacity: 0) before the animation starts, and CSS animations do not start
+    // while the element sits in a not-yet-visible container — which is what
+    // happens during a report page transition. The card would stay stuck at
+    // opacity 0 until a resize forced a fresh element. Without a fill mode the
+    // element keeps its own computed style (visible) if the animation never runs.
+    opacity: 1;
+    animation: kpi-fade-in 0.2s ease;
 
     &.high-contrast {
         .kpi-label { color: #FFFFFF !important; }
@@ -203,19 +211,7 @@
     font-size: 13px;
     text-align: center;
     user-select: none;
-    animation: kpi-fade-in 0.3s ease both;
+    opacity: 1;
+    animation: kpi-fade-in 0.3s ease;   // see note in .kpi-root — never use `both`
 }
 
-// ─── Free badge ──────────────────────────────────────────────────────────────
-
-.kpi-free-badge {
-    position: absolute;
-    bottom: 4px;
-    right: 6px;
-    font-size: 9px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    pointer-events: none;
-    user-select: none;
-    opacity: 0.6;
-}
