@@ -86,8 +86,8 @@
             }
           ],
           "dataReductionAlgorithm": {
-            "top": {
-              "count": 50
+            "window": {
+              "count": 1000
             }
           }
         },
