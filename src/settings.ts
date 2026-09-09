@@ -171,6 +171,48 @@ class SmallMultiplesSettings extends FormattingSettingsCard {
     slices = [this.columns, this.gap, this.showTitle, this.titleFontSize, this.titleColor];
 }
 
+// ─── Card: Trend (Pro) ───────────────────────────────────────────────────────
+
+class TrendSettings extends FormattingSettingsCard {
+    show = new formattingSettings.ToggleSwitch({
+        name: "show", displayName: "Show", value: true
+    });
+    type = new formattingSettings.ItemDropdown({
+        name: "type", displayName: "Chart Type",
+        items: [
+            { value: "area", displayName: "Area" },
+            { value: "line", displayName: "Line" },
+            { value: "bar",  displayName: "Bar"  }
+        ],
+        value: { value: "area", displayName: "Area" }
+    });
+    color = new formattingSettings.ColorPicker({
+        name: "color", displayName: "Color", value: { value: "#0078D4" }
+    });
+    lineWidth = new formattingSettings.NumUpDown({
+        name: "lineWidth", displayName: "Line Width", value: 2,
+        options: { minValue: { type: powerbi.visuals.ValidatorType.Min, value: 1 }, maxValue: { type: powerbi.visuals.ValidatorType.Max, value: 6 } }
+    });
+    areaOpacity = new formattingSettings.NumUpDown({
+        name: "areaOpacity", displayName: "Area Opacity %", value: 20,
+        options: { minValue: { type: powerbi.visuals.ValidatorType.Min, value: 0 }, maxValue: { type: powerbi.visuals.ValidatorType.Max, value: 100 } }
+    });
+    height = new formattingSettings.NumUpDown({
+        name: "height", displayName: "Height (px)", value: 40,
+        options: { minValue: { type: powerbi.visuals.ValidatorType.Min, value: 16 }, maxValue: { type: powerbi.visuals.ValidatorType.Max, value: 160 } }
+    });
+    showDot = new formattingSettings.ToggleSwitch({
+        name: "showDot", displayName: "Highlight Last Point", value: true
+    });
+    showTargetLine = new formattingSettings.ToggleSwitch({
+        name: "showTargetLine", displayName: "Show Target Line", value: true
+    });
+    name = "trend";
+    displayName = "Trend (Pro)";
+    slices = [this.show, this.type, this.color, this.lineWidth, this.areaOpacity,
+              this.height, this.showDot, this.showTargetLine];
+}
+
 // ─── Card: Accessibility ─────────────────────────────────────────────────────
 
 class AccessibilitySettings extends FormattingSettingsCard {
@@ -194,6 +236,7 @@ export class VisualFormattingSettingsModel extends FormattingSettingsModel {
     label = new LabelSettings();
     variance = new VarianceSettings();
     smallMultiples = new SmallMultiplesSettings();
+    trend = new TrendSettings();
     accessibility = new AccessibilitySettings();
-    cards = [this.card, this.mainValue, this.label, this.variance, this.smallMultiples, this.accessibility];
+    cards = [this.card, this.mainValue, this.label, this.variance, this.trend, this.smallMultiples, this.accessibility];
 }

@@ -81,67 +81,117 @@
   <header>
     <a class="brand" href="https://tcviz.com">TCViz</a>
     <h1>Support</h1>
-    <p class="meta">KPI Card Pro &nbsp;·&nbsp; tcviz.com</p>
+    <p class="meta">KPI Card Pro &nbsp;·&nbsp; v1.1.0.0 &nbsp;·&nbsp; docs updated 9 September 2026 &nbsp;·&nbsp; tcviz.com</p>
   </header>
 
   <main>
-    <h2>Getting Started</h2>
+    <h2>Getting started</h2>
     <p>
-      KPI Card Pro requires at least one measure in the <strong>Value</strong> field well.
-      Add an optional measure to <strong>Prior Period</strong> to enable variance calculation,
-      and a date/time dimension to <strong>Category</strong> to enable the sparkline trend chart.
+      KPI Card Pro needs one measure in the <strong>Value</strong> field well. That alone renders a
+      single card with the formatted value. Everything else is optional:
     </p>
-
-    <h2>Field Wells</h2>
     <ul>
-      <li><strong>Value</strong> — Current period KPI value (required)</li>
-      <li><strong>Prior Period</strong> — Previous period value for variance (optional)</li>
-      <li><strong>Target</strong> — Goal or budget value (optional, Pro)</li>
-      <li><strong>Category</strong> — Time dimension for sparkline (optional)</li>
-      <li><strong>Tooltips</strong> — Additional drill-through fields (optional, Pro)</li>
+      <li>Add a measure to <strong>Prior Period</strong> to show the variance, as a percentage with a
+        direction arrow and the prior value underneath.</li>
+      <li>Add a measure to <strong>Target</strong> to track against a goal.</li>
+      <li>Add a category field to <strong>Small Multiples (Pro)</strong> to render one card per
+        category instead of one card in total.</li>
+      <li>Add measures to <strong>Tooltips</strong> to show more figures on hover.</li>
+    </ul>
+
+    <h2>Field wells</h2>
+    <ul>
+      <li><strong>Value</strong> (measure, required) — the number on the card.</li>
+      <li><strong>Prior Period</strong> (measure) — the comparison value. Enables the variance
+        percentage, its arrow and the &ldquo;Prior:&rdquo; line.</li>
+      <li><strong>Target</strong> (measure) — a goal to compare against.</li>
+      <li><strong>Small Multiples (Pro)</strong> (grouping) — one card per category, up to 50. Without
+        a licence only the first category renders.</li>
+      <li><strong>Tooltips</strong> (measures) — additional figures shown on hover.</li>
+    </ul>
+
+    <h2>Format pane</h2>
+    <p>Settings that need a licence carry <strong>(Pro)</strong> in their name.</p>
+    <ul>
+      <li><strong>Card</strong> — Background, Border Colour, and <strong>(Pro)</strong> Border Width,
+        Border Radius, Padding, Drop Shadow.</li>
+      <li><strong>Main Value</strong> — Font family, size, bold, colour, display units
+        (Auto / K / M / B), decimal places, and <strong>(Pro)</strong> Prefix and Suffix.</li>
+      <li><strong>Label</strong> — Show, font size, colour.</li>
+      <li><strong>Variance</strong> — Show, positive / negative / neutral colours, invert logic (for
+        cost metrics where lower is better), show arrow, font size, and
+        <strong>(Pro)</strong> Show as Pill.</li>
+      <li><strong>Small Multiples (Pro)</strong> — Columns, gap, category title with its font size
+        and colour.</li>
+      <li><strong>Accessibility</strong> — High contrast handling and the visual title announced to
+        screen readers.</li>
     </ul>
 
     <h2>Free vs Pro</h2>
+    <p>
+      The card is fully functional without a licence. A Pro subscription adds the features listed
+      below; everything else, including all variance colours, is available to everyone.
+    </p>
     <ul>
-      <li><strong>Free:</strong> 1 KPI metric, basic sparkline, fixed colors, variance text</li>
-      <li><strong>Pro:</strong> Sparkline type selector, variance pill, custom colors, target line, tooltip drill-through, custom prefix/suffix and card styling</li>
+      <li><strong>Free</strong> — one KPI card with value, prior-period variance and target; display
+        units and decimals; label styling; card background and border colour; all variance colours,
+        invert logic and arrow; native tooltips; high contrast; keyboard focus and screen-reader
+        labels; cross-filtering by clicking the card.</li>
+      <li><strong>Pro</strong> — Small Multiples, up to 50 cards from a category field, with the
+        multi-column layout and category titles; prefix and suffix on the main value; the variance
+        pill style; extra measures in tooltips; and the card border width, radius, padding and drop
+        shadow controls.</li>
     </ul>
     <p>
-      Upgrade to Pro via <a href="https://appsource.microsoft.com" target="_blank" rel="noopener">Microsoft AppSource</a>.
+      Changing a <strong>(Pro)</strong> setting without a licence leaves the card on the free result
+      and raises Power BI's own notification, which links to the licence. Nothing is lost: the
+      setting is stored and applies as soon as the licence is active.
     </p>
 
-    <h2>Frequently Asked Questions</h2>
+    <h2>Accessibility</h2>
+    <ul>
+      <li>The card is reachable with <strong>Tab</strong> and selected with
+        <strong>Enter</strong> or <strong>Space</strong>.</li>
+      <li>Right-click opens the standard Power BI context menu, on a card and on empty space.</li>
+      <li>High-contrast themes are honoured: colours follow the Power BI palette.</li>
+      <li>Cards carry ARIA labels announcing the metric name, value and variance. The visual title
+        announced to screen readers is configurable under Accessibility.</li>
+    </ul>
 
-    <p><strong>The sparkline is not showing — why?</strong><br/>
-    The sparkline requires a field in the <strong>Category</strong> well (e.g. Month, Quarter, Year).
-    Without it, there is only one data point and no trend to draw.</p>
+    <h2>Frequently asked questions</h2>
 
-    <p><strong>The variance shows the same value for both periods.</strong><br/>
-    Make sure your Prior Period measure filters a different time period than your Value measure.
-    Use <code>CALCULATE(..., tabla[Year] = MAX(tabla[Year]) - 1)</code> as a starting point.</p>
+    <p><strong>I added a field to Small Multiples and still see one card.</strong><br />
+      Small Multiples is a Pro feature. Without a licence the first category renders and the rest are
+      not drawn; Power BI shows a licence notification when the field is bound.</p>
 
-    <p><strong>I upgraded to Pro but features are still locked.</strong><br/>
-    Sign out of Power BI Service and sign back in to refresh your license.
-    If the issue persists, contact us at the email below.</p>
+    <p><strong>I bought Pro but the Pro settings do nothing.</strong><br />
+      Licence validation runs asynchronously after the card first paints, so for a moment the free
+      result is shown. It re-renders with your settings a second later. If it persists, confirm you
+      are signed in with the account that holds the licence, and that it is active under
+      <em>My Account → Licenses</em> in the Microsoft 365 admin center.</p>
 
-    <p><strong>The visual is not rendering in Power BI Desktop.</strong><br/>
-    Make sure you are using Power BI Desktop April 2024 or later.
-    Re-import the <code>.pbiviz</code> file via Visualizations → … → Import a visual from a file.</p>
+    <p><strong>The variance shows the wrong direction.</strong><br />
+      For metrics where lower is better — cost, defects, churn — switch on <em>Invert</em> under
+      Variance. This is available in both tiers.</p>
 
-    <h2>Contact Support</h2>
+    <p><strong>Does the visual send my data anywhere?</strong><br />
+      No. All calculation and rendering happens inside Power BI. The visual makes no network calls of
+      any kind. The only host API it uses is Microsoft's own licence check, which carries no report
+      data. See the <a href="privacy.html">Privacy Policy</a>.</p>
+
+    <p><strong>Does it work in Power BI Service?</strong><br />
+      Yes. Desktop, Service and the mobile apps are all supported.</p>
+
+    <h2>Contact support</h2>
     <div class="contact-card">
-      <p><strong>TCViz Support</strong></p>
-      <p>📧 <a href="mailto:support@tcviz.com">support@tcviz.com</a></p>
-      <p>🌐 <a href="https://tcviz.com" target="_blank" rel="noopener">tcviz.com</a></p>
-      <p>🐛 <a href="https://github.com/tinocallarisa-web/kpi-card-pro/issues" target="_blank" rel="noopener">GitHub Issues</a></p>
-      <p style="margin-top:12px; font-size:13px; color:#666;">
-        We typically respond within 1–2 business days.
-      </p>
+      <p><strong>Email:</strong> <a href="mailto:support@tcviz.com">support@tcviz.com</a> — we reply within 1&ndash;2 business days.</p>
+      <p><strong>Issues and feature requests:</strong> <a href="https://github.com/tinocallarisa-web/kpi-card-pro/issues">GitHub</a></p>
+      <p><strong>Licensing:</strong> managed through Microsoft AppSource. Assign licences in the Microsoft 365 admin center.</p>
     </div>
   </main>
 
   <footer>
-    &copy; 2025 TCViz. All rights reserved. &nbsp;·&nbsp;
+    &copy; 2026 TCViz &nbsp;·&nbsp; <a href="https://tcviz.com">tcviz.com</a> &nbsp;·&nbsp;
     <a href="privacy.html">Privacy Policy</a> &nbsp;·&nbsp;
     <a href="terms.html">Terms of Use</a>
   </footer>

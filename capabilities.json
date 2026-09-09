@@ -26,12 +26,17 @@
     },
     {
       "displayName": "Small Multiples (Pro)",
-            "description": "Renders one card per category. The Pro plan shows up to 50; without a licence only the first category is rendered.",
+      "description": "Dimension to split into multiple KPI cards (optional, Pro).",
       "displayNameKey": "Role_SmallMultiples",
       "name": "smallMultiples",
       "kind": "Grouping",
-      "description": "Dimension to split into multiple KPI cards (optional, Pro).",
       "descriptionKey": "Role_SmallMultiples_Description"
+    },
+    {
+      "name": "trend",
+      "displayName": "Trend (Pro)",
+      "description": "A date or ordered field. Draws a trend line inside each card, over this axis.",
+      "kind": "Grouping"
     },
     {
       "displayName": "Tooltips",
@@ -60,6 +65,9 @@
           },
           "target": {
             "max": 1
+          },
+          "trend": {
+            "max": 1
           }
         }
       ],
@@ -69,6 +77,11 @@
             {
               "for": {
                 "in": "smallMultiples"
+              }
+            },
+            {
+              "for": {
+                "in": "trend"
               }
             }
           ],
@@ -421,6 +434,76 @@
           "displayNameKey": "Prop_Accessibility_Title",
           "type": {
             "text": true
+          }
+        }
+      }
+    },
+    "trend": {
+      "displayName": "Trend (Pro)",
+      "properties": {
+        "show": {
+          "displayName": "Show",
+          "type": {
+            "bool": true
+          }
+        },
+        "type": {
+          "displayName": "Chart Type",
+          "type": {
+            "enumeration": [
+              {
+                "value": "area",
+                "displayName": "Area"
+              },
+              {
+                "value": "line",
+                "displayName": "Line"
+              },
+              {
+                "value": "bar",
+                "displayName": "Bar"
+              }
+            ]
+          }
+        },
+        "color": {
+          "displayName": "Color",
+          "type": {
+            "fill": {
+              "solid": {
+                "color": true
+              }
+            }
+          }
+        },
+        "lineWidth": {
+          "displayName": "Line Width",
+          "type": {
+            "numeric": true
+          }
+        },
+        "areaOpacity": {
+          "displayName": "Area Opacity %",
+          "type": {
+            "numeric": true
+          }
+        },
+        "height": {
+          "displayName": "Height (px)",
+          "type": {
+            "numeric": true
+          }
+        },
+        "showDot": {
+          "displayName": "Highlight Last Point",
+          "type": {
+            "bool": true
+          }
+        },
+        "showTargetLine": {
+          "displayName": "Show Target Line",
+          "type": {
+            "bool": true
           }
         }
       }

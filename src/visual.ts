@@ -29,6 +29,7 @@ interface MetricData {
     tooltipFields: Array<{ displayName: string; value: string }>;
     selectionId: powerbi.extensibility.ISelectionId | null;
     isHighlighted: boolean;               // false = dim this card
+    trendData: number[];                  // series for the sparkline, empty when unbound
 }
 
 type DisplayUnit = "auto" | "none" | "thousands" | "millions" | "billions";
@@ -302,10 +303,22 @@ export class Visual implements IVisual {
         // halves: a matrix with no grouping still returns one anonymous child,
         // so levels.length alone would report grouping that is not there.
         const smRows = this.lastDataView?.matrix?.rows;
-        const smHasGrouping = (smRows?.levels?.length ?? 0) > 0
+        const roles  = this.rowRoles(smRows);
+
+        // Both roles share the row hierarchy, so a grouping level is not enough:
+        // with only Trend bound, the root's children are dates, not categories.
+        // Ask which role owns the level instead of assuming the first one is a card.
+        const anyGrouping = (smRows?.levels?.length ?? 0) > 0
             && !!smRows?.root?.children
             && smRows.root.children.length > 0
             && smRows.root.children[0].value !== undefined;
+        const smHasGrouping = anyGrouping && roles.sm >= 0;
+
+        // Binding Trend is intent too, and it leaves no trace in metadata.objects.
+        if (anyGrouping && roles.trend >= 0) {
+            labels.push("the trend line");
+            parts.push("role.trend=1");
+        }
 
         if (smHasGrouping) {
             const n = smRows.root.children.length;
@@ -387,6 +400,117 @@ export class Visual implements IVisual {
             this.container.appendChild(box);
         }
         box.textContent = lines.join(String.fromCharCode(10));
+    }
+
+    /**
+     * The trend line inside a card.
+     *
+     * Restored from 1.0.0, where it lived for a single day before the matrix
+     * rewrite dropped it — while the documentation went on describing it for
+     * months. It is Pro: the free card gives you the number, Pro gives you the
+     * context. Styling alone was never worth paying for.
+     *
+     * Geometry is normalised to a 0-100 viewBox with preserveAspectRatio="none",
+     * so the same path stretches to any card width without recomputing.
+     */
+    private buildSparkline(metric: MetricData, hc: boolean): HTMLElement | null {
+        const t = this.formattingSettings.trend;
+        const data = metric.trendData;
+        if (data.length < 2) return null;
+
+        const height = Math.max(16, Math.min(160, t.height.value ?? 40));
+        const wrapper = document.createElement("div");
+        wrapper.className = "kpi-sparkline";
+        wrapper.style.cssText = `width:100%;height:${height}px;margin-top:6px;flex-shrink:0;position:relative;`;
+
+        const svgNS = "http://www.w3.org/2000/svg";
+        const svg = document.createElementNS(svgNS, "svg");
+        svg.setAttribute("width", "100%");
+        svg.setAttribute("height", String(height));
+        svg.setAttribute("viewBox", `0 0 100 ${height}`);
+        svg.setAttribute("preserveAspectRatio", "none");
+        svg.setAttribute("aria-hidden", "true");
+
+        const color   = hc ? "#FFFFFF" : (t.color.value?.value ?? "#0078D4");
+        const kind    = String(t.type.value?.["value"] ?? t.type.value ?? "area");
+        const lineW   = t.lineWidth.value ?? 2;
+        const opacity = (t.areaOpacity.value ?? 20) / 100;
+
+        const minV = Math.min(...data);
+        const maxV = Math.max(...data);
+        const range = maxV - minV || 1;
+        const y = (v: number) => height - ((v - minV) / range) * (height * 0.8) - height * 0.1;
+        const pts: Array<[number, number]> = data.map((v, i) => [
+            (i / (data.length - 1)) * 100, y(v)
+        ]);
+
+        // Target line, when a Target measure is bound and within the drawn range.
+        if (t.showTargetLine.value && metric.target !== null) {
+            const line = document.createElementNS(svgNS, "line");
+            line.setAttribute("x1", "0");  line.setAttribute("x2", "100");
+            line.setAttribute("y1", String(y(metric.target)));
+            line.setAttribute("y2", String(y(metric.target)));
+            line.setAttribute("stroke", hc ? "#FFFF00" : "#A19F9D");
+            line.setAttribute("stroke-width", "1");
+            line.setAttribute("stroke-dasharray", "4 2");
+            line.setAttribute("vector-effect", "non-scaling-stroke");
+            svg.appendChild(line);
+        }
+
+        const pathD = pts.map((p, i) => `${i === 0 ? "M" : "L"}${p[0]},${p[1]}`).join(" ");
+
+        if (kind === "bar") {
+            const barW = (100 / data.length) * 0.7;
+            data.forEach((v, i) => {
+                const rect = document.createElementNS(svgNS, "rect");
+                const h = ((v - minV) / range) * (height * 0.8);
+                rect.setAttribute("x", String((i / data.length) * 100 + barW * 0.2));
+                rect.setAttribute("y", String(height - h - height * 0.1));
+                rect.setAttribute("width", String(barW));
+                rect.setAttribute("height", String(Math.max(0, h)));
+                rect.setAttribute("fill", color);
+                rect.setAttribute("fill-opacity", String(Math.min(1, opacity + 0.4)));
+                svg.appendChild(rect);
+            });
+        } else {
+            if (kind === "area") {
+                const area = document.createElementNS(svgNS, "path");
+                area.setAttribute("d", `${pathD} L100,${height} L0,${height} Z`);
+                area.setAttribute("fill", color);
+                area.setAttribute("fill-opacity", String(opacity));
+                area.setAttribute("stroke", "none");
+                svg.appendChild(area);
+            }
+            const path = document.createElementNS(svgNS, "path");
+            path.setAttribute("d", pathD);
+            path.setAttribute("fill", "none");
+            path.setAttribute("stroke", color);
+            path.setAttribute("stroke-width", String(lineW));
+            path.setAttribute("stroke-linecap", "round");
+            path.setAttribute("stroke-linejoin", "round");
+            // Without this the horizontal stretch of the viewBox thickens the line.
+            path.setAttribute("vector-effect", "non-scaling-stroke");
+            svg.appendChild(path);
+
+            if (t.showDot.value) {
+                // Not an SVG circle: preserveAspectRatio="none" stretches the
+                // viewBox horizontally, and that deforms geometry — a circle comes
+                // out as an ellipse. vector-effect only spares the stroke, not the
+                // fill. An HTML element positioned over the chart stays round at
+                // any card width.
+                const last = pts[pts.length - 1];
+                const r = lineW + 1.5;
+                const dot = document.createElement("div");
+                dot.style.cssText =
+                    `position:absolute;left:${last[0]}%;top:${last[1]}px;` +
+                    `width:${r * 2}px;height:${r * 2}px;margin:${-r}px 0 0 ${-r}px;` +
+                    `border-radius:50%;background:${color};pointer-events:none;z-index:1;`;
+                wrapper.appendChild(dot);
+            }
+        }
+
+        wrapper.appendChild(svg);
+        return wrapper;
     }
 
     private notifyProFeatureBlocked(): void {
@@ -515,6 +639,34 @@ export class Visual implements IVisual {
 
     // ─── Parse DataView (Matrix) ─────────────────────────────────────────────
 
+    /**
+     * Which row level carries which role.
+     *
+     * Both Small Multiples and Trend are grouping roles on the same row hierarchy,
+     * so the level index alone says nothing: with only Trend bound, level 0 is the
+     * time axis, and treating its children as cards would render one card per date.
+     */
+    private rowRoles(rows: powerbi.DataViewHierarchy | undefined): { sm: number; trend: number } {
+        const out = { sm: -1, trend: -1 };
+        (rows?.levels ?? []).forEach((lvl, i) => {
+            const roles = lvl?.sources?.[0]?.roles ?? {};
+            if (roles["smallMultiples"] && out.sm === -1) out.sm = i;
+            if (roles["trend"] && out.trend === -1) out.trend = i;
+        });
+        return out;
+    }
+
+    /** Ordered measure values of a node's children — the sparkline series. */
+    private seriesFrom(node: powerbi.DataViewMatrixNode | undefined, measureIdx: number): number[] {
+        const kids = node?.children ?? [];
+        const out: number[] = [];
+        for (const k of kids) {
+            const v = this.getNodeValue(k.values ?? {}, measureIdx);
+            out.push(v ?? 0);
+        }
+        return out;
+    }
+
     private parseDataView(dataView?: DataView): MetricData[] {
         if (!dataView?.matrix) return [];
 
@@ -545,10 +697,18 @@ export class Visual implements IVisual {
         // Small Multiples is only truly bound when the row hierarchy has a grouping
         // level. Power BI still returns one anonymous child when nothing is bound,
         // so checking children alone would mislabel the card as "Item 1".
-        const hasGrouping = (rows?.levels?.length ?? 0) > 0
+        const anyGrouping = (rows?.levels?.length ?? 0) > 0
             && !!rows?.root?.children
             && rows.root.children.length > 0
             && rows.root.children[0].value !== undefined;
+
+        // Trend shares the row hierarchy with Small Multiples, so a grouping level
+        // is not necessarily a card. With only Trend bound, level 0 is the time
+        // axis and its children are data points, not cards.
+        const roles = this.rowRoles(rows);
+        const smBound    = roles.sm >= 0 && anyGrouping;
+        const trendBound = roles.trend >= 0 && anyGrouping;
+        const hasGrouping = smBound;
 
         // No small multiples — single card
         if (!hasGrouping) {
@@ -571,7 +731,9 @@ export class Visual implements IVisual {
                 target,
                 tooltipFields: [],
                 selectionId: null,
-                isHighlighted: true  // single card always visible
+                isHighlighted: true,  // single card always visible
+                // Only Trend bound: the root's children are the points of the series.
+                trendData: trendBound ? this.seriesFrom(rows?.root, measureIdx) : []
             }];
         }
 
@@ -609,7 +771,9 @@ export class Visual implements IVisual {
                 target,
                 tooltipFields,
                 selectionId,
-                isHighlighted
+                isHighlighted,
+                // With both roles bound, each card's children are its own series.
+                trendData: trendBound ? this.seriesFrom(child, measureIdx) : []
             });
         }
 
@@ -949,6 +1113,13 @@ export class Visual implements IVisual {
                 subRow.appendChild(tgSpan);
             }
             cell.appendChild(subRow);
+        }
+
+        // Trend line (Pro). Free renders the card without it; the notification
+        // path explains why, so nothing disappears without a word.
+        if (this.isPro && this.formattingSettings.trend.show.value) {
+            const spark = this.buildSparkline(metric, hc);
+            if (spark) cell.appendChild(spark);
         }
 
         return cell;

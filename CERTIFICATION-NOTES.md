@@ -31,16 +31,17 @@ Free tier (no license required):
 - Native Power BI tooltips (value + prior period)
 - Display units (Auto / K / M / B), decimal places
 - Label show/hide, font size and color
-- Card background, border color, drop shadow
+- Card background and border colour
+- All variance colours (positive / negative / neutral), invert logic and direction arrow
 - High Contrast mode and ARIA title (Accessibility section)
 
 Pro tier (requires active AppSource license — plan: kpi-card-pro-tcviz):
 - Small Multiples: up to 50 cards from a category dimension
 - Multi-column layout (1–6 columns) with configurable gap
 - Custom prefix and suffix on main value
-- Variance pill style with custom positive/negative/neutral colors
+- Variance pill style (the colours themselves are available in both tiers)
 - Extended tooltips: up to 10 additional measures
-- Border width, border radius, padding controls (Card section)
+- Border width, border radius, padding and drop shadow controls (Card section)
 
 Testing instructions:
 1. Import the .pbiviz file included in the submission via Insert > More visuals > Import from file.

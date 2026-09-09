@@ -1,166 +1,130 @@
 # KPI Card Pro
 
-**Multi-metric KPI card with trend, target and variance for Power BI executive dashboards.**
+**KPI card with prior-period variance, target and small multiples for Power BI.**
 
 > Developed by [TCViz](https://tcviz.com) — Custom Visuals for Power BI
 
 [![AppSource](https://img.shields.io/badge/AppSource-Published-0078D4?logo=microsoft)](https://appsource.microsoft.com)
 [![Power BI API](https://img.shields.io/badge/API-5.10.0-yellow)](https://github.com/microsoft/powerbi-visuals-api)
-[![License](https://img.shields.io/badge/License-Proprietary-red)](docs/terms.html)
+[![Version](https://img.shields.io/badge/version-1.1.0.0-brightgreen)](pbiviz.json)
+[![License](https://img.shields.io/badge/License-Proprietary-red)](https://tinocallarisa-web.github.io/kpi-card-pro/terms.html)
+
+📖 **[Documentation & Support](https://tinocallarisa-web.github.io/kpi-card-pro/support.html)**
 
 ---
 
 ## Overview
 
-KPI Card Pro displays current value, prior-period, target, variance and a compact sparkline inside a single tile, with conditional formatting across all elements. Designed for executive dashboards that need information density without visual clutter.
+Drop a measure into **Value** and you have a card. Add **Prior Period** and it shows the variance
+as a percentage with a direction arrow and the prior figure underneath. Add **Target** to track
+against a goal. Add a category to **Small Multiples** and the single card becomes a grid, one card
+per category.
 
-![KPI Card Pro Screenshot](assets/screenshot.png)
+Variance colours are configurable and can be inverted, for metrics where lower is better — cost,
+defects, churn.
 
----
+## Data roles
 
-## Features
+| Well | Type | What it does |
+|---|---|---|
+| **Value** | Measure | The number on the card. Required. |
+| **Prior Period** | Measure | Comparison value. Enables the variance percentage, the arrow and the "Prior:" line. |
+| **Target** | Measure | A goal to compare against. |
+| **Small Multiples (Pro)** | Grouping | One card per category, up to 50. Without a licence only the first category renders. |
+| **Tooltips** | Measures | Extra figures shown on hover. |
 
-| # | Feature | Free | Pro |
-|---|---------|:----:|:---:|
-| F01 | Metrics per card | 1 | Up to 6 |
-| F02 | Target lines & variance pills | — | ✅ |
-| F02 | Sparkline (line, area, bar) | Basic | ✅ |
-| F03 | High-contrast & accessibility color scales | ✅ | ✅ |
-| F04 | Tooltip drill-through with custom payload | — | ✅ |
-| F05 | Documented measure contract | ✅ | ✅ |
-| F06 | Formatting pane parity (Desktop & Service) | ✅ | ✅ |
-| F07 | Bookmark persistence | ✅ | ✅ |
-| F08 | Context menu on empty space | ✅ | ✅ |
+## Quick start
 
----
+1. Add the visual to the report canvas.
+2. Drag a measure into **Value**.
+3. Optionally add **Prior Period**, **Target**, and a category field in **Small Multiples**.
 
-## Data Roles (Measure Contract)
+## Free vs Pro
 
-| Role | Kind | Required | Description |
-|------|------|----------|-------------|
-| **Value** | Measure | ✅ Yes | Current period KPI value(s). Up to 6 measures (Pro). |
-| **Prior Period** | Measure | No | Previous period for % and absolute variance. |
-| **Target** | Measure | No | Goal/budget value. Shown as dashed line in sparkline (Pro). |
-| **Category** | Grouping | No | Time dimension for sparkline chart. |
-| **Tooltips** | Measure | No | Additional fields shown in drill-through tooltip (Pro). |
+The card is fully functional without a licence. Settings that need one carry **(Pro)** in the
+format pane.
 
----
+| Feature | Free | Pro |
+|---|---|---|
+| KPI card with value, variance and target | ✓ | ✓ |
+| Display units, decimal places, label styling | ✓ | ✓ |
+| Card background and border colour | ✓ | ✓ |
+| Variance colours, invert logic, direction arrow | ✓ | ✓ |
+| Native tooltips, cross-filtering, context menu | ✓ | ✓ |
+| Keyboard focus, ARIA labels, high contrast | ✓ | ✓ |
+| **Small Multiples** — up to 50 cards, columns and titles | ✗ | **✓** |
+| **Prefix and suffix** on the main value | ✗ | **✓** |
+| **Variance pill** style | ✗ | **✓** |
+| **Extra measures in tooltips** | ✗ | **✓** |
+| **Border width, radius, padding, drop shadow** | ✗ | **✓** |
 
-## Quick Start
+Changing a `(Pro)` setting without a licence leaves the card on the free result and raises Power
+BI's own notification, which links to the licence. The setting is stored and applies as soon as
+the licence is active.
 
-1. **Install** from [Microsoft AppSource](https://appsource.microsoft.com) or import the `.pbiviz` directly
-2. **Add** at least one measure to the **Value** field well
-3. Optionally add **Prior Period**, **Target**, and **Category** for full functionality
-4. **Format** using the Formatting pane (Card, Main Value, Variance, Sparkline, Target, Metrics Layout, Accessibility)
+## Formatting pane reference
 
----
+- **Card** — Background, Border Colour · *(Pro)* Border Width, Border Radius, Padding, Drop Shadow
+- **Main Value** — Font family, size, bold, colour, display units, decimal places · *(Pro)* Prefix, Suffix
+- **Label** — Show, font size, colour
+- **Variance** — Show, positive / negative / neutral colours, invert, show arrow, font size · *(Pro)* Show as Pill
+- **Small Multiples (Pro)** — Columns, gap, category title with its font size and colour
+- **Accessibility** — High contrast handling, visual title announced to screen readers
 
-## Freemium Model
-
-- **Free** — 1 metric, basic sparkline (area, 20 data points), fixed color scheme. No watermark on the data area.
-- **Pro** — Unlock via [Microsoft AppSource](https://appsource.microsoft.com) subscription:
-  - Up to 6 metrics with independent formatting
-  - Sparkline types: Line, Area, Bar
-  - Variance pills with custom positive/negative/neutral colors
-  - Target line in sparkline with custom style
-  - Tooltip drill-through with custom payload fields
-  - Custom color controls across all elements
-  - Multi-metric layouts: Single, 2-Column Grid, 3-Column Grid, Horizontal Strip
-
----
-
-## Formatting Pane Reference
-
-### Card
-- Background Color, Border Color, Border Width, Border Radius, Padding, Drop Shadow
-
-### Main Value
-- Font (family, size, bold, italic), Color, Display Units, Decimal Places, Prefix, Suffix
-
-### Label
-- Show, Custom Text, Font Size, Color
-
-### Variance
-- Show, Mode (vs Prior / vs Target / Both), Positive/Negative/Neutral Colors, Invert, Show Arrow, Show as Pill (Pro), Font Size
-
-### Sparkline
-- Show, Chart Type (Line/Area/Bar — Pro), Color (Pro), Area Opacity (Pro), Line Width (Pro), Show Last Point Dot, Height
-
-### Target
-- Show, Line Color (Pro), Line Style (Pro), Show Label, Label Text
-
-### Metrics Layout
-- Layout (Single / 2-Column / 3-Column / Horizontal — Pro), Show Dividers, Divider Color
-
-### Accessibility
-- High Contrast Mode, Visual Title (ARIA)
-
----
-
-## Build from Source
+## Build from source
 
 ```bash
 # Requirements: Node.js 18+, pbiviz tools v7.0.3
-npm install -g powerbi-visuals-tools@7.0.3
-
-# Clone and install
-git clone https://github.com/tinocallarisa-web/kpi-card-pro.git
-cd kpi-card-pro
 npm install
 
-# Development server
-pbiviz start
+npm start                            # dev server, live reload in Power BI Desktop
+npx pbiviz package                   # production .pbiviz, output in dist/
 
-# Package for submission
-pbiviz package
+node build-test.js                   # test build, isPro forced, guid ..._test
+node build-test.js --free            # test build, real Free tier, guid ..._testfree
+node build-test.js --free --debug    # adds the licence diagnostic overlay
 ```
 
-The packaged file will be at `dist/KpiCardPro.pbiviz`.
+The `--free` build is the only way to exercise the free path: with the production GUID, Power BI
+serves the version installed from AppSource rather than yours.
 
----
-
-## Project Structure
+## Project structure
 
 ```
-kpi-card-pro/
+kpiCardPro/
 ├── src/
-│   ├── visual.ts          # Main visual class
-│   └── settings.ts        # Formatting model cards
-├── style/
-│   └── visual.less        # Visual styles
-├── stringResources/
-│   ├── en-US/resources.resjson
-│   └── es-ES/resources.resjson
-├── docs/
-│   ├── privacy.html       # Privacy Policy (public URL)
-│   └── terms.html         # Terms of Use (public URL)
+│   ├── visual.ts          # rendering, licensing, interactions
+│   └── settings.ts        # formatting model
+├── style/visual.less
 ├── assets/
-│   ├── icon.png           # 20×20 visual icon
-│   ├── sample-data.csv    # 15 rows × 13 columns
-│   └── BUILD-PBIX.md      # Instructions for sample .pbix
+├── privacy.html           # served at /kpi-card-pro/privacy.html
+├── support.html           # served at /kpi-card-pro/support.html
+├── terms.html             # served at /kpi-card-pro/terms.html
+├── docs/                  # infographic and release deliverables
 ├── capabilities.json
 ├── pbiviz.json
-├── tsconfig.json
-└── package.json
+└── build-test.js
 ```
 
----
+The three public pages live in the repository root and are served by GitHub Pages from there.
 
-## Privacy & Legal
+## Licensing and privacy
 
-- **Privacy Policy:** https://tinocallarisa-web.github.io/kpi-card-pro/privacy.html
-- **Terms of Use:** https://tinocallarisa-web.github.io/kpi-card-pro/terms.html
-- The Visual collects **no data** and makes **no external network requests**.
-- License verification uses Microsoft's official `IVisualLicenseManager` API.
+Licensing is handled entirely through Microsoft AppSource using the official
+`IVisualLicenseManager` API (plan `kpi-card-pro-tcviz`). There is no external account, no separate
+payment system and no licence server. Resolution is asynchronous and never blocks rendering; both
+Active and Warning licence states are honoured.
 
----
+All calculation and rendering happens inside Power BI. The visual makes no network calls of any
+kind and stores nothing outside the report.
+See the [Privacy Policy](https://tinocallarisa-web.github.io/kpi-card-pro/privacy.html) and the
+[Terms of Use](https://tinocallarisa-web.github.io/kpi-card-pro/terms.html).
+
+**Commercial software.** Source is published for AppSource review transparency. Redistribution is
+not permitted.
 
 ## Support
 
-- 🌐 Website: [tcviz.com](https://tcviz.com)
-- 📧 Email: [support@tcviz.com](mailto:support@tcviz.com)
-- 🐛 Issues: [GitHub Issues](https://github.com/tinocallarisa-web/kpi-card-pro/issues)
-
----
-
-© 2025 TCViz. All rights reserved.
+- 📖 [Documentation](https://tinocallarisa-web.github.io/kpi-card-pro/support.html)
+- 🐛 [Report a bug](https://github.com/tinocallarisa-web/kpi-card-pro/issues)
+- 📧 [support@tcviz.com](mailto:support@tcviz.com)
