@@ -114,6 +114,8 @@ export class Visual implements IVisual {
     private lastBlockedNotice = "";
     /** The persistent icon is a one-shot: it stays until cleared. */
     private licenseIconShown = false;
+    /** Solo para el overlay de diagnostico. */
+    private dbgMeasureIdx = 0;
 
     constructor(options: VisualConstructorOptions) {
         this.host = options.host;
@@ -382,6 +384,18 @@ export class Visual implements IVisual {
             `sig=${a.signature || "(vacio)"}`,
             `lastNotice=${this.lastBlockedNotice || "(vacio)"} icon=${this.licenseIconShown}`,
         ];
+
+        // La serie tal y como llega: clave del periodo y valor, en orden de entrega.
+        const roles2 = this.rowRoles(rows);
+        const card0  = rows?.root?.children?.[0];
+        const serieNode = roles2.sm >= 0 ? card0 : rows?.root;
+        const kids = serieNode?.children ?? [];
+        lines.push(`serie de: ${roles2.sm >= 0 ? String(card0?.value) : "raiz"}  n=${kids.length}`);
+        const mIdx = this.dbgMeasureIdx;
+        kids.slice(0, 8).forEach((k, i) => {
+            const v = this.getNodeValue(k.values ?? {}, mIdx);
+            lines.push(`  [${i}] ${JSON.stringify(k.value)} = ${v}`);
+        });
         // Deferred: render() clears the container in an atomic swap right after
         // this runs, so anything appended now is wiped before it is ever seen.
         // The original badge survived because it was appended to the new tree;
@@ -681,15 +695,34 @@ export class Visual implements IVisual {
         return out;
     }
 
-    /** Ordered measure values of a node's children — the sparkline series. */
+    /**
+     * The sparkline series: a node's children, in time order.
+     *
+     * Power BI does not always deliver them chronologically. A real date column
+     * comes ordered; a plain numeric period — a month number, a week number —
+     * arrives sorted by the measure instead, descending. The line then slid
+     * downwards on every card whatever the data did, because it was not a trend
+     * at all but the same values sorted from high to low.
+     *
+     * So: sort by the key ourselves, but only when every key is a number or a
+     * date, where ascending order is unambiguous. Text keys are left exactly as
+     * delivered — sorting "Enero, Febrero, Marzo" alphabetically would break the
+     * Sort-by-column the user set up precisely to avoid that.
+     */
     private seriesFrom(node: powerbi.DataViewMatrixNode | undefined, measureIdx: number): number[] {
-        const kids = node?.children ?? [];
-        const out: number[] = [];
-        for (const k of kids) {
-            const v = this.getNodeValue(k.values ?? {}, measureIdx);
-            out.push(v ?? 0);
+        const kids = (node?.children ?? []).slice();
+
+        const key = (k: powerbi.DataViewMatrixNode): number | null => {
+            const v = k.value as any;
+            if (typeof v === "number") return v;
+            if (v instanceof Date) return v.getTime();
+            return null;
+        };
+        if (kids.length > 1 && kids.every(k => key(k) !== null)) {
+            kids.sort((a, b) => (key(a) as number) - (key(b) as number));
         }
-        return out;
+
+        return kids.map(k => this.getNodeValue(k.values ?? {}, measureIdx) ?? 0);
     }
 
     private parseDataView(dataView?: DataView): MetricData[] {
@@ -715,6 +748,7 @@ export class Visual implements IVisual {
         }
 
         if (measureIdx === -1) return [];
+        this.dbgMeasureIdx = measureIdx;
 
         // Detect active cross-highlight in the whole matrix
         const hasHighlights = this.detectHighlights(matrix, measureIdx);
