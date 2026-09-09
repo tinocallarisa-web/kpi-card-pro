@@ -81,7 +81,7 @@
   <header>
     <a class="brand" href="https://tcviz.com">TCViz</a>
     <h1>Support</h1>
-    <p class="meta">KPI Card Pro &nbsp;·&nbsp; v1.1.0.0 &nbsp;·&nbsp; docs updated 9 September 2026 &nbsp;·&nbsp; tcviz.com</p>
+    <p class="meta">KPI Card Pro &nbsp;·&nbsp; v1.2.0.0 &nbsp;·&nbsp; docs updated 9 September 2026 &nbsp;·&nbsp; tcviz.com</p>
   </header>
 
   <main>
@@ -94,8 +94,9 @@
       <li>Add a measure to <strong>Prior Period</strong> to show the variance, as a percentage with a
         direction arrow and the prior value underneath.</li>
       <li>Add a measure to <strong>Target</strong> to track against a goal.</li>
+      <li>Add a date to <strong>Trend (Pro)</strong> to draw a trend line inside the card.</li>
       <li>Add a category field to <strong>Small Multiples (Pro)</strong> to render one card per
-        category instead of one card in total.</li>
+        category instead of one card in total — each with its own line.</li>
       <li>Add measures to <strong>Tooltips</strong> to show more figures on hover.</li>
     </ul>
 
@@ -107,6 +108,10 @@
       <li><strong>Target</strong> (measure) — a goal to compare against.</li>
       <li><strong>Small Multiples (Pro)</strong> (grouping) — one card per category, up to 50. Without
         a licence only the first category renders.</li>
+      <li><strong>Trend (Pro)</strong> (grouping) — a date or ordered period. Each distinct value is a
+        point on the line, with the Value measure aggregated at that point. Use a real date column:
+        a month stored as text would be ordered alphabetically. A numeric period is reordered by the
+        visual so the line reads left to right in time.</li>
       <li><strong>Tooltips</strong> (measures) — additional figures shown on hover.</li>
     </ul>
 
@@ -121,6 +126,8 @@
       <li><strong>Variance</strong> — Show, positive / negative / neutral colours, invert logic (for
         cost metrics where lower is better), show arrow, font size, and
         <strong>(Pro)</strong> Show as Pill.</li>
+      <li><strong>Trend (Pro)</strong> — Show, chart type (area, line or bar), colour, line width,
+        area opacity, height, last-point marker, and the target line drawn across the chart.</li>
       <li><strong>Small Multiples (Pro)</strong> — Columns, gap, category title with its font size
         and colour.</li>
       <li><strong>Accessibility</strong> — High contrast handling and the visual title announced to
@@ -137,10 +144,11 @@
         units and decimals; label styling; card background and border colour; all variance colours,
         invert logic and arrow; native tooltips; high contrast; keyboard focus and screen-reader
         labels; cross-filtering by clicking the card.</li>
-      <li><strong>Pro</strong> — Small Multiples, up to 50 cards from a category field, with the
-        multi-column layout and category titles; prefix and suffix on the main value; the variance
-        pill style; extra measures in tooltips; and the card border width, radius, padding and drop
-        shadow controls.</li>
+      <li><strong>Pro</strong> — the trend line inside the card, over a date or period axis, with
+        the target marked; Small Multiples, up to 50 cards from a category field, each with its own
+        line, in a multi-column layout with category titles; prefix and suffix on the main value;
+        the variance pill style; extra measures in tooltips; and the card border width, radius,
+        padding and drop shadow controls.</li>
     </ul>
     <p>
       Changing a <strong>(Pro)</strong> setting without a licence leaves the card on the free result
@@ -159,6 +167,11 @@
     </ul>
 
     <h2>Frequently asked questions</h2>
+
+    <p><strong>My trend line only goes down, whatever the data does.</strong><br />
+      That was a defect in versions before 1.2.0.0: a numeric period such as a month number was
+      delivered sorted by the measure rather than in time order, so the line was the values sorted
+      from high to low. It is fixed. If you are on an older build, use a real date column.</p>
 
     <p><strong>I added a field to Small Multiples and still see one card.</strong><br />
       Small Multiples is a Pro feature. Without a licence the first category renders and the rest are

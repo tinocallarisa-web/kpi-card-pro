@@ -36,7 +36,8 @@ Free tier (no license required):
 - High Contrast mode and ARIA title (Accessibility section)
 
 Pro tier (requires active AppSource license — plan: kpi-card-pro-tcviz):
-- Small Multiples: up to 50 cards from a category dimension
+- Trend line inside the card, over a date or period axis, with the target marked
+- Small Multiples: up to 50 cards from a category dimension, each with its own trend line
 - Multi-column layout (1–6 columns) with configurable gap
 - Custom prefix and suffix on main value
 - Variance pill style (the colours themselves are available in both tiers)
@@ -46,7 +47,9 @@ Pro tier (requires active AppSource license — plan: kpi-card-pro-tcviz):
 Testing instructions:
 1. Import the .pbiviz file included in the submission via Insert > More visuals > Import from file.
 2. Open the sample .pbix file included in the submission — it contains pre-configured examples and a "Tips & Hints" page.
-3. Without a Pro license: verify the single KPI card renders with value, prior period variance (%), and target. Confirm the "Free" badge appears in the bottom-right corner.
+3. Bind a date column to the "Trend" field well. Without a licence no line is drawn and Power BI
+   raises its own licence notification; with a licence the line appears inside each card.
+4. Without a Pro license: verify the single KPI card renders with value, prior period variance (%), and target. Confirm the "Free" badge appears in the bottom-right corner.
 4. With a Pro license assigned via Partner Center: drag a dimension field to "Small Multiples" and verify multiple cards render (up to 50). Confirm the "Free" badge disappears and Pro formatting controls are active.
 5. Right-click on any card to verify the Power BI context menu appears correctly.
 6. Hover over a card to verify the native tooltip shows value and prior period data.

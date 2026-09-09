@@ -1,12 +1,12 @@
 # KPI Card Pro
 
-**KPI card with prior-period variance, target and small multiples for Power BI.**
+**KPI card with prior-period variance, target, trend line and small multiples for Power BI.**
 
 > Developed by [TCViz](https://tcviz.com) — Custom Visuals for Power BI
 
 [![AppSource](https://img.shields.io/badge/AppSource-Published-0078D4?logo=microsoft)](https://appsource.microsoft.com)
 [![Power BI API](https://img.shields.io/badge/API-5.10.0-yellow)](https://github.com/microsoft/powerbi-visuals-api)
-[![Version](https://img.shields.io/badge/version-1.1.0.0-brightgreen)](pbiviz.json)
+[![Version](https://img.shields.io/badge/version-1.2.0.0-brightgreen)](pbiviz.json)
 [![License](https://img.shields.io/badge/License-Proprietary-red)](https://tinocallarisa-web.github.io/kpi-card-pro/terms.html)
 
 📖 **[Documentation & Support](https://tinocallarisa-web.github.io/kpi-card-pro/support.html)**
@@ -17,8 +17,9 @@
 
 Drop a measure into **Value** and you have a card. Add **Prior Period** and it shows the variance
 as a percentage with a direction arrow and the prior figure underneath. Add **Target** to track
-against a goal. Add a category to **Small Multiples** and the single card becomes a grid, one card
-per category.
+against a goal. Add a date to **Trend** and the card grows a trend line. Add a category to
+**Small Multiples** and the single card becomes a grid, one card per category — each with its own
+line.
 
 Variance colours are configurable and can be inverted, for metrics where lower is better — cost,
 defects, churn.
@@ -31,13 +32,18 @@ defects, churn.
 | **Prior Period** | Measure | Comparison value. Enables the variance percentage, the arrow and the "Prior:" line. |
 | **Target** | Measure | A goal to compare against. |
 | **Small Multiples (Pro)** | Grouping | One card per category, up to 50. Without a licence only the first category renders. |
+| **Trend (Pro)** | Grouping | A date or ordered period. Draws a trend line inside each card over this axis. |
 | **Tooltips** | Measures | Extra figures shown on hover. |
 
 ## Quick start
 
 1. Add the visual to the report canvas.
 2. Drag a measure into **Value**.
-3. Optionally add **Prior Period**, **Target**, and a category field in **Small Multiples**.
+3. Optionally add **Prior Period**, **Target**, a date in **Trend**, and a category field in
+   **Small Multiples**.
+
+Use a real date column in **Trend**. A text month would be ordered alphabetically; a numeric
+period is reordered by the visual so the line reads left to right in time.
 
 ## Free vs Pro
 
@@ -52,6 +58,7 @@ format pane.
 | Variance colours, invert logic, direction arrow | ✓ | ✓ |
 | Native tooltips, cross-filtering, context menu | ✓ | ✓ |
 | Keyboard focus, ARIA labels, high contrast | ✓ | ✓ |
+| **Trend line** inside the card — area, line or bars, with the target marked | ✗ | **✓** |
 | **Small Multiples** — up to 50 cards, columns and titles | ✗ | **✓** |
 | **Prefix and suffix** on the main value | ✗ | **✓** |
 | **Variance pill** style | ✗ | **✓** |
@@ -68,6 +75,7 @@ the licence is active.
 - **Main Value** — Font family, size, bold, colour, display units, decimal places · *(Pro)* Prefix, Suffix
 - **Label** — Show, font size, colour
 - **Variance** — Show, positive / negative / neutral colours, invert, show arrow, font size · *(Pro)* Show as Pill
+- **Trend (Pro)** — Show, chart type (area / line / bar), colour, line width, area opacity, height, last-point marker, target line
 - **Small Multiples (Pro)** — Columns, gap, category title with its font size and colour
 - **Accessibility** — High contrast handling, visual title announced to screen readers
 

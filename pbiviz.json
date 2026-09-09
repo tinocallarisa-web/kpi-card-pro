@@ -4,7 +4,7 @@
     "displayName": "KPI Card Pro",
     "guid": "kpiCardProTCViz",
     "visualClassName": "Visual",
-    "version": "1.1.0.0",
+    "version": "1.2.0.0",
     "description": "Multi-metric KPI card with trend, target and variance for Power BI executive dashboards.",
     "supportUrl": "https://tinocallarisa-web.github.io/kpi-card-pro/support.html",
     "privacyTermsLink": "https://tinocallarisa-web.github.io/kpi-card-pro/privacy.html",
