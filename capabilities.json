@@ -25,7 +25,8 @@
       "descriptionKey": "Role_Target_Description"
     },
     {
-      "displayName": "Small Multiples",
+      "displayName": "Small Multiples (Pro)",
+            "description": "Renders one card per category. The Pro plan shows up to 50; without a licence only the first category is rendered.",
       "displayNameKey": "Role_SmallMultiples",
       "name": "smallMultiples",
       "kind": "Grouping",

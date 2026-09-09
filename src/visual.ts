@@ -269,13 +269,26 @@ export class Visual implements IVisual {
 
         const groups: [string, string, string[]][] = [
             ["card styling",   "card",                 ["borderWidth", "borderRadius", "padding", "shadow"]],
-            ["small multiples","smallMultiplesLayout", ["columns", "gap", "showTitle", "titleFontSize", "titleColor"]],
+            ["the small multiples layout","smallMultiplesLayout", ["columns", "gap", "showTitle", "titleFontSize", "titleColor"]],
             ["prefix/suffix",  "mainValue",            ["prefix", "suffix"]],
             ["the variance pill", "variance",          ["showPill"]],
         ];
 
         const labels: string[] = [];
         const parts:  string[] = [];
+
+        // Small Multiples is bound in a field well, not the format pane, so it
+        // leaves nothing in metadata.objects. Without this the most visible gate
+        // in the visual — twelve categories rendering as a single card — passed
+        // silently. Only count it when cards are actually being dropped: one
+        // category renders the same either way, so there is nothing to sell.
+        const smChildren = this.lastDataView?.matrix?.rows?.root?.children?.length ?? 0;
+        const smGrouped  = (this.lastDataView?.matrix?.rows?.levels?.length ?? 0) > 0;
+        if (smGrouped && smChildren > 1) {
+            labels.push(`small multiples (${smChildren} categories, showing 1)`);
+            parts.push(`role.smallMultiples=${smChildren}`);
+        }
+
         for (const [label, card, props] of groups) {
             let touched = false;
             for (const p of props) {
