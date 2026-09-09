@@ -273,8 +273,12 @@ export class Visual implements IVisual {
      * therefore a real moment of purchase intent.
      */
     private attemptedProFeatures(): { labels: string[]; signature: string } {
-        const objs = this.lastDataView?.metadata?.objects as any;
-        if (!objs) return { labels: [], signature: "" };
+        // No early return on a missing metadata.objects. A report where the user
+        // has changed no formatting property has no objects at all — and that is
+        // exactly the case of someone who has only dropped a field into Small
+        // Multiples. Returning here skipped the data-role check below, so the
+        // most visible gate in the visual stayed silent.
+        const objs = (this.lastDataView?.metadata?.objects ?? {}) as any;
 
         const groups: [string, string, string[]][] = [
             ["card styling",   "card",                 ["borderWidth", "borderRadius", "padding", "shadow"]],
@@ -365,6 +369,14 @@ export class Visual implements IVisual {
             `sig=${a.signature || "(vacio)"}`,
             `lastNotice=${this.lastBlockedNotice || "(vacio)"} icon=${this.licenseIconShown}`,
         ];
+        // Deferred: render() clears the container in an atomic swap right after
+        // this runs, so anything appended now is wiped before it is ever seen.
+        // The original badge survived because it was appended to the new tree;
+        // this overlay is not part of that tree, so it has to wait for the swap.
+        setTimeout(() => this.dbgPaint(lines), 0);
+    }
+
+    private dbgPaint(lines: string[]): void {
         let box = this.container.querySelector("#dbg-lic") as HTMLElement | null;
         if (!box) {
             box = document.createElement("div");
