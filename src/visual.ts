@@ -279,14 +279,27 @@ export class Visual implements IVisual {
 
         // Small Multiples is bound in a field well, not the format pane, so it
         // leaves nothing in metadata.objects. Without this the most visible gate
-        // in the visual — twelve categories rendering as a single card — passed
-        // silently. Only count it when cards are actually being dropped: one
-        // category renders the same either way, so there is nothing to sell.
-        const smChildren = this.lastDataView?.matrix?.rows?.root?.children?.length ?? 0;
-        const smGrouped  = (this.lastDataView?.matrix?.rows?.levels?.length ?? 0) > 0;
-        if (smGrouped && smChildren > 1) {
-            labels.push(`small multiples (${smChildren} categories, showing 1)`);
-            parts.push(`role.smallMultiples=${smChildren}`);
+        // in the visual — a dozen categories rendering as a single card — passed
+        // in silence.
+        //
+        // Binding the field is the intent: nobody drags a category in expecting
+        // one card. So this fires on the binding, not on the category count.
+        //
+        // hasGrouping repeats the test parseDataView uses, and it needs both
+        // halves: a matrix with no grouping still returns one anonymous child,
+        // so levels.length alone would report grouping that is not there.
+        const smRows = this.lastDataView?.matrix?.rows;
+        const smHasGrouping = (smRows?.levels?.length ?? 0) > 0
+            && !!smRows?.root?.children
+            && smRows.root.children.length > 0
+            && smRows.root.children[0].value !== undefined;
+
+        if (smHasGrouping) {
+            const n = smRows.root.children.length;
+            labels.push(n > 1
+                ? `small multiples (${n} categories, showing 1)`
+                : "small multiples");
+            parts.push(`role.smallMultiples=${n}`);
         }
 
         for (const [label, card, props] of groups) {
