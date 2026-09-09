@@ -137,7 +137,7 @@ Add text boxes with the following content:
 - Documentation: https://tcviz.com
 - Privacy Policy: https://tinocallarisa-web.github.io/kpi-card-pro/privacy.html
 - Terms of Use: https://tinocallarisa-web.github.io/kpi-card-pro/terms.html
-- Support: info@tcviz.com
+- Support: support@tcviz.com
 
 ---
 

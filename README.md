@@ -158,7 +158,7 @@ kpi-card-pro/
 ## Support
 
 - 🌐 Website: [tcviz.com](https://tcviz.com)
-- 📧 Email: [info@tcviz.com](mailto:info@tcviz.com)
+- 📧 Email: [support@tcviz.com](mailto:support@tcviz.com)
 - 🐛 Issues: [GitHub Issues](https://github.com/tinocallarisa-web/kpi-card-pro/issues)
 
 ---
