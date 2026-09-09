@@ -49,6 +49,8 @@ let licenseResolved: boolean | null = null;
 let licenseEnvSupported = true;
 /** False when the licence could not be read: offline, or not signed in. */
 let licenseInfoAvailable = true;
+/** Diagnostic overlay. Patched to true by `node build-test.js --debug`. */
+let DBG_LICENSE = false; // DBG_LICENSE_MARKER
 
 
 function resolveLicense(licenseManager: IVisualLicenseManager): Promise<boolean> {
@@ -348,7 +350,35 @@ export class Visual implements IVisual {
      * put its only explanation in a `title` attribute on an element with
      * `pointer-events: none`, so it could never be hovered and never appeared.
      */
+    /** Diagnostic overlay: what the licence detection actually sees. */
+    private dbgOverlay(stage: string): void {
+        if (!DBG_LICENSE) return;
+        const rows = this.lastDataView?.matrix?.rows;
+        const a = this.attemptedProFeatures();
+        const lines = [
+            `stage=${stage}`,
+            `isPro=${this.isPro} resolved=${licenseResolved}`,
+            `env=${licenseEnvSupported} info=${licenseInfoAvailable}`,
+            `levels=${rows?.levels?.length ?? "-"} children=${rows?.root?.children?.length ?? "-"}`,
+            `child0.value=${JSON.stringify(rows?.root?.children?.[0]?.value)}`,
+            `labels=[${a.labels.join(" / ")}]`,
+            `sig=${a.signature || "(vacio)"}`,
+            `lastNotice=${this.lastBlockedNotice || "(vacio)"} icon=${this.licenseIconShown}`,
+        ];
+        let box = this.container.querySelector("#dbg-lic") as HTMLElement | null;
+        if (!box) {
+            box = document.createElement("div");
+            box.id = "dbg-lic";
+            box.style.cssText = "position:absolute;top:2px;left:2px;z-index:99999;max-width:96%;" +
+                "font:10px/1.35 monospace;color:#fff;background:#C96442;padding:3px 6px;" +
+                "border-radius:3px;white-space:pre;pointer-events:none;";
+            this.container.appendChild(box);
+        }
+        box.textContent = lines.join(String.fromCharCode(10));
+    }
+
     private notifyProFeatureBlocked(): void {
+        this.dbgOverlay("enter");
         if (this.isPro) { this.clearLicenseNotice(); return; }
 
         // The licence resolves after the first paint, so isPro is false on the way

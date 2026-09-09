@@ -63,6 +63,20 @@ try {
     fs.writeFileSync(PBIVIZ_JSON, JSON.stringify(pbiviz, null, 2), 'utf8');
     console.log(`📝  GUID   →  ${guid}`);
 
+    // Overlay de diagnóstico: muestra qué ve la detección de licencia.
+    // Nunca debe llegar a una build de producción; por eso vive tras una bandera
+    // que solo este script enciende, y el fuente queda restaurado al final.
+    if (process.argv.includes('--debug')) {
+        const DBG_OFF = 'let DBG_LICENSE = false; // DBG_LICENSE_MARKER';
+        const DBG_ON  = 'let DBG_LICENSE = true;  // DBG_LICENSE_MARKER';
+        const src = fs.readFileSync(VISUAL_TS, 'utf8');
+        if (!src.includes(DBG_OFF)) {
+            throw new Error('No se encontró DBG_LICENSE_MARKER en src/visual.ts.');
+        }
+        fs.writeFileSync(VISUAL_TS, src.replace(DBG_OFF, DBG_ON), 'utf8');
+        console.log('🐞  DBG_LICENSE  →  true  (overlay de diagnóstico ACTIVO)');
+    }
+
     if (freeMode) {
         console.log('📝  isPro  →  false  (--free: tier Free real, sin forzar)');
     } else {
@@ -72,7 +86,9 @@ try {
                 `Actualiza este script para que coincida con el fuente actual.`
             );
         }
-        fs.writeFileSync(VISUAL_TS, visualOrig.replace(ISPRO_FALSE, ISPRO_TRUE), 'utf8');
+        // Leer del disco, no de visualOrig: --debug puede haber parcheado ya.
+        const cur = fs.readFileSync(VISUAL_TS, 'utf8');
+        fs.writeFileSync(VISUAL_TS, cur.replace(ISPRO_FALSE, ISPRO_TRUE), 'utf8');
         console.log('📝  isPro  →  true');
     }
 
