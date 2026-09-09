@@ -244,7 +244,14 @@ export class Visual implements IVisual {
     }
 
     private applyLicense(isPro: boolean): void {
-        if (!isPro || this.isPro) return;             // only ever upgrades Free → Pro
+        if (!isPro || this.isPro) {
+            // Free stays Free — but the answer has arrived, and notifying is the
+            // one thing still pending. render() already ran and bailed out of the
+            // notification because the licence was unresolved; nothing re-renders
+            // for a Free user, so without this the banner never appears at all.
+            this.notifyProFeatureBlocked();
+            return;
+        }
         this.isPro = true;
         this.clearLicenseNotice();
         if (this.lastDataView && this.formattingSettings) {
