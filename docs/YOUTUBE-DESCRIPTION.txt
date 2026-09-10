@@ -1,0 +1,78 @@
+KPI CARD PRO v1.2.0.0 — YOUTUBE
+================================================================
+
+TÍTULOS (elige uno; el 1 es el que recomiendo)
+----------------------------------------------------------------
+1. One KPI card, twelve at a glance — KPI Card Pro for Power BI
+2. Power BI KPI cards with a trend line, a target and small multiples
+3. Turn one KPI into a grid of twelve — KPI Card Pro for Power BI
+4. KPI Card Pro: the number, the trend and the target in one card
+5. Stop stacking KPI visuals in Power BI — one card, every category
+
+Por qué el 1: dice el beneficio antes que el producto, cabe entero en el
+listado de YouTube (58 caracteres) y contiene "Power BI", que es lo que la
+gente busca. Evita "Pro 1.2", que no aporta y envejece con cada versión.
+
+Versión en español, si el audio es en español:
+   Un KPI, doce de un vistazo — KPI Card Pro para Power BI
+
+
+DESCRIPCIÓN LARGA
+----------------------------------------------------------------
+KPI Card Pro turns a single measure into a card that actually says
+something: the number, how it compares with the prior period, the target,
+and the trend behind it. Drop a category field in and the card becomes a
+grid — one card per channel, product or region, each with its own line.
+
+In this video:
+• Building the card from a single measure
+• Prior period variance, with the arrow and the comparison underneath
+• The trend line: area, line or bars, over any date or period axis
+• The target drawn period by period, so you see where you fell short
+• One card per category with Small Multiples
+• A logo per category from a Base64 image column
+• What the Pro plan unlocks, and what stays free
+
+FREE
+The complete card: value, prior-period variance, target, display units,
+label and card styling, all variance colours and the invert logic for
+metrics where lower is better, images, tooltips, cross-filtering, keyboard
+navigation and high contrast.
+
+PRO
+The trend line inside the card, and Small Multiples — up to 50 cards from a
+category field, each with its own line. Plus prefix and suffix, the
+variance pill, extra tooltip measures, and the card border and padding
+controls.
+
+PRIVACY
+No network calls of any kind. All calculation happens inside Power BI, and
+images must be embedded in your model as Base64 — external URLs are
+rejected on purpose.
+
+LINKS
+Get it on Microsoft AppSource: [añadir enlace de la ficha]
+Documentation: https://tinocallarisa-web.github.io/kpi-card-pro/support.html
+Privacy: https://tinocallarisa-web.github.io/kpi-card-pro/privacy.html
+Terms: https://tinocallarisa-web.github.io/kpi-card-pro/terms.html
+GitHub: https://github.com/tinocallarisa-web/kpi-card-pro
+
+#PowerBI #DataVisualization #BusinessIntelligence #KPI #Dashboard
+
+
+CAPÍTULOS (pon los tiempos reales)
+----------------------------------------------------------------
+0:00  The problem: one number is not enough
+0:00  Building the card
+0:00  Prior period and target
+0:00  The trend line
+0:00  One card per category
+0:00  Logos per category
+0:00  Free vs Pro
+
+
+VERSIÓN CORTA (Shorts, LinkedIn)
+----------------------------------------------------------------
+One measure in, and you get the number, the variance, the target and the
+trend. Add a category and it becomes twelve cards, each with its own line.
+KPI Card Pro for Power BI.
