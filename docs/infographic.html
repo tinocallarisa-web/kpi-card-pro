@@ -33,8 +33,10 @@
   /* Infographic container */
   #infographic {
     width: 1366px;
-    /* Alto fijo, no del contenido: Microsoft pide 1366x768 exactos y
-       html2canvas captura la caja tal y como esta maquetada. */
+    /* 1366x768 exactos: la medida que pide Microsoft. El contenido no se
+
+       recorta para caber, se escala — ver ajustar() al final del fichero. */
+
     height: 768px;
     background: #FAF9F5;
     font-family: 'Segoe UI', system-ui, sans-serif;
@@ -712,22 +714,78 @@
 </div><!-- /infographic -->
 
 <script>
+/**
+ * Ajuste a 1366x768.
+ *
+ * Microsoft pide esa medida exacta. Recortar con overflow:hidden la respeta
+ * pero deja la infografia con el pie cortado, y escalar solo en alto la
+ * deforma. Esto reduce el contenido entero de forma uniforme hasta que cabe,
+ * compensando el ancho para que siga llenando los 1366.
+ *
+ * Iterativo porque las dos magnitudes dependen entre si: al ensanchar la
+ * maqueta el texto ocupa menos lineas y el alto baja, lo que permite una
+ * escala mayor. Converge en tres o cuatro vueltas.
+ */
+const ANCHO = 1366, ALTO = 768;
+let inner = null, escala = 1;
+
+function envolver() {
+  const existente = document.getElementById('info-inner');
+  if (existente) return existente;
+  const box = document.getElementById('infographic');
+  const w = document.createElement('div');
+  w.id = 'info-inner';
+  w.style.cssText = 'transform-origin: top left; width:' + ANCHO + 'px;';
+  while (box.firstChild) w.appendChild(box.firstChild);
+  box.appendChild(w);
+  return w;
+}
+
+function ajustar() {
+  inner = envolver();
+  escala = 1;
+  for (let i = 0; i < 8; i++) {
+    inner.style.width = (ANCHO / escala) + 'px';
+    inner.style.transform = 'none';            // medir sin escalar
+    const alto = inner.scrollHeight;
+    const nueva = Math.min(1, ALTO / alto);
+    if (Math.abs(nueva - escala) < 0.002) { escala = nueva; break; }
+    escala = nueva;
+  }
+  inner.style.width = (ANCHO / escala) + 'px';
+  inner.style.transform = 'scale(' + escala + ')';
+}
+
+window.addEventListener('load', ajustar);
+
 async function downloadPNG() {
   const btn = document.getElementById('dl-btn');
   btn.textContent = '⏳ Generating…';
   btn.disabled = true;
   try {
-    const el = document.getElementById('infographic');
-    const canvas = await html2canvas(el, {
-      width: 1366,
-      height: 768,   // fijo: con offsetHeight el PNG salia con la altura de la maqueta
-      scale: 1,
-      useCORS: true,
-      backgroundColor: '#FAF9F5'
+    ajustar();
+    // Se captura a tamano natural y se reescala al dibujar. html2canvas tiene
+    // soporte irregular de transform: capturarlo ya escalado haria depender el
+    // resultado de su version. Asi solo depende de drawImage, que no falla.
+    const ancho = ANCHO / escala;
+    const alto  = ALTO  / escala;
+    inner.style.transform = 'none';
+    const shot = await html2canvas(inner, {
+      width: ancho, height: alto, scale: 1,
+      useCORS: true, backgroundColor: '#FAF9F5'
     });
+    inner.style.transform = 'scale(' + escala + ')';
+
+    const out = document.createElement('canvas');
+    out.width = ANCHO; out.height = ALTO;
+    const ctx = out.getContext('2d');
+    ctx.fillStyle = '#FAF9F5';
+    ctx.fillRect(0, 0, ANCHO, ALTO);
+    ctx.drawImage(shot, 0, 0, ANCHO, ALTO);
+
     const link = document.createElement('a');
     link.download = 'kpi-card-pro-infographic.png';
-    link.href = canvas.toDataURL('image/png');
+    link.href = out.toDataURL('image/png');
     link.click();
   } finally {
     btn.textContent = '⬇ Download PNG';
@@ -736,30 +794,5 @@ async function downloadPNG() {
 }
 </script>
 
-<script>
-// Aviso de desbordamiento.
-//
-// #infographic lleva overflow:hidden para garantizar los 1366x768 que pide
-// Microsoft. El efecto colateral es que si la maqueta crece, lo que sobra se
-// recorta sin decir nada y el PNG sale con el pie cortado. Esto lo dice.
-//
-// Vive FUERA de #infographic a proposito: html2canvas captura ese elemento, y
-// un aviso dentro acabaria dibujado en la imagen que se sube a Partner Center.
-(function () {
-  window.addEventListener('load', function () {
-    var el = document.getElementById('infographic');
-    if (!el) return;
-    var sobra = el.scrollHeight - 768;
-    if (sobra <= 0) return;
-    var d = document.createElement('div');
-    d.style.cssText = 'position:fixed;bottom:12px;left:12px;z-index:9999;' +
-      'font:600 12px/1.5 system-ui,sans-serif;color:#fff;background:#8C3A3A;' +
-      'padding:8px 12px;border-radius:6px;max-width:420px;';
-    d.textContent = 'El contenido se sale ' + sobra + 'px de los 768. El PNG saldra ' +
-      'recortado por abajo: reduce alguna seccion antes de exportar.';
-    document.body.appendChild(d);
-  });
-})();
-</script>
 </body>
 </html>
