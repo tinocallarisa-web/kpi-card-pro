@@ -28,7 +28,9 @@
       "name": "image",
       "displayName": "Image",
       "description": "A column holding a Base64 data URI (data:image/*;base64,...). Shown in the top-right of each card. External URLs are rejected: the visual makes no network requests.",
-      "kind": "Measure"
+      "kind": "Measure",
+      "displayNameKey": "Role_Image",
+      "descriptionKey": "Role_Image_Description"
     },
     {
       "displayName": "Small Multiples (Pro)",
@@ -42,7 +44,9 @@
       "name": "trend",
       "displayName": "Trend (Pro)",
       "description": "A date or ordered field. Draws a trend line inside each card, over this axis.",
-      "kind": "Grouping"
+      "kind": "Grouping",
+      "displayNameKey": "Role_Trend",
+      "descriptionKey": "Role_Trend_Description"
     },
     {
       "displayName": "Tooltips",
@@ -317,13 +321,15 @@
             "formatting": {
               "fontFamily": true
             }
-          }
+          },
+          "displayNameKey": "Prop_Label_FontFamily"
         },
         "bold": {
           "displayName": "Bold",
           "type": {
             "bool": true
-          }
+          },
+          "displayNameKey": "Prop_Label_Bold"
         }
       }
     },
@@ -450,13 +456,15 @@
             "formatting": {
               "fontFamily": true
             }
-          }
+          },
+          "displayNameKey": "Prop_SM_TitleFontFamily"
         },
         "titleBold": {
           "displayName": "Title Bold",
           "type": {
             "bool": true
-          }
+          },
+          "displayNameKey": "Prop_SM_TitleBold"
         }
       }
     },
@@ -487,7 +495,8 @@
           "displayName": "Show",
           "type": {
             "bool": true
-          }
+          },
+          "displayNameKey": "Prop_Trend_Show"
         },
         "type": {
           "displayName": "Chart Type",
@@ -506,7 +515,8 @@
                 "displayName": "Bar"
               }
             ]
-          }
+          },
+          "displayNameKey": "Prop_Trend_Type"
         },
         "color": {
           "displayName": "Color",
@@ -516,37 +526,43 @@
                 "color": true
               }
             }
-          }
+          },
+          "displayNameKey": "Prop_Trend_Color"
         },
         "lineWidth": {
           "displayName": "Line Width",
           "type": {
             "numeric": true
-          }
+          },
+          "displayNameKey": "Prop_Trend_LineWidth"
         },
         "areaOpacity": {
           "displayName": "Area Opacity %",
           "type": {
             "numeric": true
-          }
+          },
+          "displayNameKey": "Prop_Trend_AreaOpacity"
         },
         "height": {
           "displayName": "Height (px)",
           "type": {
             "numeric": true
-          }
+          },
+          "displayNameKey": "Prop_Trend_Height"
         },
         "showDot": {
           "displayName": "Highlight Last Point",
           "type": {
             "bool": true
-          }
+          },
+          "displayNameKey": "Prop_Trend_ShowDot"
         },
         "showTargetLine": {
           "displayName": "Show Target Line",
           "type": {
             "bool": true
-          }
+          },
+          "displayNameKey": "Prop_Trend_ShowTargetLine"
         },
         "targetColor": {
           "displayName": "Target Line Color",
@@ -556,9 +572,11 @@
                 "color": true
               }
             }
-          }
+          },
+          "displayNameKey": "Prop_Trend_TargetColor"
         }
-      }
+      },
+      "displayNameKey": "Object_Trend"
     },
     "subTotals": {
       "displayName": "Subtotals",
@@ -602,21 +620,25 @@
           "displayName": "Show",
           "type": {
             "bool": true
-          }
+          },
+          "displayNameKey": "Prop_Image_Show"
         },
         "height": {
           "displayName": "Height (px)",
           "type": {
             "numeric": true
-          }
+          },
+          "displayNameKey": "Prop_Image_Height"
         },
         "radius": {
           "displayName": "Corner Radius (px)",
           "type": {
             "numeric": true
-          }
+          },
+          "displayNameKey": "Prop_Image_Radius"
         }
-      }
+      },
+      "displayNameKey": "Object_Image"
     },
     "secondary": {
       "displayName": "Prior & Target",
@@ -625,7 +647,8 @@
           "displayName": "Show",
           "type": {
             "bool": true
-          }
+          },
+          "displayNameKey": "Prop_Secondary_Show"
         },
         "fontFamily": {
           "displayName": "Font Family",
@@ -633,7 +656,8 @@
             "formatting": {
               "fontFamily": true
             }
-          }
+          },
+          "displayNameKey": "Prop_Secondary_FontFamily"
         },
         "fontSize": {
           "displayName": "Font Size",
@@ -641,7 +665,8 @@
             "formatting": {
               "fontSize": true
             }
-          }
+          },
+          "displayNameKey": "Prop_Secondary_FontSize"
         },
         "color": {
           "displayName": "Color",
@@ -651,9 +676,11 @@
                 "color": true
               }
             }
-          }
+          },
+          "displayNameKey": "Prop_Secondary_Color"
         }
-      }
+      },
+      "displayNameKey": "Object_Secondary"
     }
   },
   "privileges": [],

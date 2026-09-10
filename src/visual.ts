@@ -103,6 +103,7 @@ export class Visual implements IVisual {
     private formattingSettingsService: FormattingSettingsService;
     private selectionManager: ISelectionManager;
     private licenseManager: IVisualLicenseManager;
+    private localization: powerbi.extensibility.ILocalizationManager | undefined;
     private events: powerbi.extensibility.IVisualEventService;
     private isPro: boolean = false; // set true locally to test Pro features
     private lastContextMenuTime: number = 0;
@@ -122,6 +123,13 @@ export class Visual implements IVisual {
     constructor(options: VisualConstructorOptions) {
         this.host = options.host;
         this.selectionManager = this.host.createSelectionManager();
+        // Localizacion en tiempo de ejecucion. Los .resjson solo cubren los nombres
+        // del panel de formato; los textos que el visual escribe -la pagina de
+        // inicio, 'Prior:', 'Target:'- salen de aqui, y sin esto quedaban en ingles
+        // aunque Power BI estuviera en espanol.
+        try {
+            this.localization = (options.host as any).createLocalizationManager?.();
+        } catch (_) { this.localization = undefined; }
 
         // Bookmarks.
         //
@@ -670,7 +678,7 @@ export class Visual implements IVisual {
         landing.appendChild(title);
 
         const hint = document.createElement("div");
-        hint.textContent = "Add a measure to the Value field well to get started.";
+        hint.textContent = this.t("Msg_Landing", "Add a measure to the Value field well to get started.");
         hint.style.cssText = `font-size: 12px; color: ${muted}; max-width: 200px; line-height: 1.5;`;
         landing.appendChild(hint);
 
@@ -728,6 +736,16 @@ export class Visual implements IVisual {
      * appear in the sparkline as one enormous final bar, and in the grid as an
      * extra card called "Total".
      */
+    /** Cadena localizada, con el ingles como respaldo si falta la clave. */
+    private t(key: string, fallback: string): string {
+        try {
+            const v = this.localization?.getDisplayName(key);
+            return v && v !== key ? v : fallback;
+        } catch (_) {
+            return fallback;
+        }
+    }
+
     private realChildren(node: powerbi.DataViewMatrixNode | undefined): powerbi.DataViewMatrixNode[] {
         return (node?.children ?? []).filter(k => !(k as any).isSubtotal);
     }
@@ -898,7 +916,7 @@ export class Visual implements IVisual {
         const cardNodes = this.realChildren(rows.root);
         for (let i = 0; i < Math.min(cardNodes.length, limit); i++) {
             const child = cardNodes[i];
-            const categoryName = child.value != null ? String(child.value) : `Item ${i + 1}`;
+            const categoryName = child.value != null ? String(child.value) : `${this.t("Label_Item", "Item")} ${i + 1}`;
             const rowValues = child.values ?? {};
 
             const value = this.nodeOrChildrenValue(child, measureIdx);
@@ -1149,7 +1167,7 @@ export class Visual implements IVisual {
         const palette = this.host.colorPalette;
         const empty = document.createElement("div");
         empty.className = "kpi-empty";
-        empty.title = "KPI Card Pro — Add a measure to the Value field well";
+        empty.title = "KPI Card Pro — " + this.t("Msg_Empty", "Add a measure to the Value field well");
         empty.style.cssText = `
             display: flex; flex: 1; align-items: center; justify-content: center;
             flex-direction: column; gap: 8px;
@@ -1347,15 +1365,15 @@ export class Visual implements IVisual {
             if (metric.priorPeriod !== null) {
                 const ppSpan = document.createElement("span");
                 const ppFormatted = this.formatMetricValue(metric.priorPeriod);
-                ppSpan.textContent = `Prior: ${ppFormatted}`;
+                ppSpan.textContent = `${this.t("Label_Prior", "Prior")}: ${ppFormatted}`;
                 ppSpan.title = `Prior Period: ${ppFormatted}`;
                 subRow.appendChild(ppSpan);
             }
             if (metric.target !== null) {
                 const tgSpan = document.createElement("span");
                 const tgFormatted = this.formatMetricValue(metric.target);
-                tgSpan.textContent = `Target: ${tgFormatted}`;
-                tgSpan.title = `Target: ${tgFormatted}`;
+                tgSpan.textContent = `${this.t("Label_Target", "Target")}: ${tgFormatted}`;
+                tgSpan.title = `${this.t("Label_Target", "Target")}: ${tgFormatted}`;
                 subRow.appendChild(tgSpan);
             }
             cell.appendChild(subRow);
@@ -1446,10 +1464,10 @@ export class Visual implements IVisual {
                 }
             ];
             if (metric.priorPeriod !== null) {
-                items.push({ displayName: "Prior Period", value: this.formatMetricValue(metric.priorPeriod), color: "#605E5C" });
+                items.push({ displayName: this.t("Role_PriorPeriod", "Prior Period"), value: this.formatMetricValue(metric.priorPeriod), color: "#605E5C" });
             }
             if (metric.target !== null) {
-                items.push({ displayName: "Target", value: this.formatMetricValue(metric.target), color: "#605E5C" });
+                items.push({ displayName: this.t("Role_Target", "Target"), value: this.formatMetricValue(metric.target), color: "#605E5C" });
             }
             if (this.isPro) {
                 for (const tf of metric.tooltipFields) {
