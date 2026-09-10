@@ -1,0 +1,136 @@
+KPI CARD PRO — TIPS & HINTS (versión para pegar)
+================================================================
+Los text boxes de Power BI no soportan tablas markdown: al pegar se pierde
+el formato. Esta versión usa listas con puntos guía, que sobreviven al
+copiar y pegar. Un bloque por text box.
+
+
+TEXT BOX 1 — Título de página
+----------------------------------------------------------------
+KPI Card Pro — How to use this visual
+
+
+TEXT BOX 2 — Getting Started
+----------------------------------------------------------------
+GETTING STARTED
+
+1. Add KPI Card Pro to your report page.
+2. Drag a measure to the Value field well — the card renders immediately.
+3. Optionally add a Prior Period measure to see variance vs. previous period.
+4. Optionally add a Target measure to display target tracking.
+5. Add a date to Trend (Pro) and the card grows a trend line.
+6. Use a dimension field in Small Multiples (Pro) to split into multiple
+   cards, each with its own line.
+7. Bind a Base64 image column to Image to show a logo on each card.
+
+
+TEXT BOX 3 — Field Wells
+----------------------------------------------------------------
+FIELD WELLS
+
+Value (required) ......... The main KPI measure. Total Sales, Revenue,
+                           Headcount.
+Prior Period (optional) .. A measure for the previous period. The visual
+                           calculates the variance.
+Target (optional) ........ A budget or target measure, shown below the value.
+Trend (Pro) .............. A date or ordered period. Draws the trend line
+                           inside each card.
+Image (optional) ......... A column with a Base64 data URI
+                           (data:image/png;base64,...), shown top-right.
+                           Set the aggregation to First. External URLs are
+                           rejected.
+Small Multiples (Pro) .... A category dimension. One card per value, up to 50.
+Tooltips (optional) ...... Additional measures shown on hover. The extra
+                           measures are Pro.
+
+
+TEXT BOX 4 — Format Pane
+----------------------------------------------------------------
+FORMAT PANE — QUICK REFERENCE
+
+Card ................. Background, border colour. Pro: border width, radius,
+                       padding, drop shadow.
+Main Value ........... Font family, size, bold, colour, display units
+                       (Auto / K / M / B), decimals. Pro: prefix, suffix.
+Label (single card) .. Show, font family, size, bold, colour. Governs the name
+                       above the number WHEN THERE IS ONE CARD; with Small
+                       Multiples that text is governed by that card.
+Variance ............. Show, positive / negative / neutral colours, invert
+                       logic, show arrow, font size. Pro: pill style.
+Prior & Target ....... Show, font family, size and colour of the
+                       "Prior:" / "Target:" line.
+Trend (Pro) .......... Show, chart type (area / line / bar), colour, line
+                       width, area opacity, height, last-point marker, target
+                       line and its colour.
+Image ................ Show, height, corner radius.
+Small Multiples (Pro)  Columns (1–6), gap, category title with font, size,
+                       bold and colour.
+Accessibility ........ High contrast, ARIA title for screen readers.
+
+
+TEXT BOX 5 — Free vs Pro
+----------------------------------------------------------------
+FREE VS PRO
+
+The card is complete without a licence. Settings that need one say (Pro).
+
+Free:
+- Single KPI card with value, prior-period variance and target
+- Display units, decimals, label and card styling
+- All variance colours, invert logic and the direction arrow
+- Image per card
+- Native tooltips, cross-filtering, bookmarks, context menu
+- Keyboard navigation and high contrast
+
+Pro:
+- The trend line inside the card, with the target drawn period by period
+- Small Multiples: one card per category, up to 50, each with its own line
+- Multi-column layout with category titles
+- Prefix and suffix on the main value
+- Variance pill style
+- Extra measures in tooltips
+- Card border width, radius, padding and drop shadow
+
+Get a licence from Microsoft AppSource. Changing a (Pro) setting without one
+leaves the card on the free result and Power BI shows its own notification
+with the link; the setting is stored and applies as soon as the licence is
+active.
+
+
+TEXT BOX 6 — Tips
+----------------------------------------------------------------
+TIPS & BEST PRACTICES
+
+- Use Auto display units to handle values from hundreds to billions without
+  configuring anything.
+- For cost or effort metrics where a decrease is good, enable Invert (Lower
+  is Better) under Variance.
+- In Trend, use a real date column. A month stored as text would be ordered
+  alphabetically and the line would mean nothing.
+- The target line is drawn period by period, so it follows a target that
+  changes over time.
+- In Small Multiples, set columns to match the number of categories for a
+  clean row layout.
+- Use Prefix ($, €) and Suffix (%, pts) to give the value context without
+  changing the measure.
+- Right-click any card for the Power BI context menu: drill-through,
+  spotlight, export data.
+
+
+TEXT BOX 7 — Example Configurations
+----------------------------------------------------------------
+EXAMPLE CONFIGURATIONS
+
+Sales dashboard:
+  Value = Total Revenue | Prior Period = Revenue LY | Target = Revenue Budget
+  Trend = Date | Small Multiples = Region | Image = Region logo (Base64)
+
+HR overview:
+  Value = Headcount | Prior Period = Headcount Previous Month
+  Target = Headcount Plan | Trend = Month
+
+Finance KPI:
+  Value = EBITDA | Prefix = $ | Display Units = Millions | Invert = OFF
+
+Cost tracking:
+  Value = Total Costs | Prior Period = Costs LY | Invert = ON (lower is better)

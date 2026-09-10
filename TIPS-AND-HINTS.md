@@ -19,7 +19,10 @@ KPI Card Pro — How to use this visual
 2. Drag a measure to the **Value** field well — the card renders immediately.
 3. Optionally add a **Prior Period** measure to see variance vs. previous period.
 4. Optionally add a **Target** measure to display target tracking.
-5. Use a dimension field in **Small Multiples** (Pro) to split into multiple cards.
+5. Add a date to **Trend** (Pro) and the card grows a trend line.
+6. Use a dimension field in **Small Multiples** (Pro) to split into multiple cards, each with
+   its own line.
+7. Bind a Base64 image column to **Image** to show a logo on each card.
 
 ---
 
@@ -31,7 +34,10 @@ KPI Card Pro — How to use this visual
 • **Prior Period** (optional) — A measure for the previous period. The visual calculates variance % automatically.
 • **Target** (optional) — A budget or target measure displayed below the main value.
 • **Small Multiples** (optional, Pro) — A category dimension (e.g. Region, Product) to render one card per member, up to 50 cards.
-• **Tooltips** (optional, Pro) — Up to 10 additional measures shown in the tooltip on hover.
+• **Trend** (optional, Pro) — A date or ordered period. Draws the trend line inside each card.
+• **Image** (optional) — A column with a Base64 data URI (`data:image/png;base64,...`), shown
+  top-right of the card. Set the aggregation to *First*. External URLs are rejected.
+• **Tooltips** (optional) — Additional measures shown on hover. The extra measures are Pro.
 
 ---
 
@@ -41,9 +47,14 @@ KPI Card Pro — How to use this visual
 
 • **Card** — Background color, border color/width/radius, padding, drop shadow.
 • **Main Value** — Font family, size, bold, color, display units (Auto / K / M / B), decimal places, prefix and suffix (Pro).
-• **Label** — Show/hide the metric name, font size, color.
+• **Label (single card)** — Show, font family, size, bold, color. Governs the name above the
+  number *when there is one card*; with Small Multiples that text is governed by that card.
 • **Variance** — Show/hide, positive/negative/neutral colors, invert logic (for cost metrics where lower = better), arrow, pill style (Pro).
-• **Small Multiples** — Columns (1–6), gap between cards, category title font and color.
+• **Trend (Pro)** — Show, chart type (area / line / bar), color, line width, area opacity,
+  height, last-point marker, target line and its color.
+• **Image** — Show, height, corner radius.
+• **Prior & Target** — Show, font family, size and color of the "Prior:" / "Target:" line.
+• **Small Multiples (Pro)** — Columns (1–6), gap, category title with font, size, bold and color.
 • **Accessibility** — High Contrast mode toggle, custom ARIA title for screen readers.
 
 ---
@@ -58,12 +69,16 @@ KPI Card Pro — How to use this visual
 | Prior Period variance | ✅ | ✅ |
 | Target display | ✅ | ✅ |
 | Tooltips (native) | ✅ | ✅ |
+| Variance colors and invert logic | ✅ | ✅ |
+| Image per card | ✅ | ✅ |
+| Bookmarks, keyboard, high contrast | ✅ | ✅ |
+| **Trend line inside the card** | ❌ | ✅ |
 | Small Multiples (up to 50) | ❌ | ✅ |
+| Multi-column layout | ❌ | ✅ |
 | Prefix / Suffix | ❌ | ✅ |
 | Variance pill style | ❌ | ✅ |
-| Custom variance colors | ❌ | ✅ |
-| Extended tooltips (up to 10 measures) | ❌ | ✅ |
-| Multi-column layout | ❌ | ✅ |
+| Extended tooltip measures | ❌ | ✅ |
+| Card border, radius, padding, shadow | ❌ | ✅ |
 
 To unlock Pro features, get a license from Microsoft AppSource.
 
@@ -79,6 +94,8 @@ To unlock Pro features, get a license from Microsoft AppSource.
 • Use **Prefix** ($, €) and **Suffix** (%, pts) to give the value instant context without changing the measure format.
 • Enable **High Contrast Mode** in the Accessibility section to meet WCAG 2.1 requirements.
 • Right-click any card to access the Power BI context menu (drill-through, spotlight, export data).
+• In **Trend**, use a real date column. A month stored as text would be ordered alphabetically.
+• The target line is drawn period by period, so it follows a target that changes over time.
 
 ---
 
@@ -87,7 +104,8 @@ To unlock Pro features, get a license from Microsoft AppSource.
 **Example Configurations**
 
 **Sales Dashboard:**
-Value = Total Revenue | Prior Period = Revenue LY | Target = Revenue Budget | Small Multiples = Region
+Value = Total Revenue | Prior Period = Revenue LY | Target = Revenue Budget |
+Trend = Date | Small Multiples = Region | Image = Region logo (Base64)
 
 **HR Overview:**
 Value = Headcount | Prior Period = Headcount Previous Month | Target = Headcount Plan

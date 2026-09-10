@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Changelog — KPI Card Pro | TCViz</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 15px;
+           line-height: 1.7; color: #1a1a1a; background: #fff;
+           max-width: 760px; margin: 0 auto; padding: 48px 24px 80px; }
+    header { border-bottom: 1px solid #e8e8e8; padding-bottom: 24px; margin-bottom: 32px; }
+    .brand { font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+             color: #0078D4; text-decoration: none; }
+    h1 { font-size: 28px; font-weight: 700; margin-top: 12px; }
+    .meta { font-size: 13px; color: #666; margin-top: 6px; }
+    .rel { border: 1px solid #e8e8e8; border-radius: 10px; padding: 20px 24px; margin-bottom: 20px; }
+    .rel-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+    .rel-ver { font-size: 18px; font-weight: 700; }
+    .rel-date { font-size: 13px; color: #666; }
+    .tag { display: inline-block; font-size: 10px; font-weight: 700; text-transform: uppercase;
+           letter-spacing: .5px; padding: 2px 8px; border-radius: 20px; color: #fff; }
+    .tag-cur { background: #0078D4; }
+    .tag-add { background: #2E7D5B; }
+    .tag-chg { background: #8A6D1F; }
+    .tag-rem { background: #8C3A3A; }
+    .tag-fix { background: #2E5BA8; }
+    .tag-doc { background: #605E5C; }
+    h4 { margin: 16px 0 6px; font-weight: 400; }
+    ul { margin: 0 0 4px 20px; }
+    li { margin-bottom: 8px; }
+    code { background: #f1f3f5; padding: 1px 5px; border-radius: 4px; font-size: 13px; }
+    a { color: #0078D4; }
+    footer { margin-top: 48px; padding-top: 24px; border-top: 1px solid #e8e8e8;
+             font-size: 13px; color: #999; }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="brand" href="https://tcviz.com">TCViz</a>
+    <h1>Changelog</h1>
+    <p class="meta">KPI Card Pro &nbsp;·&nbsp; current version 1.2.0.0</p>
+  </header>
+
+  <main>
+    <div class="rel">
+      <div class="rel-head">
+        <span class="rel-ver">1.2.0.0</span>
+        <span class="tag tag-cur">Current</span>
+        <span class="rel-date">2026-09-09</span>
+      </div>
+      <h4><span class="tag tag-add">Added</span></h4>
+    <ul>
+      <li><strong>Trend line inside the card.</strong> A new <strong>Trend (Pro)</strong> field well takes a date or ordered period and draws the series inside each card: area, line or bars, with the target marked across it. With Small Multiples bound as well, every card carries its own line. The feature existed in 1.0.0 and was dropped a day later by the matrix rewrite, while the documentation went on describing it.</li>
+      <li><strong>Power BI's own licensing notifications.</strong> Changing a <code>(Pro)</code> setting without a licence now raises the platform's "feature blocked" banner, which carries the purchase path, and a persistent licence icon while Pro settings are set without one. Both clear as soon as a licence resolves.</li>
+      <li><strong>Total/SubTotal API.</strong> Power BI now computes the card's figure with the measure's real aggregation instead of the visual summing the periods itself. It matters as soon as Value is not additive: an average ticket or a margin percentage was showing the sum of the monthly figures, which is a number that means nothing. Subtotal nodes are filtered out of the hierarchy, so they never appear as an extra "Total" card or as a giant final bar in the trend line.</li>
+      <li><strong>An image per category</strong>, top-right of each card. A new <strong>Image</strong> field well takes a column of Base64 data URIs; anything else — http, https, blob — is rejected without comment, which is what keeps the promise that the visual makes no network request. It is rendered through <code>&lt;img src&gt;</code>, never by building markup, because it is user data.</li>
+      <li><strong>Settings that were missing entirely.</strong> Prior and Target had no options at all: their size and colour were hard-coded. The Small Multiples title could only change size and colour, not font or weight. The trend's target line had a fixed grey that vanished against a dark card background.</li>
+      <li><strong>Bookmark support.</strong> <code>registerOnSelectCallback</code> repaints the cards when the selection changes from outside — applying a bookmark, or clearing filters elsewhere. Without it a bookmark left the previous dimming on screen, showing a selection that no longer existed.</li>
+      <li><strong><code>build-test.js</code></strong>, with <code>--free</code> for the real free tier and <code>--debug</code> for a licence diagnostic overlay. Testing previously meant editing <code>isPro</code> by hand.</li>
+    </ul>
+      <h4><span class="tag tag-chg">Changed</span></h4>
+    <ul>
+      <li><strong>Every paid setting now says so.</strong> Border Width, Border Radius, Padding, Drop Shadow, Prefix, Suffix and the Small Multiples field well carry <code>(Pro)</code> in their name. They were silently ignored before: the user changed them, nothing happened, and nothing explained why — which reads as the visual being broken rather than as a paid feature.</li>
+      <li><strong>A licence in the <code>Warning</code> state is honoured</strong> alongside <code>Active</code>. Warning is a payment grace period, so a paying customer no longer drops to the free tier while it is resolved.</li>
+      <li><strong><code>isLicenseUnsupportedEnv</code> and <code>isLicenseInfoAvailable</code> are respected.</strong> In Publish to Web, embedded, national clouds and PDF/PowerPoint export a Pro customer reads as free; there the card renders the free result without prompting anyone to buy what they own.</li>
+    </ul>
+      <h4><span class="tag tag-rem">Removed</span></h4>
+    <ul>
+      <li><strong>The "Free" badge drawn in the corner of the card.</strong> Microsoft's guidance is that a visual should not display its own licensing UI, and this one put its entire explanation in a <code>title</code> attribute on an element with <code>pointer-events: none</code> — so it could never be hovered and never appeared.</li>
+    </ul>
+      <h4><span class="tag tag-fix">Fixed</span></h4>
+    <ul>
+      <li><strong>"Show Target Line" drew nothing.</strong> With Trend bound, the card's Target is the total for the whole period while the points on the line are per period, so the horizontal line landed far above the maximum and outside the visible area. The target is now drawn period by period, on a scale that spans both series.</li>
+      <li><strong>The tooltip always showed the first card's figures.</strong> Every cell was written with index <code>0</code>, and the tooltip resolves its metric from the DOM. Click and keyboard were unaffected, which is why it went unnoticed.</li>
+      <li><strong>Cross-highlighting never reached the cards.</strong> Clicking a treemap or a chart highlights rather than filters, and the highlight check only looked two levels deep — with Trend bound the highlights sit on the leaves. Slicers kept working because a slicer filters instead.</li>
+      <li><strong>The card lost its value when Trend was bound.</strong> With a second row level the values move to the leaves and the card's own node carries none, so a dash was shown instead of the number.</li>
+      <li><strong>The trend line always sloped downwards.</strong> A numeric period such as a month number was delivered sorted by the measure, so the line was the series ordered from high to low rather than a trend. The row reduction also asked for the *top* N by measure instead of the first N.</li>
+      <li><strong>Public URLs.</strong> <code>supportUrl</code> pointed at the site home rather than a support page, and <code>privacyTermsLink</code> was missing entirely — its absence is grounds for rejection.</li>
+      <li><strong>Legal pages</strong> claimed an effective date of 1 January 2025, fifteen months before the visual existed, and carried the wrong contact address.</li>
+      <li><strong>A stray <code>style/pbiviz.json</code></strong> carrying a different GUID from the real one.</li>
+    </ul>
+      <h4><span class="tag tag-doc">Documentation</span></h4>
+    <ul>
+      <li><code>support.html</code> described a sparkline type selector, a target line and tooltip drill-through, none of which existed, and a <code>Category</code> field well that does not exist either. Rewritten against the code. The README described a different product entirely.</li>
+      <li>Free and Pro were both wrong in every document: Drop Shadow was listed as free when its control is paid, and the variance colours were sold as paid when they have always been free.</li>
+    </ul>
+    <div class="rel">
+      <div class="rel-head">
+        <span class="rel-ver">1.1.0.0</span>
+        <span class="rel-date">2026-08-01</span>
+      </div>
+      <h4><span class="tag tag-add">Added</span></h4>
+    <ul>
+      <li>Cross-highlighting from other visuals, with the cards outside the selection dimmed.</li>
+      <li>Keyboard navigation and a landing page when no data is bound.</li>
+      <li>Colour palette support, so the card follows the report theme.</li>
+    </ul>
+      <h4><span class="tag tag-fix">Fixed</span></h4>
+    <ul>
+      <li>An invalid matrix mapping that stopped the data view from being generated.</li>
+      <li>The label on a single card.</li>
+    </ul>
+    <div class="rel">
+      <div class="rel-head">
+        <span class="rel-ver">1.0.0.1</span>
+        <span class="rel-date">2026-05-07</span>
+      </div>
+      <h4><span class="tag tag-chg">Changed</span></h4>
+    <ul>
+      <li>Formatting pane rebuilt on the current API, with the constructor pattern.</li>
+    </ul>
+      <h4><span class="tag tag-add">Added</span></h4>
+    <ul>
+      <li>Rendering events on every exit path of <code>update()</code>.</li>
+    </ul>
+    <div class="rel">
+      <div class="rel-head">
+        <span class="rel-ver">1.0.0.0</span>
+        <span class="rel-date">2026-04-24</span>
+      </div>
+      <h4><span class="tag tag-add">Added</span></h4>
+    <ul>
+      <li>Initial release: KPI card with prior-period variance and target.</li>
+    </ul>
+    </div>
+  </main>
+
+  <footer>
+    &copy; 2026 TCViz &nbsp;·&nbsp; <a href="https://tcviz.com">tcviz.com</a> &nbsp;·&nbsp;
+    <a href="support.html">Support</a> &nbsp;·&nbsp;
+    <a href="privacy.html">Privacy</a> &nbsp;·&nbsp;
+    <a href="terms.html">Terms</a>
+  </footer>
+</body>
+</html>

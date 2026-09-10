@@ -72,3 +72,27 @@
   code. The README described a different product entirely.
 - Free and Pro were both wrong in every document: Drop Shadow was listed as free when its control is
   paid, and the variance colours were sold as paid when they have always been free.
+
+## [1.1.0.0] — 2026-08-01
+
+### Added
+- Cross-highlighting from other visuals, with the cards outside the selection dimmed.
+- Keyboard navigation and a landing page when no data is bound.
+- Colour palette support, so the card follows the report theme.
+
+### Fixed
+- An invalid matrix mapping that stopped the data view from being generated.
+- The label on a single card.
+
+## [1.0.0.1] — 2026-05-07
+
+### Changed
+- Formatting pane rebuilt on the current API, with the constructor pattern.
+
+### Added
+- Rendering events on every exit path of `update()`.
+
+## [1.0.0.0] — 2026-04-24
+
+### Added
+- Initial release: KPI card with prior-period variance and target.
