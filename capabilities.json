@@ -310,6 +310,20 @@
               }
             }
           }
+        },
+        "fontFamily": {
+          "displayName": "Font Family",
+          "type": {
+            "formatting": {
+              "fontFamily": true
+            }
+          }
+        },
+        "bold": {
+          "displayName": "Bold",
+          "type": {
+            "bool": true
+          }
         }
       }
     },
@@ -428,6 +442,20 @@
                 "color": true
               }
             }
+          }
+        },
+        "titleFontFamily": {
+          "displayName": "Title Font Family",
+          "type": {
+            "formatting": {
+              "fontFamily": true
+            }
+          }
+        },
+        "titleBold": {
+          "displayName": "Title Bold",
+          "type": {
+            "bool": true
           }
         }
       }
@@ -576,6 +604,43 @@
           "displayName": "Corner Radius (px)",
           "type": {
             "numeric": true
+          }
+        }
+      }
+    },
+    "secondary": {
+      "displayName": "Prior & Target",
+      "properties": {
+        "show": {
+          "displayName": "Show",
+          "type": {
+            "bool": true
+          }
+        },
+        "fontFamily": {
+          "displayName": "Font Family",
+          "type": {
+            "formatting": {
+              "fontFamily": true
+            }
+          }
+        },
+        "fontSize": {
+          "displayName": "Font Size",
+          "type": {
+            "formatting": {
+              "fontSize": true
+            }
+          }
+        },
+        "color": {
+          "displayName": "Color",
+          "type": {
+            "fill": {
+              "solid": {
+                "color": true
+              }
+            }
           }
         }
       }

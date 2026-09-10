@@ -103,9 +103,20 @@ class LabelSettings extends FormattingSettingsCard {
         name: "color", displayName: "Color",
         value: { value: "#6B6B6B" }
     });
+    fontFamily = new formattingSettings.TextInput({
+        name: "fontFamily", displayName: "Font Family",
+        placeholder: "e.g. Segoe UI",
+        value: "Segoe UI, wf_segoe-ui_normal, helvetica, arial, sans-serif"
+    });
+    bold = new formattingSettings.ToggleSwitch({
+        name: "bold", displayName: "Bold", value: false
+    });
     name = "label";
-    displayName = "Label";
-    slices = [this.show, this.fontSize, this.color];
+    // El alcance no era evidente: esta tarjeta manda sobre el texto de encima
+    // del numero solo cuando hay UNA tarjeta. Con Small Multiples ese mismo
+    // texto pasa a gobernarlo la tarjeta Small Multiples, y nada lo decia.
+    displayName = "Label (single card)";
+    slices = [this.show, this.fontFamily, this.fontSize, this.bold, this.color];
 }
 
 // ─── Card: Variance ──────────────────────────────────────────────────────────
@@ -166,9 +177,40 @@ class SmallMultiplesSettings extends FormattingSettingsCard {
         name: "titleColor", displayName: "Title Color",
         value: { value: "#605E5C" }
     });
+    titleFontFamily = new formattingSettings.TextInput({
+        name: "titleFontFamily", displayName: "Title Font Family",
+        placeholder: "e.g. Segoe UI",
+        value: "Segoe UI, wf_segoe-ui_normal, helvetica, arial, sans-serif"
+    });
+    titleBold = new formattingSettings.ToggleSwitch({
+        name: "titleBold", displayName: "Title Bold", value: false
+    });
     name = "smallMultiplesLayout";
     displayName = "Small Multiples (Pro)";
-    slices = [this.columns, this.gap, this.showTitle, this.titleFontSize, this.titleColor];
+    slices = [this.columns, this.gap, this.showTitle, this.titleFontFamily, this.titleFontSize, this.titleBold, this.titleColor];
+}
+
+// ─── Card: Prior & Target ────────────────────────────────────────────────────
+
+class SecondarySettings extends FormattingSettingsCard {
+    show = new formattingSettings.ToggleSwitch({
+        name: "show", displayName: "Show", value: true
+    });
+    fontFamily = new formattingSettings.TextInput({
+        name: "fontFamily", displayName: "Font Family",
+        placeholder: "e.g. Segoe UI",
+        value: "Segoe UI, wf_segoe-ui_normal, helvetica, arial, sans-serif"
+    });
+    fontSize = new formattingSettings.NumUpDown({
+        name: "fontSize", displayName: "Font Size", value: 11,
+        options: { minValue: { type: powerbi.visuals.ValidatorType.Min, value: 7 }, maxValue: { type: powerbi.visuals.ValidatorType.Max, value: 32 } }
+    });
+    color = new formattingSettings.ColorPicker({
+        name: "color", displayName: "Color", value: { value: "#605E5C" }
+    });
+    name = "secondary";
+    displayName = "Prior & Target";
+    slices = [this.show, this.fontFamily, this.fontSize, this.color];
 }
 
 // ─── Card: Image ─────────────────────────────────────────────────────────────
@@ -255,8 +297,9 @@ export class VisualFormattingSettingsModel extends FormattingSettingsModel {
     label = new LabelSettings();
     variance = new VarianceSettings();
     smallMultiples = new SmallMultiplesSettings();
+    secondary = new SecondarySettings();
     image = new ImageSettings();
     trend = new TrendSettings();
     accessibility = new AccessibilitySettings();
-    cards = [this.card, this.mainValue, this.label, this.variance, this.image, this.trend, this.smallMultiples, this.accessibility];
+    cards = [this.card, this.mainValue, this.label, this.variance, this.secondary, this.image, this.trend, this.smallMultiples, this.accessibility];
 }

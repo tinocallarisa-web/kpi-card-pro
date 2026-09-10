@@ -1214,8 +1214,17 @@ export class Visual implements IVisual {
             const labelColor = isGridMode && this.isPro
                 ? (hc ? "#FFFFFF" : (s.smallMultiples.titleColor.value?.value ?? themeMuted))
                 : (hc ? "#FFFFFF" : (s.label.color.value?.value ?? themeMuted));
+            // La fuente sigue la misma regla que el tamano y el color: en rejilla
+            // manda Small Multiples, en tarjeta unica manda Label.
+            const labelFont = isGridMode && this.isPro
+                ? (s.smallMultiples.titleFontFamily.value || "Segoe UI, sans-serif")
+                : (s.label.fontFamily.value || "Segoe UI, sans-serif");
+            const labelBold = isGridMode && this.isPro
+                ? s.smallMultiples.titleBold.value
+                : s.label.bold.value;
             labelEl.style.cssText = `
-                font-family: 'Segoe UI', sans-serif;
+                font-family: ${labelFont};
+                font-weight: ${labelBold ? 700 : 400};
                 font-size: ${labelFontSize}px;
                 color: ${labelColor};
                 white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
@@ -1289,13 +1298,15 @@ export class Visual implements IVisual {
         }
 
         // ── Prior & Target ─────────────────────────────────────────────────
-        if (metric.priorPeriod !== null || metric.target !== null) {
+        if (s.secondary.show.value && (metric.priorPeriod !== null || metric.target !== null)) {
             const subRow = document.createElement("div");
             subRow.className = "kpi-sub-row";
+            const sec = s.secondary;
             subRow.style.cssText = `
                 display: flex; flex-wrap: wrap; gap: 8px;
-                font-family: 'Segoe UI', sans-serif; font-size: 11px;
-                color: ${hc ? "#FFFFFF" : "#605E5C"};
+                font-family: ${sec.fontFamily.value || "Segoe UI, sans-serif"};
+                font-size: ${sec.fontSize.value ?? 11}px;
+                color: ${hc ? "#FFFFFF" : (sec.color.value?.value ?? "#605E5C")};
             `;
             if (metric.priorPeriod !== null) {
                 const ppSpan = document.createElement("span");
