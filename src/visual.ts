@@ -122,6 +122,26 @@ export class Visual implements IVisual {
     constructor(options: VisualConstructorOptions) {
         this.host = options.host;
         this.selectionManager = this.host.createSelectionManager();
+
+        // Bookmarks.
+        //
+        // Applying a bookmark, or clearing filters from elsewhere, changes the
+        // selection without the visual having been touched. Power BI announces it
+        // here; without listening, the cards keep showing whatever was dimmed
+        // before, so a bookmark leaves a selection on screen that no longer exists.
+        //
+        // Repainting from the cached dataView is enough: every visual state the
+        // cards show — which are dimmed, which value each one carries — is derived
+        // from it, so there is nothing to reconcile by hand.
+        const sm = this.selectionManager as any;
+        if (typeof sm.registerOnSelectCallback === "function") {
+            sm.registerOnSelectCallback(() => {
+                if (!this.lastDataView || !this.formattingSettings) return;
+                try {
+                    this.render(this.parseDataView(this.lastDataView));
+                } catch (_) { /* keep what is on screen */ }
+            });
+        }
         this.formattingSettingsService = new FormattingSettingsService();
         this.events = options.host.eventService;
 

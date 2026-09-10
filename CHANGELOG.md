@@ -22,6 +22,9 @@
 - **Settings that were missing entirely.** Prior and Target had no options at all: their size and
   colour were hard-coded. The Small Multiples title could only change size and colour, not font or
   weight. The trend's target line had a fixed grey that vanished against a dark card background.
+- **Bookmark support.** `registerOnSelectCallback` repaints the cards when the selection changes
+  from outside — applying a bookmark, or clearing filters elsewhere. Without it a bookmark left the
+  previous dimming on screen, showing a selection that no longer existed.
 - **`build-test.js`**, with `--free` for the real free tier and `--debug` for a licence diagnostic
   overlay. Testing previously meant editing `isPro` by hand.
 

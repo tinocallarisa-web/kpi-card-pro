@@ -37,6 +37,7 @@ or an AppSource-installed instance rather than a file import.
 
 Free tier (no license required):
 - Image per category from a Base64 data URI, shown top-right of the card
+- Bookmarks: selection is restored through registerOnSelectCallback
 - Single KPI card with main value, prior period variance, and target
 - Native Power BI tooltips (value + prior period)
 - Display units (Auto / K / M / B), decimal places
