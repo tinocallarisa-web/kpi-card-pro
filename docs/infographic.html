@@ -33,6 +33,9 @@
   /* Infographic container */
   #infographic {
     width: 1366px;
+    /* Alto fijo, no del contenido: Microsoft pide 1366x768 exactos y
+       html2canvas captura la caja tal y como esta maquetada. */
+    height: 768px;
     background: #FAF9F5;
     font-family: 'Segoe UI', system-ui, sans-serif;
     overflow: hidden;
@@ -717,7 +720,7 @@ async function downloadPNG() {
     const el = document.getElementById('infographic');
     const canvas = await html2canvas(el, {
       width: 1366,
-      height: el.offsetHeight,
+      height: 768,   // fijo: con offsetHeight el PNG salia con la altura de la maqueta
       scale: 1,
       useCORS: true,
       backgroundColor: '#FAF9F5'
@@ -731,6 +734,32 @@ async function downloadPNG() {
     btn.disabled = false;
   }
 }
+</script>
+
+<script>
+// Aviso de desbordamiento.
+//
+// #infographic lleva overflow:hidden para garantizar los 1366x768 que pide
+// Microsoft. El efecto colateral es que si la maqueta crece, lo que sobra se
+// recorta sin decir nada y el PNG sale con el pie cortado. Esto lo dice.
+//
+// Vive FUERA de #infographic a proposito: html2canvas captura ese elemento, y
+// un aviso dentro acabaria dibujado en la imagen que se sube a Partner Center.
+(function () {
+  window.addEventListener('load', function () {
+    var el = document.getElementById('infographic');
+    if (!el) return;
+    var sobra = el.scrollHeight - 768;
+    if (sobra <= 0) return;
+    var d = document.createElement('div');
+    d.style.cssText = 'position:fixed;bottom:12px;left:12px;z-index:9999;' +
+      'font:600 12px/1.5 system-ui,sans-serif;color:#fff;background:#8C3A3A;' +
+      'padding:8px 12px;border-radius:6px;max-width:420px;';
+    d.textContent = 'El contenido se sale ' + sobra + 'px de los 768. El PNG saldra ' +
+      'recortado por abajo: reduce alguna seccion antes de exportar.';
+    document.body.appendChild(d);
+  });
+})();
 </script>
 </body>
 </html>
