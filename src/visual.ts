@@ -977,7 +977,7 @@ export class Visual implements IVisual {
         if (metrics.length === 0) {
             this.renderEmpty(root, hc);
         } else if (metrics.length === 1) {
-            const cell = this.buildMetricCell(metrics[0], hc, true, themeFg, themeMuted);
+            const cell = this.buildMetricCell(metrics[0], hc, true, themeFg, themeMuted, 0);
             root.appendChild(cell);
         } else {
             this.renderGrid(root, metrics, hc, themeFg, themeMuted);
@@ -1065,7 +1065,7 @@ export class Visual implements IVisual {
             `;
             wrapper.dataset.selectionIndex = String(idx);
 
-            const cell = this.buildMetricCell(metric, hc, false, themeFg, themeMuted);
+            const cell = this.buildMetricCell(metric, hc, false, themeFg, themeMuted, idx);
             wrapper.appendChild(cell);
             grid.appendChild(wrapper);
         });
@@ -1110,11 +1110,16 @@ export class Visual implements IVisual {
         root.appendChild(empty);
     }
 
-    private buildMetricCell(metric: MetricData, hc: boolean, large: boolean, themeFg: string, themeMuted: string): HTMLElement {
+    private buildMetricCell(metric: MetricData, hc: boolean, large: boolean, themeFg: string, themeMuted: string, index: number): HTMLElement {
         const s = this.formattingSettings;
         const cell = document.createElement("div");
         cell.className = "kpi-metric-cell";
-        cell.dataset.selectionIndex = "0";
+        // The real index. This used to be hard-coded to "0" on every card, and the
+        // tooltip resolves its metric with closest("[data-selection-index]") — which
+        // finds the cell before the wrapper that carried the right value, so every
+        // card showed the first card's figures. Click and keyboard were unaffected:
+        // they capture the metric in the closure instead of looking it up.
+        cell.dataset.selectionIndex = String(index);
         cell.setAttribute("role", "button");
         cell.setAttribute("aria-label", metric.name);
         cell.setAttribute("tabindex", "0");                   // Keyboard Navigation
