@@ -97,6 +97,7 @@
       <li>Add a date to <strong>Trend (Pro)</strong> to draw a trend line inside the card.</li>
       <li>Add a category field to <strong>Small Multiples (Pro)</strong> to render one card per
         category instead of one card in total — each with its own line.</li>
+      <li>Add a Base64 image column to <strong>Image</strong> to show a logo per card.</li>
       <li>Add measures to <strong>Tooltips</strong> to show more figures on hover.</li>
     </ul>
 
@@ -112,6 +113,9 @@
         point on the line, with the Value measure aggregated at that point. Use a real date column:
         a month stored as text would be ordered alphabetically. A numeric period is reordered by the
         visual so the line reads left to right in time.</li>
+      <li><strong>Image</strong> (measure, aggregated as <em>First</em>) — a column holding a Base64
+        data URI (<code>data:image/png;base64,&hellip;</code>), shown in the top-right of each card.
+        External URLs are rejected: the visual makes no network requests of any kind.</li>
       <li><strong>Tooltips</strong> (measures) — additional figures shown on hover.</li>
     </ul>
 
@@ -122,14 +126,20 @@
         Border Radius, Padding, Drop Shadow.</li>
       <li><strong>Main Value</strong> — Font family, size, bold, colour, display units
         (Auto / K / M / B), decimal places, and <strong>(Pro)</strong> Prefix and Suffix.</li>
-      <li><strong>Label</strong> — Show, font size, colour.</li>
+      <li><strong>Label (single card)</strong> — Show, font family, size, bold, colour. This governs
+        the text above the number <em>when there is a single card</em>. With Small Multiples, that
+        same text is governed by the Small Multiples card instead.</li>
       <li><strong>Variance</strong> — Show, positive / negative / neutral colours, invert logic (for
         cost metrics where lower is better), show arrow, font size, and
         <strong>(Pro)</strong> Show as Pill.</li>
       <li><strong>Trend (Pro)</strong> — Show, chart type (area, line or bar), colour, line width,
-        area opacity, height, last-point marker, and the target line drawn across the chart.</li>
-      <li><strong>Small Multiples (Pro)</strong> — Columns, gap, category title with its font size
-        and colour.</li>
+        area opacity, height, last-point marker, and the target line with its own colour. The target
+        is drawn period by period, not as a flat line, so it follows a target that changes over time.</li>
+      <li><strong>Image</strong> — Show, height, corner radius.</li>
+      <li><strong>Prior &amp; Target</strong> — Show, font family, size and colour of the
+        &ldquo;Prior:&rdquo; and &ldquo;Target:&rdquo; line under the variance.</li>
+      <li><strong>Small Multiples (Pro)</strong> — Columns, gap, and the category title with its
+        font family, size, bold and colour.</li>
       <li><strong>Accessibility</strong> — High contrast handling and the visual title announced to
         screen readers.</li>
     </ul>
@@ -167,6 +177,12 @@
     </ul>
 
     <h2>Frequently asked questions</h2>
+
+    <p><strong>My image does not appear.</strong><br />
+      The Image well only accepts Base64 data URIs (<code>data:image/png;base64,&hellip;</code>).
+      A link to an image on a web server is rejected on purpose: honouring it would make the visual
+      fetch from the network, which it never does. Convert the images in Power Query or with a small
+      script, and set the field's aggregation to <em>First</em>.</p>
 
     <p><strong>My trend line only goes down, whatever the data does.</strong><br />
       That was a defect in versions before 1.2.0.0: a numeric period such as a month number was

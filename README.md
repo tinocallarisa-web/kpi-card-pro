@@ -33,6 +33,7 @@ defects, churn.
 | **Target** | Measure | A goal to compare against. |
 | **Small Multiples (Pro)** | Grouping | One card per category, up to 50. Without a licence only the first category renders. |
 | **Trend (Pro)** | Grouping | A date or ordered period. Draws a trend line inside each card over this axis. |
+| **Image** | Measure (First) | A Base64 data URI shown in the top-right of each card. External URLs are rejected. |
 | **Tooltips** | Measures | Extra figures shown on hover. |
 
 ## Quick start
@@ -73,10 +74,12 @@ the licence is active.
 
 - **Card** — Background, Border Colour · *(Pro)* Border Width, Border Radius, Padding, Drop Shadow
 - **Main Value** — Font family, size, bold, colour, display units, decimal places · *(Pro)* Prefix, Suffix
-- **Label** — Show, font size, colour
+- **Label (single card)** — Show, font family, size, bold, colour. Governs the text above the number when there is a single card; with Small Multiples that text is governed by the Small Multiples card instead.
 - **Variance** — Show, positive / negative / neutral colours, invert, show arrow, font size · *(Pro)* Show as Pill
-- **Trend (Pro)** — Show, chart type (area / line / bar), colour, line width, area opacity, height, last-point marker, target line
-- **Small Multiples (Pro)** — Columns, gap, category title with its font size and colour
+- **Trend (Pro)** — Show, chart type (area / line / bar), colour, line width, area opacity, height, last-point marker, target line and its colour
+- **Image** — Show, height, corner radius
+- **Prior & Target** — Show, font family, size, colour
+- **Small Multiples (Pro)** — Columns, gap, category title with its font family, size, bold and colour
 - **Accessibility** — High contrast handling, visual title announced to screen readers
 
 ## Build from source

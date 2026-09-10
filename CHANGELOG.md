@@ -15,6 +15,13 @@
   additive: an average ticket or a margin percentage was showing the sum of the monthly figures,
   which is a number that means nothing. Subtotal nodes are filtered out of the hierarchy, so they
   never appear as an extra "Total" card or as a giant final bar in the trend line.
+- **An image per category**, top-right of each card. A new **Image** field well takes a column of
+  Base64 data URIs; anything else — http, https, blob — is rejected without comment, which is what
+  keeps the promise that the visual makes no network request. It is rendered through `<img src>`,
+  never by building markup, because it is user data.
+- **Settings that were missing entirely.** Prior and Target had no options at all: their size and
+  colour were hard-coded. The Small Multiples title could only change size and colour, not font or
+  weight. The trend's target line had a fixed grey that vanished against a dark card background.
 - **`build-test.js`**, with `--free` for the real free tier and `--debug` for a licence diagnostic
   overlay. Testing previously meant editing `isPro` by hand.
 
@@ -35,6 +42,16 @@
   on an element with `pointer-events: none` — so it could never be hovered and never appeared.
 
 ### Fixed
+- **"Show Target Line" drew nothing.** With Trend bound, the card's Target is the total for the whole
+  period while the points on the line are per period, so the horizontal line landed far above the
+  maximum and outside the visible area. The target is now drawn period by period, on a scale that
+  spans both series.
+- **The tooltip always showed the first card's figures.** Every cell was written with index `0`, and
+  the tooltip resolves its metric from the DOM. Click and keyboard were unaffected, which is why it
+  went unnoticed.
+- **Cross-highlighting never reached the cards.** Clicking a treemap or a chart highlights rather
+  than filters, and the highlight check only looked two levels deep — with Trend bound the
+  highlights sit on the leaves. Slicers kept working because a slicer filters instead.
 - **The card lost its value when Trend was bound.** With a second row level the values move to the
   leaves and the card's own node carries none, so a dash was shown instead of the number.
 - **The trend line always sloped downwards.** A numeric period such as a month number was delivered

@@ -14,6 +14,10 @@ Support: https://tcviz.com
 License validation:
 This visual uses the official Microsoft IVisualLicenseManager API (spIdentifier: kpi-card-pro-tcviz).
 
+The Image data role accepts only data:image/<type>;base64,<payload>. Every other scheme — http,
+https, blob, javascript — is rejected at parse time, so the visual makes no outbound request of any
+kind. Images are rendered through an <img> src attribute, never by building markup from user data.
+
 The Total/SubTotal API is enabled for row subtotals, so the figure on each card is the aggregate
 Power BI computes with the measure's own aggregation, rather than a sum performed by the visual.
 Subtotal nodes are filtered out of the hierarchy: they are not rendered as cards and are excluded
@@ -32,6 +36,7 @@ If you observe the visual clearing on page navigation, please verify with an ent
 or an AppSource-installed instance rather than a file import.
 
 Free tier (no license required):
+- Image per category from a Base64 data URI, shown top-right of the card
 - Single KPI card with main value, prior period variance, and target
 - Native Power BI tooltips (value + prior period)
 - Display units (Auto / K / M / B), decimal places
@@ -41,7 +46,7 @@ Free tier (no license required):
 - High Contrast mode and ARIA title (Accessibility section)
 
 Pro tier (requires active AppSource license — plan: kpi-card-pro-tcviz):
-- Trend line inside the card, over a date or period axis, with the target marked
+- Trend line inside the card, over a date or period axis, with the target drawn period by period
 - Small Multiples: up to 50 cards from a category dimension, each with its own trend line
 - Multi-column layout (1–6 columns) with configurable gap
 - Custom prefix and suffix on main value
