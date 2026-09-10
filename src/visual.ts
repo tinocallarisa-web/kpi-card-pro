@@ -30,6 +30,7 @@ interface MetricData {
     selectionId: powerbi.extensibility.ISelectionId | null;
     isHighlighted: boolean;               // false = dim this card
     trendData: number[];                  // series for the sparkline, empty when unbound
+    targetData: number[];                 // target per period, aligned with trendData
     image: string | null;                 // validated Base64 data URI, or null
 }
 
@@ -451,20 +452,33 @@ export class Visual implements IVisual {
         const lineW   = t.lineWidth.value ?? 2;
         const opacity = (t.areaOpacity.value ?? 20) / 100;
 
-        const minV = Math.min(...data);
-        const maxV = Math.max(...data);
+        // La escala abarca las dos series. Si solo cubriera los valores, un
+        // objetivo por encima del maximo -o por debajo del minimo- se dibujaria
+        // fuera del area y pareceria que la opcion no hace nada.
+        const tgt = t.showTargetLine.value ? metric.targetData : [];
+        const all = tgt.length === data.length ? data.concat(tgt) : data;
+        const minV = Math.min(...all);
+        const maxV = Math.max(...all);
         const range = maxV - minV || 1;
         const y = (v: number) => height - ((v - minV) / range) * (height * 0.8) - height * 0.1;
         const pts: Array<[number, number]> = data.map((v, i) => [
             (i / (data.length - 1)) * 100, y(v)
         ]);
 
-        // Target line, when a Target measure is bound and within the drawn range.
-        if (t.showTargetLine.value && metric.target !== null) {
-            const line = document.createElementNS(svgNS, "line");
-            line.setAttribute("x1", "0");  line.setAttribute("x2", "100");
-            line.setAttribute("y1", String(y(metric.target)));
-            line.setAttribute("y2", String(y(metric.target)));
+        // El objetivo, periodo a periodo, no una linea plana.
+        //
+        // metric.target es el total del periodo: con Trend vinculado suma los
+        // objetivos de todos los meses. Dibujar una horizontal en ese numero la
+        // situaba muy por encima de unos puntos que son mensuales, fuera del
+        // area visible — de ahi que la opcion pareciera no hacer nada. Si el
+        // objetivo es constante, esta serie sale plana igualmente.
+        if (tgt.length === data.length && tgt.length > 1) {
+            const dTgt = tgt
+                .map((v, i) => `${i === 0 ? "M" : "L"}${(i / (tgt.length - 1)) * 100},${y(v)}`)
+                .join(" ");
+            const line = document.createElementNS(svgNS, "path");
+            line.setAttribute("d", dTgt);
+            line.setAttribute("fill", "none");
             line.setAttribute("stroke", hc ? "#FFFF00" : "#A19F9D");
             line.setAttribute("stroke-width", "1");
             line.setAttribute("stroke-dasharray", "4 2");
@@ -850,6 +864,7 @@ export class Visual implements IVisual {
                 isHighlighted: true,  // single card always visible
                 // Only Trend bound: the root's children are the points of the series.
                 trendData: trendBound ? this.seriesFrom(rows?.root, measureIdx) : [],
+                targetData: trendBound && targetIdx >= 0 ? this.seriesFrom(rows?.root, targetIdx) : [],
                 image: this.nodeOrChildrenText(valueNode, imageIdx)
             }];
         }
@@ -894,6 +909,7 @@ export class Visual implements IVisual {
                 isHighlighted,
                 // With both roles bound, each card's children are its own series.
                 trendData: trendBound ? this.seriesFrom(child, measureIdx) : [],
+                targetData: trendBound && targetIdx >= 0 ? this.seriesFrom(child, targetIdx) : [],
                 image: this.nodeOrChildrenText(child, imageIdx)
             });
         }
