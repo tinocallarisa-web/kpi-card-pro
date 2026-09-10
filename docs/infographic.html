@@ -62,7 +62,11 @@
     margin-top: 4px;
     line-height: 1.4;
   }
-  .header-chart svg { display: block; }
+  /* La cabecera lleva ahora una captura real del visual, no una ilustracion.
+     Va incrustada en Base64: html2canvas no puede capturar imagenes externas
+     sin toparse con CORS, y dejaria un hueco al exportar el PNG. */
+  .header-chart svg,
+  .header-chart img { display: block; }
 
   /* ── USE CASES STRIP ── */
   .use-cases {
