@@ -310,10 +310,10 @@ export class Visual implements IVisual {
         // Both roles share the row hierarchy, so a grouping level is not enough:
         // with only Trend bound, the root's children are dates, not categories.
         // Ask which role owns the level instead of assuming the first one is a card.
+        const smKids = this.realChildren(smRows?.root);
         const anyGrouping = (smRows?.levels?.length ?? 0) > 0
-            && !!smRows?.root?.children
-            && smRows.root.children.length > 0
-            && smRows.root.children[0].value !== undefined;
+            && smKids.length > 0
+            && smKids[0].value !== undefined;
         const smHasGrouping = anyGrouping && roles.sm >= 0;
 
         // Binding Trend is intent too, and it leaves no trace in metadata.objects.
@@ -323,7 +323,7 @@ export class Visual implements IVisual {
         }
 
         if (smHasGrouping) {
-            const n = smRows.root.children.length;
+            const n = smKids.length;
             labels.push(n > 1
                 ? `small multiples (${n} categories, showing 1)`
                 : "small multiples");
@@ -674,7 +674,7 @@ export class Visual implements IVisual {
     private nodeOrChildrenValue(node: powerbi.DataViewMatrixNode | undefined, idx: number): number | null {
         const own = this.getNodeValue(node?.values ?? {}, idx);
         if (own !== null) return own;
-        const kids = node?.children ?? [];
+        const kids = this.realChildren(node);
         if (kids.length === 0) return null;
         let sum = 0;
         let seen = false;
@@ -683,6 +683,18 @@ export class Visual implements IVisual {
             if (v !== null) { sum += v; seen = true; }
         }
         return seen ? sum : null;
+    }
+
+    /**
+     * A node's real children, with subtotal nodes filtered out.
+     *
+     * With the Total/SubTotal API enabled Power BI inserts subtotal nodes into the
+     * hierarchy. They are aggregates, not data points: left in, a subtotal would
+     * appear in the sparkline as one enormous final bar, and in the grid as an
+     * extra card called "Total".
+     */
+    private realChildren(node: powerbi.DataViewMatrixNode | undefined): powerbi.DataViewMatrixNode[] {
+        return (node?.children ?? []).filter(k => !(k as any).isSubtotal);
     }
 
     private rowRoles(rows: powerbi.DataViewHierarchy | undefined): { sm: number; trend: number } {
@@ -710,7 +722,7 @@ export class Visual implements IVisual {
      * Sort-by-column the user set up precisely to avoid that.
      */
     private seriesFrom(node: powerbi.DataViewMatrixNode | undefined, measureIdx: number): number[] {
-        const kids = (node?.children ?? []).slice();
+        const kids = this.realChildren(node).slice();
 
         const key = (k: powerbi.DataViewMatrixNode): number | null => {
             const v = k.value as any;
@@ -756,10 +768,13 @@ export class Visual implements IVisual {
         // Small Multiples is only truly bound when the row hierarchy has a grouping
         // level. Power BI still returns one anonymous child when nothing is bound,
         // so checking children alone would mislabel the card as "Item 1".
+        // Against realChildren, not children: rowSubtotalsType defaults to "Bottom"
+        // but can be "Top", and a subtotal node in first place would carry no value
+        // and make a real grouping look like none.
+        const groupKids = this.realChildren(rows?.root);
         const anyGrouping = (rows?.levels?.length ?? 0) > 0
-            && !!rows?.root?.children
-            && rows.root.children.length > 0
-            && rows.root.children[0].value !== undefined;
+            && groupKids.length > 0
+            && groupKids[0].value !== undefined;
 
         // Trend shares the row hierarchy with Small Multiples, so a grouping level
         // is not necessarily a card. With only Trend bound, level 0 is the time
@@ -808,8 +823,11 @@ export class Visual implements IVisual {
         const metrics: MetricData[] = [];
         const limit = this.isPro ? 50 : 1;
 
-        for (let i = 0; i < Math.min(rows.root.children.length, limit); i++) {
-            const child = rows.root.children[i];
+        // Subtotal nodes are not cards: without this the grid would show an extra
+        // "Total" card, and it would eat one of the 50 Pro slots.
+        const cardNodes = this.realChildren(rows.root);
+        for (let i = 0; i < Math.min(cardNodes.length, limit); i++) {
+            const child = cardNodes[i];
             const categoryName = child.value != null ? String(child.value) : `Item ${i + 1}`;
             const rowValues = child.values ?? {};
 

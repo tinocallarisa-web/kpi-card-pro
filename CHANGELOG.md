@@ -10,6 +10,11 @@
 - **Power BI's own licensing notifications.** Changing a `(Pro)` setting without a licence now
   raises the platform's "feature blocked" banner, which carries the purchase path, and a persistent
   licence icon while Pro settings are set without one. Both clear as soon as a licence resolves.
+- **Total/SubTotal API.** Power BI now computes the card's figure with the measure's real
+  aggregation instead of the visual summing the periods itself. It matters as soon as Value is not
+  additive: an average ticket or a margin percentage was showing the sum of the monthly figures,
+  which is a number that means nothing. Subtotal nodes are filtered out of the hierarchy, so they
+  never appear as an extra "Total" card or as a giant final bar in the trend line.
 - **`build-test.js`**, with `--free` for the real free tier and `--debug` for a licence diagnostic
   overlay. Testing previously meant editing `isPro` by hand.
 

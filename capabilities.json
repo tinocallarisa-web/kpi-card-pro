@@ -507,6 +507,41 @@
           }
         }
       }
+    },
+    "subTotals": {
+      "displayName": "Subtotals",
+      "properties": {
+        "rowSubtotals": {
+          "displayName": "Row subtotals",
+          "type": {
+            "bool": true
+          }
+        },
+        "perRowLevel": {
+          "displayName": "Per row level",
+          "type": {
+            "bool": true
+          }
+        },
+        "columnSubtotals": {
+          "displayName": "Column subtotals",
+          "type": {
+            "bool": true
+          }
+        },
+        "perColumnLevel": {
+          "displayName": "Per column level",
+          "type": {
+            "bool": true
+          }
+        },
+        "levelSubtotalEnabled": {
+          "displayName": "Level subtotal enabled",
+          "type": {
+            "bool": true
+          }
+        }
+      }
     }
   },
   "privileges": [],
@@ -523,5 +558,44 @@
     "roles": [
       "tooltips"
     ]
+  },
+  "subtotals": {
+    "matrix": {
+      "rowSubtotals": {
+        "propertyIdentifier": {
+          "objectName": "subTotals",
+          "propertyName": "rowSubtotals"
+        },
+        "defaultValue": true
+      },
+      "rowSubtotalsPerLevel": {
+        "propertyIdentifier": {
+          "objectName": "subTotals",
+          "propertyName": "perRowLevel"
+        },
+        "defaultValue": false
+      },
+      "columnSubtotals": {
+        "propertyIdentifier": {
+          "objectName": "subTotals",
+          "propertyName": "columnSubtotals"
+        },
+        "defaultValue": false
+      },
+      "columnSubtotalsPerLevel": {
+        "propertyIdentifier": {
+          "objectName": "subTotals",
+          "propertyName": "perColumnLevel"
+        },
+        "defaultValue": false
+      },
+      "levelSubtotalEnabled": {
+        "propertyIdentifier": {
+          "objectName": "subTotals",
+          "propertyName": "levelSubtotalEnabled"
+        },
+        "defaultValue": true
+      }
+    }
   }
 }

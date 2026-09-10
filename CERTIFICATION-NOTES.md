@@ -13,6 +13,11 @@ Support: https://tcviz.com
 
 License validation:
 This visual uses the official Microsoft IVisualLicenseManager API (spIdentifier: kpi-card-pro-tcviz).
+
+The Total/SubTotal API is enabled for row subtotals, so the figure on each card is the aggregate
+Power BI computes with the measure's own aggregation, rather than a sum performed by the visual.
+Subtotal nodes are filtered out of the hierarchy: they are not rendered as cards and are excluded
+from the trend series.
 No external license server is used. The license state is resolved asynchronously after
 the first render, so rendering never depends on the licensing call completing.
 
