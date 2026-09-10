@@ -9,7 +9,8 @@
 [![Version](https://img.shields.io/badge/version-1.2.0.0-brightgreen)](pbiviz.json)
 [![License](https://img.shields.io/badge/License-Proprietary-red)](https://tinocallarisa-web.github.io/kpi-card-pro/terms.html)
 
-📖 **[Documentation & Support](https://tinocallarisa-web.github.io/kpi-card-pro/support.html)**
+📖 **[Documentation & Support](https://tinocallarisa-web.github.io/kpi-card-pro/support.html)** ·
+🎬 **[Video walkthrough](https://www.youtube.com/watch?v=3VbAcI90CQQ)**
 
 ---
 

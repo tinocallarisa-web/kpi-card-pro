@@ -1,4 +1,4 @@
-# KPI Card Pro — Certification Notes
+# KPI Card Pro — Certification Notes — v1.2.0.0
 # Copia este contenido en el campo "Notas para la certificación" de Partner Center antes de publicar.
 # IMPORTANTE: El campo se borra en cada reenvío. Guarda este archivo.
 
@@ -9,6 +9,7 @@ https://github.com/tinocallarisa-web/kpi-card-pro/tree/certification
 
 Privacy Policy: https://tinocallarisa-web.github.io/kpi-card-pro/privacy.html
 Terms of Use: https://tinocallarisa-web.github.io/kpi-card-pro/terms.html
+Video walkthrough: https://www.youtube.com/watch?v=3VbAcI90CQQ
 Support: https://tcviz.com
 
 License validation:
