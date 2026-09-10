@@ -4,14 +4,17 @@ Genera assets/sample-data-kpi.csv para probar KPI Card Pro.
 36 meses (2024-01 a 2026-12) x 12 subcanales en 5 canales, con tendencia,
 estacionalidad por canal y ruido reproducible. Incluye el mes anterior y el
 mismo mes del ano anterior ya calculados, para poder llenar el well
-"Prior Period" sin escribir DAX.
+"Prior Period" sin escribir DAX, y un icono por canal para el well "Image".
 
 Sin dependencias.  Uso:  python assets/make-sample-data.py
 """
 
+import base64
 import csv
 import io
 import os
+import struct
+import zlib
 
 # ─────────────────────────────────────────────────────────────── datos ────
 
@@ -50,6 +53,75 @@ CANALES = {
 
 ANIO_INI, ANIO_FIN = 2024, 2026
 
+# ─────────────────────────────────────────────── iconos PNG (Base64) ────
+# El well "Image" solo acepta data URIs Base64: una URL externa convertiria
+# el visual en algo que hace peticiones de red, y eso rompe la promesa que
+# sostienen la politica de privacidad y las notas de certificacion.
+# PNG escrito a mano con zlib, sin depender de PIL.
+
+SS = 4       # supersampling, para bordes suaves
+ICONO = 28   # px
+
+
+def _png(pixels, w, h):
+    # Cada fila va precedida de su byte de filtro (0 = ninguno).
+    raw = b"".join(
+        bytes([0]) + b"".join(struct.pack("BBBB", *px) for px in row)
+        for row in pixels
+    )
+
+    def chunk(tag, data):
+        c = tag + data
+        return struct.pack(">I", len(data)) + c + struct.pack(">I", zlib.crc32(c) & 0xFFFFFFFF)
+
+    firma = bytes([137, 80, 78, 71, 13, 10, 26, 10])
+    return (firma
+            + chunk(b"IHDR", struct.pack(">IIBBBBB", w, h, 8, 6, 0, 0, 0))
+            + chunk(b"IDAT", zlib.compress(raw, 9))
+            + chunk(b"IEND", b""))
+
+
+def _icono(forma, color, size=ICONO):
+    r, g, b = color
+    big = size * SS
+    cx = cy = big / 2.0
+    rad = big * 0.44
+    acc = [[0] * size for _ in range(size)]
+    for y in range(big):
+        for x in range(big):
+            dx, dy = x - cx, y - cy
+            if forma == "circulo":
+                dentro = dx * dx + dy * dy <= rad * rad
+            elif forma == "cuadrado":
+                k = rad * 0.9
+                dentro = abs(dx) <= k and abs(dy) <= k
+            elif forma == "rombo":
+                dentro = abs(dx) + abs(dy) <= rad * 1.2
+            elif forma == "triangulo":
+                dentro = (dy <= rad * 0.8) and (dy >= -rad * 0.9) \
+                    and (abs(dx) <= (dy + rad * 0.9) * 0.6)
+            elif forma == "anillo":
+                d2 = dx * dx + dy * dy
+                dentro = (rad * 0.55) ** 2 <= d2 <= rad * rad
+            else:
+                dentro = False
+            if dentro:
+                acc[y // SS][x // SS] += 1
+    full = SS * SS
+    px = [[(r, g, b, int(round(255.0 * acc[y][x] / full))) for x in range(size)]
+          for y in range(size)]
+    return "data:image/png;base64," + base64.b64encode(_png(px, size, size)).decode("ascii")
+
+
+# Un icono por canal, forma y color distintos para reconocerlos de un vistazo.
+ICONOS = {
+    "HOTEL":       ("circulo",   (201, 100, 66)),
+    "BAR":         ("cuadrado",  (61, 110, 176)),
+    "RESTAURANTE": ("rombo",     (74, 145, 88)),
+    "DISCOTECA":   ("triangulo", (156, 135, 245)),
+    "CAFETERIA":   ("anillo",    (176, 87, 48)),
+}
+
 
 def rnd(seed):
     """LCG minimo: mismo CSV en cada ejecucion, sin depender de random."""
@@ -78,6 +150,8 @@ def main():
                 for mes in range(1, 13):
                     datos[(sub, anio, mes)] = ventas(canal, sub, i, anio, mes)
 
+    iconos = {k: _icono(*v) for k, v in ICONOS.items()}
+
     filas = 0
     with io.open(out, "w", encoding="utf-8-sig", newline="") as fh:
         w = csv.writer(fh)
@@ -85,6 +159,7 @@ def main():
             "Fecha", "Anio", "MesNumero", "Mes",
             "Canal", "Subcanal",
             "Ventas", "VentasMesAnterior", "VentasAnioAnterior", "Objetivo",
+            "ImagenCanal",
         ])
         for canal, (subs, _b, _g, _s) in CANALES.items():
             for sub in subs:
@@ -103,15 +178,17 @@ def main():
                         w.writerow([
                             "%04d-%02d-01" % (anio, mes), anio, mes, MESES[mes - 1],
                             canal, sub, v, prev_mes, prev_anio, objetivo,
+                            iconos[canal],
                         ])
                         filas += 1
 
     print("Escrito: %s" % out)
-    print("  filas      : %d" % filas)
-    print("  meses      : %d (%d-01 a %d-12)" % ((ANIO_FIN - ANIO_INI + 1) * 12, ANIO_INI, ANIO_FIN))
-    print("  canales    : %d" % len(CANALES))
-    print("  subcanales : %d" % sum(len(v[0]) for v in CANALES.values()))
-    print("  tamano     : %.1f KB" % (os.path.getsize(out) / 1024.0))
+    print("  filas       : %d" % filas)
+    print("  meses       : %d (%d-01 a %d-12)" % ((ANIO_FIN - ANIO_INI + 1) * 12, ANIO_INI, ANIO_FIN))
+    print("  canales     : %d" % len(CANALES))
+    print("  subcanales  : %d" % sum(len(v[0]) for v in CANALES.values()))
+    print("  iconos      : %d (%d chars cada uno)" % (len(iconos), len(next(iter(iconos.values())))))
+    print("  tamano      : %.1f KB" % (os.path.getsize(out) / 1024.0))
 
 
 if __name__ == "__main__":

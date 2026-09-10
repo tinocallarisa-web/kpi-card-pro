@@ -171,6 +171,25 @@ class SmallMultiplesSettings extends FormattingSettingsCard {
     slices = [this.columns, this.gap, this.showTitle, this.titleFontSize, this.titleColor];
 }
 
+// ─── Card: Image ─────────────────────────────────────────────────────────────
+
+class ImageSettings extends FormattingSettingsCard {
+    show = new formattingSettings.ToggleSwitch({
+        name: "show", displayName: "Show", value: true
+    });
+    height = new formattingSettings.NumUpDown({
+        name: "height", displayName: "Height (px)", value: 28,
+        options: { minValue: { type: powerbi.visuals.ValidatorType.Min, value: 12 }, maxValue: { type: powerbi.visuals.ValidatorType.Max, value: 96 } }
+    });
+    radius = new formattingSettings.NumUpDown({
+        name: "radius", displayName: "Corner Radius (px)", value: 4,
+        options: { minValue: { type: powerbi.visuals.ValidatorType.Min, value: 0 }, maxValue: { type: powerbi.visuals.ValidatorType.Max, value: 48 } }
+    });
+    name = "image";
+    displayName = "Image";
+    slices = [this.show, this.height, this.radius];
+}
+
 // ─── Card: Trend (Pro) ───────────────────────────────────────────────────────
 
 class TrendSettings extends FormattingSettingsCard {
@@ -236,7 +255,8 @@ export class VisualFormattingSettingsModel extends FormattingSettingsModel {
     label = new LabelSettings();
     variance = new VarianceSettings();
     smallMultiples = new SmallMultiplesSettings();
+    image = new ImageSettings();
     trend = new TrendSettings();
     accessibility = new AccessibilitySettings();
-    cards = [this.card, this.mainValue, this.label, this.variance, this.trend, this.smallMultiples, this.accessibility];
+    cards = [this.card, this.mainValue, this.label, this.variance, this.image, this.trend, this.smallMultiples, this.accessibility];
 }

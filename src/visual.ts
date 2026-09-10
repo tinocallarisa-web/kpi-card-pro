@@ -30,6 +30,7 @@ interface MetricData {
     selectionId: powerbi.extensibility.ISelectionId | null;
     isHighlighted: boolean;               // false = dim this card
     trendData: number[];                  // series for the sparkline, empty when unbound
+    image: string | null;                 // validated Base64 data URI, or null
 }
 
 type DisplayUnit = "auto" | "none" | "thousands" | "millions" | "billions";
@@ -697,6 +698,37 @@ export class Visual implements IVisual {
         return (node?.children ?? []).filter(k => !(k as any).isSubtotal);
     }
 
+    /**
+     * A safe image for the card, or null.
+     *
+     * Only `data:image/<type>;base64,<payload>` is accepted. Every other scheme —
+     * http, https, blob, javascript — is rejected without comment, which is what
+     * keeps the promise that the visual makes no network request of any kind. That
+     * promise is not decoration: it is what the privacy policy and the
+     * certification notes claim, and an external URL would quietly make both
+     * false. A sibling visual was rejected for XSS over exactly this.
+     */
+    private safeImage(raw: unknown): string | null {
+        if (typeof raw !== "string") return null;
+        const v = raw.trim();
+        if (v.length < 32 || v.length > 2_000_000) return null;
+        return /^data:image\/(png|jpeg|jpg|gif|webp|svg\+xml);base64,[A-Za-z0-9+/=\s]+$/i.test(v)
+            ? v
+            : null;
+    }
+
+    /** Text value of a node, searching descendants when the node itself has none. */
+    private nodeOrChildrenText(node: powerbi.DataViewMatrixNode | undefined, idx: number): string | null {
+        if (idx < 0) return null;
+        const own = this.safeImage((node?.values?.[idx] as any)?.value);
+        if (own) return own;
+        for (const k of this.realChildren(node)) {
+            const found = this.nodeOrChildrenText(k, idx);
+            if (found) return found;
+        }
+        return null;
+    }
+
     private rowRoles(rows: powerbi.DataViewHierarchy | undefined): { sm: number; trend: number } {
         const out = { sm: -1, trend: -1 };
         (rows?.levels ?? []).forEach((lvl, i) => {
@@ -747,6 +779,7 @@ export class Visual implements IVisual {
         let measureIdx = -1;
         let priorIdx = -1;
         let targetIdx = -1;
+        let imageIdx = -1;
         const tooltipIdxs: number[] = [];
 
         if (cols?.levels?.[0]?.sources) {
@@ -755,6 +788,7 @@ export class Visual implements IVisual {
                 if (roles["measure"] && measureIdx === -1) measureIdx = i;
                 else if (roles["priorPeriod"] && priorIdx === -1) priorIdx = i;
                 else if (roles["target"] && targetIdx === -1) targetIdx = i;
+                else if (roles["image"] && imageIdx === -1) imageIdx = i;
                 else if (roles["tooltips"]) tooltipIdxs.push(i);
             });
         }
@@ -815,7 +849,8 @@ export class Visual implements IVisual {
                 selectionId: null,
                 isHighlighted: true,  // single card always visible
                 // Only Trend bound: the root's children are the points of the series.
-                trendData: trendBound ? this.seriesFrom(rows?.root, measureIdx) : []
+                trendData: trendBound ? this.seriesFrom(rows?.root, measureIdx) : [],
+                image: this.nodeOrChildrenText(valueNode, imageIdx)
             }];
         }
 
@@ -858,7 +893,8 @@ export class Visual implements IVisual {
                 selectionId,
                 isHighlighted,
                 // With both roles bound, each card's children are its own series.
-                trendData: trendBound ? this.seriesFrom(child, measureIdx) : []
+                trendData: trendBound ? this.seriesFrom(child, measureIdx) : [],
+                image: this.nodeOrChildrenText(child, imageIdx)
             });
         }
 
@@ -1186,6 +1222,44 @@ export class Visual implements IVisual {
                 line-height: 1.4;
             `;
             cell.appendChild(labelEl);
+        }
+
+        // Image, top-right. A flex header rather than absolute positioning, so a
+        // long category title shrinks instead of running underneath the logo.
+        const imgSrc = s.image.show.value ? metric.image : null;
+        if (imgSrc) {
+            const h = Math.max(12, Math.min(96, s.image.height.value ?? 28));
+            const img = document.createElement("img");
+            // An <img> src, never innerHTML: this is user data, and the sibling
+            // visual that built markup from a data role was rejected for XSS.
+            // Script inside an SVG does not run in an <img> context either.
+            img.src = imgSrc;
+            img.alt = "";
+            img.setAttribute("aria-hidden", "true");
+            img.style.cssText =
+                `height:${h}px;width:auto;max-width:45%;object-fit:contain;` +
+                `border-radius:${Math.max(0, s.image.radius.value ?? 4)}px;flex-shrink:0;`;
+
+            const header = cell.querySelector(".kpi-header") as HTMLElement | null ?? (() => {
+                const hd = document.createElement("div");
+                hd.className = "kpi-header";
+                hd.style.cssText = "display:flex;align-items:flex-start;justify-content:space-between;gap:8px;";
+                // Move the label inside the header so the two share a row.
+                const existing = cell.querySelector(".kpi-label");
+                if (existing) {
+                    cell.removeChild(existing);
+                    // Inside a flex row, text-overflow only works with min-width: 0 —
+                    // otherwise the item refuses to shrink below its content and the
+                    // title pushes the image out of the card instead of ellipsing.
+                    (existing as HTMLElement).style.flex = "1";
+                    (existing as HTMLElement).style.minWidth = "0";
+                    hd.appendChild(existing);
+                }
+                else { hd.appendChild(document.createElement("span")); }
+                cell.insertBefore(hd, cell.firstChild);
+                return hd;
+            })();
+            header.appendChild(img);
         }
 
         // ── Main Value — show highlight value if cross-filter active ───────

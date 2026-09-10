@@ -25,6 +25,12 @@
       "descriptionKey": "Role_Target_Description"
     },
     {
+      "name": "image",
+      "displayName": "Image",
+      "description": "A column holding a Base64 data URI (data:image/*;base64,...). Shown in the top-right of each card. External URLs are rejected: the visual makes no network requests.",
+      "kind": "Measure"
+    },
+    {
       "displayName": "Small Multiples (Pro)",
       "description": "Dimension to split into multiple KPI cards (optional, Pro).",
       "displayNameKey": "Role_SmallMultiples",
@@ -67,6 +73,9 @@
             "max": 1
           },
           "trend": {
+            "max": 1
+          },
+          "image": {
             "max": 1
           }
         }
@@ -111,6 +120,11 @@
             {
               "bind": {
                 "to": "tooltips"
+              }
+            },
+            {
+              "bind": {
+                "to": "image"
               }
             }
           ]
@@ -539,6 +553,29 @@
           "displayName": "Level subtotal enabled",
           "type": {
             "bool": true
+          }
+        }
+      }
+    },
+    "image": {
+      "displayName": "Image",
+      "properties": {
+        "show": {
+          "displayName": "Show",
+          "type": {
+            "bool": true
+          }
+        },
+        "height": {
+          "displayName": "Height (px)",
+          "type": {
+            "numeric": true
+          }
+        },
+        "radius": {
+          "displayName": "Corner Radius (px)",
+          "type": {
+            "numeric": true
           }
         }
       }
