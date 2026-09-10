@@ -1,0 +1,47 @@
+KPI Card Pro v1.2.0.0 - GUID kpiCardProTCViz
+Repo (certification branch), full notes in CERTIFICATION-NOTES.md:
+https://github.com/tinocallarisa-web/kpi-card-pro/tree/certification
+Support: https://tinocallarisa-web.github.io/kpi-card-pro/support.html
+Privacy: https://tinocallarisa-web.github.io/kpi-card-pro/privacy.html
+Terms:   https://tinocallarisa-web.github.io/kpi-card-pro/terms.html
+Video:   https://www.youtube.com/watch?v=3VbAcI90CQQ
+
+TESTING - FREE (no licence)
+1. Bind a measure to Value: one card with the formatted number.
+2. Add Prior Period and Target: variance percentage with its arrow, and the
+   "Prior:" / "Target:" line underneath.
+3. Bind a Base64 image column to Image (aggregation: First): a logo appears
+   top-right. An http/https URL is rejected on purpose.
+4. Click the card: it cross-filters. Right-click on the card and on empty
+   space: the context menu appears in both.
+5. Bind a date to Trend, or a category to Small Multiples. Both are Pro: the
+   card keeps the free result and Power BI's own "feature blocked" banner
+   appears. A licence icon also shows while Pro settings are set without one;
+   both clear once a licence resolves.
+6. Same for any setting marked "(Pro)" in the format pane.
+
+TESTING - PRO (active plan)
+7. Trend draws the line inside the card - area, line or bars - with the target
+   drawn period by period across it.
+8. Small Multiples renders one card per category, up to 50, each with its own
+   line. No banner or icon appears.
+
+PRIVACY / NETWORK
+No external calls: no telemetry, analytics, CDN or endpoints. Rendering is all
+local. The only host API is IVisualLicenseManager, carrying no report data.
+The Image role accepts only data:image/<type>;base64,<payload>; anything else
+is rejected at parse time, so nothing is ever fetched. Images go through an
+<img> src, never markup built from user data.
+
+LICENSING
+Plan ID kpi-card-pro-tcviz. Resolved after the first paint, so it never blocks
+rendering; on failure the visual stays Free. Active and Warning both accepted.
+isLicenseUnsupportedEnv and isLicenseInfoAvailable respected, so a Pro user in
+Publish to Web, embedded or PDF export is never prompted to buy. No licensing
+UI of our own, only platform notifications. Production state: isPro from the
+licence manager, GUID unsuffixed.
+
+
+FREE: the complete card, minus the Pro items.
+PRO: the trend line and Small Multiples, plus prefix/suffix, the variance pill,
+extra tooltip measures, and card border, radius, padding and shadow.
