@@ -796,7 +796,7 @@ export class Visual implements IVisual {
             const valueNode = trendBound ? rows?.root : anonChild;
             const value = this.nodeOrChildrenValue(valueNode, measureIdx)
                 ?? this.getNodeValue(rootValues, measureIdx);
-            const highlightValue = hasHighlights ? this.getNodeHighlight(rootValues, measureIdx) : null;
+            const highlightValue = hasHighlights ? this.nodeOrChildrenHighlight(valueNode, measureIdx) : null;
             const prior = priorIdx >= 0
                 ? (this.nodeOrChildrenValue(valueNode, priorIdx) ?? this.getNodeValue(rootValues, priorIdx))
                 : null;
@@ -832,7 +832,7 @@ export class Visual implements IVisual {
             const rowValues = child.values ?? {};
 
             const value = this.nodeOrChildrenValue(child, measureIdx);
-            const highlightValue = hasHighlights ? this.getNodeHighlight(rowValues, measureIdx) : null;
+            const highlightValue = hasHighlights ? this.nodeOrChildrenHighlight(child, measureIdx) : null;
             const prior = priorIdx >= 0 ? this.nodeOrChildrenValue(child, priorIdx) : null;
             const target = targetIdx >= 0 ? this.nodeOrChildrenValue(child, targetIdx) : null;
 
@@ -865,18 +865,53 @@ export class Visual implements IVisual {
         return metrics;
     }
 
+    /**
+     * Is any highlight active anywhere in the matrix?
+     *
+     * Walks the whole hierarchy rather than just the root and its children. With
+     * Trend bound the values — and therefore the highlights — sit on the leaves,
+     * one level deeper, so the old two-level check found nothing and the visual
+     * ignored cross-highlighting entirely. Slicers still worked because a slicer
+     * filters the data; a treemap or a chart highlights it, which is a different
+     * mechanism and the one that was broken.
+     */
     private detectHighlights(matrix: powerbi.DataViewMatrix, measureIdx: number): boolean {
-        // Check root (single card case)
         const rootVals = matrix.rows?.root?.values ?? matrix.columns?.root?.values ?? {};
         if (this.getNodeHighlight(rootVals, measureIdx) !== null) return true;
 
-        // Check children (small multiples case)
-        if (matrix.rows?.root?.children) {
-            for (const child of matrix.rows.root.children) {
-                if (this.getNodeHighlight(child.values ?? {}, measureIdx) !== null) return true;
+        const walk = (node: powerbi.DataViewMatrixNode | undefined): boolean => {
+            for (const k of (node?.children ?? [])) {
+                if (this.getNodeHighlight(k.values ?? {}, measureIdx) !== null) return true;
+                if (walk(k)) return true;
             }
-        }
-        return false;
+            return false;
+        };
+        return walk(matrix.rows?.root);
+    }
+
+    /**
+     * A node's highlight, falling back to the sum of its descendants'.
+     *
+     * Same shape as nodeOrChildrenValue and for the same reason: with Trend bound
+     * the card's own node carries nothing. Null means genuinely not highlighted,
+     * which is what dims the card — so an empty result must stay null rather than
+     * become zero.
+     */
+    private nodeOrChildrenHighlight(node: powerbi.DataViewMatrixNode | undefined, idx: number): number | null {
+        const own = this.getNodeHighlight(node?.values ?? {}, idx);
+        if (own !== null) return own;
+
+        let sum = 0;
+        let seen = false;
+        const walk = (n: powerbi.DataViewMatrixNode | undefined): void => {
+            for (const k of this.realChildren(n)) {
+                const h = this.getNodeHighlight(k.values ?? {}, idx);
+                if (h !== null) { sum += h; seen = true; }
+                walk(k);
+            }
+        };
+        walk(node);
+        return seen ? sum : null;
     }
 
     private getNodeValue(values: powerbi.DataViewMatrixNodeValue, idx: number): number | null {
