@@ -268,10 +268,13 @@ class TrendSettings extends FormattingSettingsCard {
     showTargetLine = new formattingSettings.ToggleSwitch({
         name: "showTargetLine", displayName: "Show Target Line", value: true
     });
+    targetColor = new formattingSettings.ColorPicker({
+        name: "targetColor", displayName: "Target Line Color", value: { value: "#A19F9D" }
+    });
     name = "trend";
     displayName = "Trend (Pro)";
     slices = [this.show, this.type, this.color, this.lineWidth, this.areaOpacity,
-              this.height, this.showDot, this.showTargetLine];
+              this.height, this.showDot, this.showTargetLine, this.targetColor];
 }
 
 // ─── Card: Accessibility ─────────────────────────────────────────────────────

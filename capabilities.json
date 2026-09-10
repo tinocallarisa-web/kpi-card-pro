@@ -547,6 +547,16 @@
           "type": {
             "bool": true
           }
+        },
+        "targetColor": {
+          "displayName": "Target Line Color",
+          "type": {
+            "fill": {
+              "solid": {
+                "color": true
+              }
+            }
+          }
         }
       }
     },

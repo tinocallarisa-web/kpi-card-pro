@@ -479,7 +479,7 @@ export class Visual implements IVisual {
             const line = document.createElementNS(svgNS, "path");
             line.setAttribute("d", dTgt);
             line.setAttribute("fill", "none");
-            line.setAttribute("stroke", hc ? "#FFFF00" : "#A19F9D");
+            line.setAttribute("stroke", hc ? "#FFFF00" : (t.targetColor.value?.value ?? "#A19F9D"));
             line.setAttribute("stroke-width", "1");
             line.setAttribute("stroke-dasharray", "4 2");
             line.setAttribute("vector-effect", "non-scaling-stroke");
