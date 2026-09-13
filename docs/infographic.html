@@ -9,380 +9,125 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
+  :root {
+    --bg:#FAF9F5;  --bg2:#EDE9DE;  --bd:#F5F3ED;  --line:#DAD9D4;
+    --t1:#3D3929;  --t2:#535146;   --t3:#83827D;
+    --acc:#2B6CB0; --accd:#1F4E80; --acc2:#3E9C5B; --acc2l:#D9EFE0;
+  }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    background: #888;
-    font-family: 'Segoe UI', system-ui, sans-serif;
-    min-height: 100vh;
-    display: flex;
-    justify-content: flex-start;
-    align-items: flex-start;
-    padding: 24px;
-  }
+  body { background: #888; font-family: 'Segoe UI', system-ui, sans-serif; }
 
-  /* Download button */
   #dl-btn {
-    position: fixed; top: 16px; left: 16px; z-index: 999;
-    background: #C96442; color: #fff; border: none;
-    padding: 8px 16px; border-radius: 6px; font-size: 13px;
-    font-family: 'Segoe UI', sans-serif; font-weight: 600;
-    cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    position: fixed; top: 12px; left: 12px; z-index: 999;
+    background: var(--acc); color: #fff; border: none; border-radius: 6px;
+    padding: 8px 16px; font: 700 13px 'Segoe UI', sans-serif; cursor: pointer;
   }
-  #dl-btn:hover { background: #B05730; }
+  #dl-btn:hover { background: var(--accd); }
+  #fit-check { position: fixed; top: 12px; right: 12px; z-index: 10000; background: #B00020; color: #fff; font: 700 13px 'Segoe UI', sans-serif; padding: 6px 12px; border-radius: 6px; }
 
-  /* Infographic container */
+  /* 1366x768 exactos: la medida que pide Microsoft. */
   #infographic {
-    width: 1366px;
-      /* 1366x768 exactos: la medida que pide Microsoft. El contenido no se
-         recorta para caber, se escala — ver ajustar() al final del fichero. */
-      height: 768px;
-    background: #FAF9F5;
-    font-family: 'Segoe UI', system-ui, sans-serif;
-    overflow: hidden;
+    width: 1366px; height: 768px; overflow: hidden;
+    background: var(--bg); color: var(--t1);
+    display: flex; flex-direction: column;
+    padding: 12px 36px 8px;
   }
 
   /* ── HEADER ── */
-  .header {
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    align-items: center;
-    gap: 24px;
-    background: #FAF9F5;
-    border-bottom: 2px solid #DAD9D4;
-    padding: 20px 32px;
-  }
-  .header-center h1 {
-    font-family: 'Segoe UI', sans-serif;
-    font-size: 30px;
-    font-weight: 700;
-    color: #3D3929;
-    line-height: 1.1;
-  }
-  .header-center h1 span { color: #C96442; }
-  .header-center p {
-    font-size: 14px;
-    color: #535146;
-    margin-top: 4px;
-    line-height: 1.4;
-  }
-  /* La cabecera lleva ahora una captura real del visual, no una ilustracion.
-     Va incrustada en Base64: html2canvas no puede capturar imagenes externas
-     sin toparse con CORS, y dejaria un hueco al exportar el PNG. */
-  .header-chart svg,
-  .header-chart img { display: block; }
+  .header { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 24px; margin-bottom: 8px; }
+  .header-center h1 { font-size: 28px; font-weight: 700; color: var(--t1); line-height: 1.1; }
+  .header-center h1 span { color: var(--acc); }
+  .header-center p { font-size: 13px; color: var(--t3); margin-top: 4px; line-height: 1.4; }
+  /* Captura real del visual incrustada en Base64 (html2canvas + CORS). */
+  .header-chart svg, .header-chart img { display: block; }
 
   /* ── USE CASES STRIP ── */
-  .use-cases {
-    display: flex;
-    align-items: center;
-    gap: 0;
-    background: #EDE9DE;
-    border-bottom: 1px solid #DAD9D4;
-    padding: 10px 32px;
-  }
-  .use-cases-label {
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 2px;
-    color: #83827D;
-    white-space: nowrap;
-    margin-right: 20px;
-    text-transform: uppercase;
-  }
-  .use-cases-icons {
-    display: flex;
-    gap: 20px;
-    flex: 1;
-    align-items: center;
-  }
-  .use-case-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 3px;
-  }
-  .use-case-item i {
-    font-size: 22px;
-    color: #535146;
-  }
-  .use-case-item span {
-    font-size: 10px;
-    color: #535146;
-    white-space: nowrap;
-  }
-  .use-case-callout {
-    background: #C96442;
-    color: #fff;
-    border-radius: 8px;
-    padding: 8px 14px;
-    font-size: 12px;
-    font-weight: 600;
-    max-width: 220px;
-    line-height: 1.4;
-    text-align: center;
-    margin-left: 20px;
-  }
+  .use-cases { display: flex; align-items: center; gap: 16px; background: var(--bd); border: 1px solid var(--line); border-radius: 10px; padding: 6px 20px; margin-bottom: 8px; }
+  .use-cases-label { writing-mode: vertical-rl; transform: rotate(180deg); font-size: 10px; font-weight: 700; letter-spacing: 2px; color: var(--t3); white-space: nowrap; text-transform: uppercase; }
+  .use-cases-icons { display: flex; gap: 20px; flex: 1; align-items: center; }
+  .use-case-item { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .use-case-item i { font-size: 18px; color: var(--acc); }
+  .use-case-item span { font-size: 11px; color: var(--t2); white-space: nowrap; }
+  .use-case-callout { background: var(--acc); color: #fff; border-radius: 20px; padding: 6px 14px; font-size: 12px; font-weight: 700; max-width: 260px; line-height: 1.3; text-align: center; }
 
   /* ── BODY ── */
-  .body {
-    display: grid;
-    grid-template-columns: 1fr 200px 1fr;
-    gap: 0;
-    padding: 0;
-    min-height: 280px;
-    border-bottom: 1px solid #DAD9D4;
-  }
-  .body-left, .body-right {
-    padding: 20px 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  .body-left { border-right: 1px solid #DAD9D4; }
-  .body-right { border-left: 1px solid #DAD9D4; }
+  .body { display: grid; grid-template-columns: 1fr 190px 1fr; gap: 18px; margin-bottom: 8px; }
+  .body-left, .body-right { border-radius: 10px; padding: 8px 18px; display: flex; flex-direction: column; gap: 4px; background: #fff; }
+  .body-left { border: 2px solid var(--acc); }
+  .body-right { border: 2px solid var(--acc2); }
 
-  .section-title {
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: #83827D;
-    margin-bottom: 4px;
-  }
+  .section-title { font-size: 13px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 1px; }
+  .body-left .section-title { color: var(--acc); }
+  .body-right .section-title { color: var(--acc2); }
 
-  .step-card {
-    display: flex;
-    gap: 10px;
-    align-items: flex-start;
-  }
-  .step-num {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-    font-weight: 700;
-    flex-shrink: 0;
-    margin-top: 1px;
-  }
-  .step-num.orange { background: #C96442; color: #fff; }
-  .step-num.purple { background: #9C87F5; color: #fff; }
-  .step-card-text strong {
-    display: block;
-    font-size: 13px;
-    color: #3D3929;
-    font-weight: 600;
-  }
-  .step-card-text p {
-    font-size: 11px;
-    color: #535146;
-    margin-top: 2px;
-    line-height: 1.4;
-  }
+  .step-card { display: flex; gap: 9px; align-items: flex-start; }
+  .step-num { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+  .step-num.orange { background: var(--acc); color: #fff; }
+  .step-num.purple { background: var(--acc2); color: #fff; }
+  .step-card-text strong { display: block; font-size: 12px; color: var(--t1); font-weight: 600; line-height: 1.25; }
+  .step-card-text p { font-size: 11px; color: var(--t2); margin-top: 0; line-height: 1.3; }
 
   /* Center column */
-  .body-center {
-    padding: 20px 16px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
-  }
-  .pro-badge {
-    width: 72px;
-    height: 72px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #C96442, #9C87F5);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-    font-weight: 700;
-    font-size: 20px;
-    line-height: 1;
-  }
+  .body-center { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; }
+  .pro-badge { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, var(--acc), var(--acc2)); display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 20px; line-height: 1; }
   .pro-badge span { font-size: 9px; font-weight: 500; letter-spacing: 1px; }
-  .stat-pill {
-    background: #EDE9DE;
-    border: 1px solid #DAD9D4;
-    border-radius: 8px;
-    padding: 8px 12px;
-    width: 100%;
-    text-align: center;
-  }
-  .stat-pill .stat-val {
-    font-size: 20px;
-    font-weight: 700;
-    color: #C96442;
-    line-height: 1;
-  }
-  .stat-pill .stat-label {
-    font-size: 10px;
-    color: #535146;
-    margin-top: 2px;
-  }
+  .stat-pill { background: var(--bd); border: 1px solid var(--line); border-radius: 6px; padding: 4px 8px; width: 100%; text-align: center; }
+  .stat-pill .stat-val { font-size: 16px; font-weight: 700; color: var(--acc); line-height: 1.1; }
+  .stat-pill .stat-label { font-size: 9px; color: var(--t3); text-transform: uppercase; letter-spacing: .5px; }
 
   /* ── WORKFLOW ── */
-  .workflow {
-    display: flex;
-    align-items: center;
-    gap: 0;
-    padding: 16px 32px;
-    background: #FAF9F5;
-    border-bottom: 1px solid #DAD9D4;
-  }
-  .workflow-step {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    flex: 1;
-  }
-  .workflow-step i {
-    font-size: 22px;
-    color: #C96442;
-  }
-  .workflow-step span {
-    font-size: 10px;
-    color: #3D3929;
-    font-weight: 600;
-    text-align: center;
-  }
-  .workflow-arrow {
-    color: #DAD9D4;
-    font-size: 18px;
-    margin: 0 4px;
-  }
-  .workflow-tagline {
-    font-size: 11px;
-    color: #83827D;
-    font-style: italic;
-    text-align: center;
-    padding: 6px 32px 10px;
-    border-bottom: 1px solid #DAD9D4;
-  }
+  .workflow { display: flex; align-items: center; gap: 8px; background: var(--bd); border: 1px solid var(--line); border-radius: 10px; padding: 6px 20px; }
+  .workflow-step { display: flex; flex-direction: column; align-items: center; gap: 2px; flex: 1; }
+  .workflow-step i { font-size: 18px; color: var(--acc); }
+  .workflow-step span { font-size: 11px; color: var(--t2); text-align: center; }
+  .workflow-arrow { color: var(--t3); font-size: 16px; }
+  .workflow-tagline { font-style: italic; color: var(--t3); font-size: 11px; text-align: center; margin: 3px 0 8px; }
 
   /* ── BOTTOM GRID ── */
-  .bottom-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 0;
-    min-height: 190px;
-  }
-  .bottom-card {
-    padding: 16px 20px;
-    border-right: 1px solid #DAD9D4;
-  }
-  .bottom-card:last-child { border-right: none; }
-  .bottom-card-title {
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: #83827D;
-    margin-bottom: 10px;
-  }
-  .benefit-item {
-    display: flex;
-    gap: 8px;
-    align-items: flex-start;
-    margin-bottom: 8px;
-  }
-  .benefit-item i {
-    font-size: 16px;
-    color: #C96442;
-    flex-shrink: 0;
-    margin-top: 1px;
-  }
-  .benefit-item div strong {
-    display: block;
-    font-size: 12px;
-    color: #3D3929;
-    font-weight: 600;
-  }
-  .benefit-item div p {
-    font-size: 11px;
-    color: #535146;
-    line-height: 1.4;
-    margin-top: 1px;
-  }
-  .tip-item {
-    display: flex;
-    gap: 6px;
-    align-items: flex-start;
-    margin-bottom: 6px;
-    font-size: 11px;
-    color: #3D3929;
-    line-height: 1.4;
-  }
-  .tip-check { color: #107C10; font-weight: 700; flex-shrink: 0; }
+  .bottom-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; flex: 1; }
+  .bottom-card { background: var(--bd); border: 1px solid var(--line); border-radius: 10px; padding: 7px 14px; }
+  .bottom-card-title { font-size: 13px; font-weight: 700; color: var(--acc); margin-bottom: 4px; }
+  .benefit-item { display: flex; gap: 7px; align-items: flex-start; margin-bottom: 3px; }
+  .benefit-item i { font-size: 15px; color: var(--acc); flex-shrink: 0; margin-top: 1px; }
+  .benefit-item div strong { display: block; font-size: 11.5px; color: var(--t1); font-weight: 600; }
+  .benefit-item div p { font-size: 10.5px; color: var(--t2); line-height: 1.3; }
+  .tip-item { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10.5px; color: var(--t2); line-height: 1.3; }
+  .tip-check { color: var(--acc2); font-weight: 700; flex-shrink: 0; }
 
-  .format-section { margin-bottom: 8px; }
-  .format-section-name {
-    font-size: 11px;
-    font-weight: 700;
-    color: #3D3929;
-    margin-bottom: 3px;
-  }
-  .format-tag {
-    display: inline-block;
-    background: #EDE9DE;
-    border: 1px solid #DAD9D4;
-    border-radius: 4px;
-    font-size: 10px;
-    color: #535146;
-    padding: 1px 6px;
-    margin: 1px 2px 1px 0;
-  }
-  .format-tag.pro {
-    background: #DBD3F0;
-    border-color: #9C87F5;
-    color: #6A52C8;
-  }
+  .format-section { margin-bottom: 3px; }
+  .format-section-name { font-size: 11px; font-weight: 700; color: var(--t1); margin-bottom: 1px; }
+  .format-tag { display: inline-block; background: #fff; border: 1px solid var(--line); border-radius: 4px; font-size: 10px; color: var(--t2); padding: 0 5px; margin: 1px 2px 1px 0; }
+  .format-tag.pro { background: var(--acc2l); border-color: var(--acc2); color: #2A6B3E; }
 
   /* ── FOOTER ── */
-  .footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 32px;
-    background: #EDE9DE;
-    border-top: 2px solid #DAD9D4;
-    border-bottom: 2px solid #DAD9D4;
-  }
-  .footer-left {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .footer-visual-name {
-    font-size: 12px;
-    font-weight: 600;
-    color: #3D3929;
-  }
-  .footer-links {
-    display: flex;
-    gap: 16px;
-    align-items: center;
-  }
-  .footer-links a {
-    font-size: 11px;
-    color: #535146;
-    text-decoration: none;
-    font-weight: 500;
-  }
-  .footer-links a:hover { color: #C96442; }
-  .footer-sep { color: #DAD9D4; }
+  .footer { display: flex; align-items: center; justify-content: space-between; margin-top: 6px; padding-top: 5px; border-top: 1px solid var(--line); }
+  .footer-left { display: flex; align-items: center; gap: 10px; }
+  .footer-visual-name { font-size: 12px; font-weight: 600; color: var(--t3); }
+  .footer-links { display: flex; gap: 12px; align-items: center; }
+  .footer-links a { font-size: 12px; color: var(--t3); text-decoration: none; }
+  .footer-links a:hover { color: var(--acc); }
+  .footer-sep { color: var(--line); }
 
   @media print {
     @page { size: A4 landscape; margin: 0; }
-    body { background: none; padding: 0; }
-    #dl-btn { display: none; }
+    body { background: none; }
+    #dl-btn, #fit-check { display: none; }
     #infographic { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
   }
+
+  /* compactado para 1366x768 */
+  .header-chart img { width: 85px; height: 80px; }
+  .use-case-item { flex-direction: row; gap: 5px; }
+  .use-case-item i { font-size: 16px; }
+  .body-center { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; align-content: center; justify-items: center; }
+  .body-center .pro-badge { grid-column: 1 / -1; }
+  .stat-pill { padding: 3px 4px; }
+  .stat-pill .stat-label { font-size: 8.5px; line-height: 1.15; }
+  .workflow-step { flex-direction: row; gap: 6px; justify-content: center; }
+  .format-section-name { display: inline-block; margin-right: 4px; }
+  .format-section { margin-bottom: 2px; line-height: 1.2; }
+  .tip-item { margin-bottom: 1px; }
+  .benefit-item { margin-bottom: 2px; }
 </style>
 </head>
 <body>
@@ -398,9 +143,9 @@
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 828 362" width="160" height="70">
         <defs>
           <linearGradient id="g" x1="0" y1="1" x2="1" y2="0">
-            <stop offset="0" stop-color="#B05730"/>
-            <stop offset="0.55" stop-color="#C96442"/>
-            <stop offset="1" stop-color="#9C87F5"/>
+            <stop offset="0" stop-color="#1F4E80"/>
+            <stop offset="0.55" stop-color="#2B6CB0"/>
+            <stop offset="1" stop-color="#3E9C5B"/>
           </linearGradient>
         </defs>
         <g transform="translate(40,46)">
@@ -661,7 +406,7 @@
         <span class="format-tag">Font Size</span>
       </div>
       <div class="format-section">
-        <div class="format-section-name">Small Multiples <span style="color:#9C87F5;font-weight:700">✦ Pro</span></div>
+        <div class="format-section-name">Small Multiples <span style="color:#3E9C5B;font-weight:700">✦ Pro</span></div>
         <span class="format-tag pro">Columns ✦</span>
         <span class="format-tag pro">Gap ✦</span>
         <span class="format-tag pro">Title Font &amp; Color ✦</span>
@@ -677,9 +422,9 @@
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 828 362" width="70" height="30">
         <defs>
           <linearGradient id="gf" x1="0" y1="1" x2="1" y2="0">
-            <stop offset="0" stop-color="#B05730"/>
-            <stop offset="0.55" stop-color="#C96442"/>
-            <stop offset="1" stop-color="#9C87F5"/>
+            <stop offset="0" stop-color="#1F4E80"/>
+            <stop offset="0.55" stop-color="#2B6CB0"/>
+            <stop offset="1" stop-color="#3E9C5B"/>
           </linearGradient>
         </defs>
         <g transform="translate(40,46)">
@@ -699,7 +444,7 @@
       <span class="footer-visual-name">KPI Card Pro</span>
     </div>
     <div class="footer-links">
-      <a href="https://tcviz.com">Support</a>
+      <a href="https://tinocallarisa-web.github.io/kpi-card-pro/support.html">Support</a>
       <span class="footer-sep">·</span>
       <a href="https://tinocallarisa-web.github.io/kpi-card-pro/privacy.html">Privacy Policy</a>
       <span class="footer-sep">·</span>
@@ -712,78 +457,18 @@
 </div><!-- /infographic -->
 
 <script>
-/**
- * Ajuste a 1366x768.
- *
- * Microsoft pide esa medida exacta. Recortar con overflow:hidden la respeta
- * pero deja la infografia con el pie cortado, y escalar solo en alto la
- * deforma. Esto reduce el contenido entero de forma uniforme hasta que cabe,
- * compensando el ancho para que siga llenando los 1366.
- *
- * Iterativo porque las dos magnitudes dependen entre si: al ensanchar la
- * maqueta el texto ocupa menos lineas y el alto baja, lo que permite una
- * escala mayor. Converge en tres o cuatro vueltas.
- */
-const ANCHO = 1366, ALTO = 768;
-let inner = null, escala = 1;
-
-function envolver() {
-  const existente = document.getElementById('info-inner');
-  if (existente) return existente;
-  const box = document.getElementById('infographic');
-  const w = document.createElement('div');
-  w.id = 'info-inner';
-  w.style.cssText = 'transform-origin: top left; width:' + ANCHO + 'px;';
-  while (box.firstChild) w.appendChild(box.firstChild);
-  box.appendChild(w);
-  return w;
-}
-
-function ajustar() {
-  inner = envolver();
-  escala = 1;
-  for (let i = 0; i < 8; i++) {
-    inner.style.width = (ANCHO / escala) + 'px';
-    inner.style.transform = 'none';            // medir sin escalar
-    const alto = inner.scrollHeight;
-    const nueva = Math.min(1, ALTO / alto);
-    if (Math.abs(nueva - escala) < 0.002) { escala = nueva; break; }
-    escala = nueva;
-  }
-  inner.style.width = (ANCHO / escala) + 'px';
-  inner.style.transform = 'scale(' + escala + ')';
-}
-
-window.addEventListener('load', ajustar);
-
 async function downloadPNG() {
   const btn = document.getElementById('dl-btn');
   btn.textContent = '⏳ Generating…';
   btn.disabled = true;
   try {
-    ajustar();
-    // Se captura a tamano natural y se reescala al dibujar. html2canvas tiene
-    // soporte irregular de transform: capturarlo ya escalado haria depender el
-    // resultado de su version. Asi solo depende de drawImage, que no falla.
-    const ancho = ANCHO / escala;
-    const alto  = ALTO  / escala;
-    inner.style.transform = 'none';
-    const shot = await html2canvas(inner, {
-      width: ancho, height: alto, scale: 1,
+    const canvas = await html2canvas(document.getElementById('infographic'), {
+      width: 1366, height: 768, scale: 1,
       useCORS: true, backgroundColor: '#FAF9F5'
     });
-    inner.style.transform = 'scale(' + escala + ')';
-
-    const out = document.createElement('canvas');
-    out.width = ANCHO; out.height = ALTO;
-    const ctx = out.getContext('2d');
-    ctx.fillStyle = '#FAF9F5';
-    ctx.fillRect(0, 0, ANCHO, ALTO);
-    ctx.drawImage(shot, 0, 0, ANCHO, ALTO);
-
     const link = document.createElement('a');
     link.download = 'kpi-card-pro-infographic.png';
-    link.href = out.toDataURL('image/png');
+    link.href = canvas.toDataURL('image/png');
     link.click();
   } finally {
     btn.textContent = '⬇ Download PNG';
@@ -792,5 +477,20 @@ async function downloadPNG() {
 }
 </script>
 
+<div id="fit-check" hidden></div>
+<script>
+(function () {
+  function check() {
+    var el = document.getElementById('infographic');
+    var h = el.scrollHeight, b = document.getElementById('fit-check');
+    if (h > 768) { b.textContent = 'OVERFLOW: ' + (h - 768) + 'px'; b.hidden = false; document.title = 'OVERFLOW'; }
+    else { b.hidden = true; document.title = 'FIT'; }
+  }
+  window.addEventListener('load', function () {
+    var ready = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
+    ready.then(function () { setTimeout(check, 100); });
+  });
+})();
+</script>
 </body>
 </html>
