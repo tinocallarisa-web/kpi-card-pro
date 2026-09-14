@@ -1,4 +1,4 @@
-# KPI Card Pro — Certification Notes — v1.2.0.0
+# KPI Card Pro — Certification Notes — v1.2.1.0
 # Copia este contenido en el campo "Notas para la certificación" de Partner Center antes de publicar.
 # IMPORTANTE: El campo se borra en cada reenvío. Guarda este archivo.
 

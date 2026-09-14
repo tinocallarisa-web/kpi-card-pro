@@ -1,6 +1,6 @@
 # KPI Card Pro — TCViz Web Product Page Content
 
-Content for the four tabs of the TCViz product page. Current version: **1.2.0.0**.
+Content for the four tabs of the TCViz product page. Current version: **1.2.1.0**.
 
 **Hero image:** the twelve-card grid — one card per subchannel, each with its logo, value,
 variance, prior and target, and its own trend line with the target drawn across it. It shows the

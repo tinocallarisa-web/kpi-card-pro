@@ -1,5 +1,17 @@
 # Changelog — KPI Card Pro
 
+## [1.2.1.0] — 2026-09-14
+
+### Fixed
+- **A paying customer could stay on Free.** `getAvailableServicePlans()` returns each plan's
+  `spIdentifier` as the full Partner Center **Service ID** (`publisher.offer.plan`), as the licensing
+  API documentation states. The visual compared it with the bare plan ID `kpi-card-pro-tcviz` using
+  `===`, which never matches. It now accepts a Service ID ending in `.kpi-card-pro-tcviz`, and the
+  bare plan ID as well.
+- **A failed licence lookup could ask a paying customer to buy.** When the call threw
+  synchronously, the visual fell back to Free but still treated the licence information as
+  available. It now shows no purchase prompt, as it already did when the promise rejected.
+
 ## [1.2.0.0] — 2026-09-09
 
 ### Added

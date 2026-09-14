@@ -1,4 +1,7 @@
-KPI Card Pro v1.2.0.0 - GUID kpiCardProTCViz
+KPI Card Pro v1.2.1.0 - GUID kpiCardProTCViz
+WHY THIS SUBMISSION: licence fix. spIdentifier is the full Service ID
+(publisher.offer.plan); the check now accepts one ending in
+".kpi-card-pro-tcviz". A failed licence lookup never shows purchase prompts.
 Repo (certification branch), full notes in CERTIFICATION-NOTES.md:
 https://github.com/tinocallarisa-web/kpi-card-pro/tree/certification
 Support: https://tinocallarisa-web.github.io/kpi-card-pro/support.html
@@ -27,20 +30,16 @@ TESTING - PRO (active plan)
    line. No banner or icon appears.
 
 PRIVACY / NETWORK
-No external calls: no telemetry, analytics, CDN or endpoints. Rendering is all
-local. The only host API is IVisualLicenseManager, carrying no report data.
-The Image role accepts only data:image/<type>;base64,<payload>; anything else
-is rejected at parse time, so nothing is ever fetched. Images go through an
-<img> src, never markup built from user data.
+No external calls, telemetry or CDN. Image accepts only
+data:image/<type>;base64 URIs, so nothing is fetched; rendered via <img> src,
+never markup built from user data.
 
 LICENSING
 Plan ID kpi-card-pro-tcviz. Resolved after the first paint, so it never blocks
 rendering; on failure the visual stays Free. Active and Warning both accepted.
 isLicenseUnsupportedEnv and isLicenseInfoAvailable respected, so a Pro user in
 Publish to Web, embedded or PDF export is never prompted to buy. No licensing
-UI of our own, only platform notifications. Production state: isPro from the
-licence manager, GUID unsuffixed.
-
+UI of our own, only platform notifications.
 
 FREE: the complete card, minus the Pro items.
 PRO: the trend line and Small Multiples, plus prefix/suffix, the variance pill,

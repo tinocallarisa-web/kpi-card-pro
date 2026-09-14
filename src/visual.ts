@@ -41,6 +41,16 @@ const CONTEXT_MENU_DEBOUNCE = 200;
 const SERVICE_PLAN_ID = "kpi-card-pro-tcviz";
 
 /**
+ * spIdentifier is the full Partner Center Service ID (publisher.offer.plan),
+ * not the bare plan ID, so an exact comparison never matches a real licence.
+ * The bare plan ID is accepted as well.
+ */
+function matchesPlan(spIdentifier: unknown, planId: string): boolean {
+    const sp = String(spIdentifier ?? "");
+    return sp === planId || sp.endsWith("." + planId);
+}
+
+/**
  * Session-level license cache.
  * Power BI recreates the visual instance on every page switch. Without this,
  * getAvailableServicePlans() is called again on each switch, racing against
@@ -72,7 +82,7 @@ function resolveLicense(licenseManager: IVisualLicenseManager): Promise<boolean>
                     // paying customer keeps their features through it.
                     // ServicePlanState: Active = 1, Warning = 2.
                     licenseResolved = plans.some(
-                        (p: any) => p.spIdentifier === SERVICE_PLAN_ID &&
+                        (p: any) => matchesPlan(p.spIdentifier, SERVICE_PLAN_ID) &&
                                     (p.state === 1 || p.state === 2)
                     );
                     // A Pro customer legitimately reads as Free in these cases, so
@@ -88,7 +98,9 @@ function resolveLicense(licenseManager: IVisualLicenseManager): Promise<boolean>
                 }
             );
         } catch (_) {
+            // The licence could not be read: Free, but never a purchase prompt.
             licenseResolved = false;
+            licenseInfoAvailable = false;
             resolve(false);
         }
     });
