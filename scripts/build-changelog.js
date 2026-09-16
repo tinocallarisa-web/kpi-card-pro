@@ -17,7 +17,7 @@ const path = require("path");
 
 const ROOT = path.join(__dirname, "..");
 const MD = path.join(ROOT, "CHANGELOG.md");
-const OUT = path.join(ROOT, "changelog.html");
+const OUT = path.join(ROOT, "docs", "changelog.html");
 
 const version = JSON.parse(fs.readFileSync(path.join(ROOT, "pbiviz.json"), "utf8")).visual.version;
 

@@ -6,7 +6,7 @@
     "type": "git",
     "url": "https://github.com/tinocallarisa-web/kpi-card-pro"
   },
-  "license": "MIT",
+  "license": "SEE LICENSE IN LICENSE",
   "scripts": {
     "pbiviz": "pbiviz",
     "start": "pbiviz start",

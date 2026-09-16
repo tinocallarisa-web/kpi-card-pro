@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Support — KPI Card Pro | TCViz</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --text: #1a1a1a;
+      --muted: #555;
+      --accent: #0078D4;
+      --border: #e8e8e8;
+      --bg: #ffffff;
+    }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      font-size: 15px;
+      line-height: 1.7;
+      color: var(--text);
+      background: var(--bg);
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 48px 24px 80px;
+    }
+    header {
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 24px;
+      margin-bottom: 40px;
+    }
+    .brand {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      text-decoration: none;
+    }
+    h1 {
+      font-size: 28px;
+      font-weight: 700;
+      margin-top: 12px;
+      line-height: 1.2;
+    }
+    .meta {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+    h2 {
+      font-size: 17px;
+      font-weight: 600;
+      margin-top: 36px;
+      margin-bottom: 10px;
+    }
+    p { margin-bottom: 14px; }
+    ul {
+      margin: 0 0 14px 20px;
+      padding: 0;
+    }
+    li { margin-bottom: 6px; }
+    a { color: var(--accent); }
+    .contact-card {
+      background: #f5f9ff;
+      border: 1px solid #d0e4f7;
+      border-radius: 8px;
+      padding: 20px 24px;
+      margin-top: 24px;
+    }
+    .contact-card p { margin-bottom: 6px; }
+    footer {
+      margin-top: 64px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+      font-size: 13px;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="brand" href="https://tcviz.com">TCViz</a>
+    <h1>Support</h1>
+    <p class="meta">KPI Card Pro &nbsp;·&nbsp; v1.2.1.0 &nbsp;·&nbsp; docs updated 14 September 2026 &nbsp;·&nbsp; tcviz.com</p>
+  </header>
+
+  <main>
+    <h2>Getting started</h2>
+    <p>
+      KPI Card Pro needs one measure in the <strong>Value</strong> field well. That alone renders a
+      single card with the formatted value. Everything else is optional:
+    </p>
+    <ul>
+      <li>Add a measure to <strong>Prior Period</strong> to show the variance, as a percentage with a
+        direction arrow and the prior value underneath.</li>
+      <li>Add a measure to <strong>Target</strong> to track against a goal.</li>
+      <li>Add a date to <strong>Trend (Pro)</strong> to draw a trend line inside the card.</li>
+      <li>Add a category field to <strong>Small Multiples (Pro)</strong> to render one card per
+        category instead of one card in total — each with its own line.</li>
+      <li>Add a Base64 image column to <strong>Image</strong> to show a logo per card.</li>
+      <li>Add measures to <strong>Tooltips</strong> to show more figures on hover.</li>
+    </ul>
+
+    <h2>Field wells</h2>
+    <ul>
+      <li><strong>Value</strong> (measure, required) — the number on the card.</li>
+      <li><strong>Prior Period</strong> (measure) — the comparison value. Enables the variance
+        percentage, its arrow and the &ldquo;Prior:&rdquo; line.</li>
+      <li><strong>Target</strong> (measure) — a goal to compare against.</li>
+      <li><strong>Small Multiples (Pro)</strong> (grouping) — one card per category, up to 50. Without
+        a licence only the first category renders.</li>
+      <li><strong>Trend (Pro)</strong> (grouping) — a date or ordered period. Each distinct value is a
+        point on the line, with the Value measure aggregated at that point. Use a real date column:
+        a month stored as text would be ordered alphabetically. A numeric period is reordered by the
+        visual so the line reads left to right in time.</li>
+      <li><strong>Image</strong> (measure, aggregated as <em>First</em>) — a column holding a Base64
+        data URI (<code>data:image/png;base64,&hellip;</code>), shown in the top-right of each card.
+        External URLs are rejected: the visual makes no network requests of any kind.</li>
+      <li><strong>Tooltips</strong> (measures) — additional figures shown on hover.</li>
+    </ul>
+
+    <h2>Format pane</h2>
+    <p>Settings that need a licence carry <strong>(Pro)</strong> in their name.</p>
+    <ul>
+      <li><strong>Card</strong> — Background, Border Colour, and <strong>(Pro)</strong> Border Width,
+        Border Radius, Padding, Drop Shadow.</li>
+      <li><strong>Main Value</strong> — Font family, size, bold, colour, display units
+        (Auto / K / M / B), decimal places, and <strong>(Pro)</strong> Prefix and Suffix.</li>
+      <li><strong>Label (single card)</strong> — Show, font family, size, bold, colour. This governs
+        the text above the number <em>when there is a single card</em>. With Small Multiples, that
+        same text is governed by the Small Multiples card instead.</li>
+      <li><strong>Variance</strong> — Show, positive / negative / neutral colours, invert logic (for
+        cost metrics where lower is better), show arrow, font size, and
+        <strong>(Pro)</strong> Show as Pill.</li>
+      <li><strong>Trend (Pro)</strong> — Show, chart type (area, line or bar), colour, line width,
+        area opacity, height, last-point marker, and the target line with its own colour. The target
+        is drawn period by period, not as a flat line, so it follows a target that changes over time.</li>
+      <li><strong>Image</strong> — Show, height, corner radius.</li>
+      <li><strong>Prior &amp; Target</strong> — Show, font family, size and colour of the
+        &ldquo;Prior:&rdquo; and &ldquo;Target:&rdquo; line under the variance.</li>
+      <li><strong>Small Multiples (Pro)</strong> — Columns, gap, and the category title with its
+        font family, size, bold and colour.</li>
+      <li><strong>Accessibility</strong> — High contrast handling and the visual title announced to
+        screen readers.</li>
+    </ul>
+
+    <h2>Free vs Pro</h2>
+    <p>
+      The card is fully functional without a licence. A Pro subscription adds the features listed
+      below; everything else, including all variance colours, is available to everyone.
+    </p>
+    <ul>
+      <li><strong>Free</strong> — one KPI card with value, prior-period variance and target; display
+        units and decimals; label styling; card background and border colour; all variance colours,
+        invert logic and arrow; native tooltips; high contrast; keyboard focus and screen-reader
+        labels; cross-filtering by clicking the card.</li>
+      <li><strong>Pro</strong> — the trend line inside the card, over a date or period axis, with
+        the target marked; Small Multiples, up to 50 cards from a category field, each with its own
+        line, in a multi-column layout with category titles; prefix and suffix on the main value;
+        the variance pill style; extra measures in tooltips; and the card border width, radius,
+        padding and drop shadow controls.</li>
+    </ul>
+    <p>
+      Changing a <strong>(Pro)</strong> setting without a licence leaves the card on the free result
+      and raises Power BI's own notification, which links to the licence. Nothing is lost: the
+      setting is stored and applies as soon as the licence is active.
+    </p>
+
+    <h2>Accessibility</h2>
+    <ul>
+      <li>The card is reachable with <strong>Tab</strong> and selected with
+        <strong>Enter</strong> or <strong>Space</strong>.</li>
+      <li>Right-click opens the standard Power BI context menu, on a card and on empty space.</li>
+      <li>High-contrast themes are honoured: colours follow the Power BI palette.</li>
+      <li>Cards carry ARIA labels announcing the metric name, value and variance. The visual title
+        announced to screen readers is configurable under Accessibility.</li>
+    </ul>
+
+    <h2>Video walkthrough</h2>
+    <p>
+      A four-minute tour: building the card, turning it into a grid of small multiples,
+      adding the trend line and the target, and what the Pro plan unlocks.
+    </p>
+    <p><a href="https://www.youtube.com/watch?v=3VbAcI90CQQ">Watch on YouTube</a></p>
+
+    <h2>Frequently asked questions</h2>
+
+    <p><strong>My image does not appear.</strong><br />
+      The Image well only accepts Base64 data URIs (<code>data:image/png;base64,&hellip;</code>).
+      A link to an image on a web server is rejected on purpose: honouring it would make the visual
+      fetch from the network, which it never does. Convert the images in Power Query or with a small
+      script, and set the field's aggregation to <em>First</em>.</p>
+
+    <p><strong>My trend line only goes down, whatever the data does.</strong><br />
+      That was a defect in versions before 1.2.0.0: a numeric period such as a month number was
+      delivered sorted by the measure rather than in time order, so the line was the values sorted
+      from high to low. It is fixed. If you are on an older build, use a real date column.</p>
+
+    <p><strong>I added a field to Small Multiples and still see one card.</strong><br />
+      Small Multiples is a Pro feature. Without a licence the first category renders and the rest are
+      not drawn; Power BI shows a licence notification when the field is bound.</p>
+
+    <p><strong>I bought Pro but the Pro settings do nothing.</strong><br />
+      Licence validation runs asynchronously after the card first paints, so for a moment the free
+      result is shown. It re-renders with your settings a second later. If it persists, confirm you
+      are signed in with the account that holds the licence, and that it is active under
+      <em>My Account → Licenses</em> in the Microsoft 365 admin center.</p>
+
+    <p><strong>The variance shows the wrong direction.</strong><br />
+      For metrics where lower is better — cost, defects, churn — switch on <em>Invert</em> under
+      Variance. This is available in both tiers.</p>
+
+    <p><strong>Does the visual send my data anywhere?</strong><br />
+      No. All calculation and rendering happens inside Power BI. The visual makes no network calls of
+      any kind. The only host API it uses is Microsoft's own licence check, which carries no report
+      data. See the <a href="privacy.html">Privacy Policy</a>.</p>
+
+    <p><strong>Does it work in Power BI Service?</strong><br />
+      Yes. Desktop, Service and the mobile apps are all supported.</p>
+
+    <h2>Contact support</h2>
+    <div class="contact-card">
+      <p><strong>Email:</strong> <a href="mailto:support@tcviz.com">support@tcviz.com</a> — we reply within 1&ndash;2 business days.</p>
+      <p><strong>Issues and feature requests:</strong> <a href="mailto:support@tcviz.com?subject=KPI%20Card%20Pro">support@tcviz.com</a></p>
+      <p><strong>What changed recently:</strong> <a href="changelog.html">Changelog</a></p>
+      <p><strong>Licensing:</strong> managed through Microsoft AppSource. Assign licences in the Microsoft 365 admin center.</p>
+    </div>
+  </main>
+
+  <footer>
+    &copy; 2026 TCViz &nbsp;·&nbsp; <a href="https://tcviz.com">tcviz.com</a> &nbsp;·&nbsp;
+    <a href="privacy.html">Privacy Policy</a> &nbsp;·&nbsp;
+    <a href="terms.html">Terms of Use</a>
+  </footer>
+</body>
+</html>
