@@ -6,7 +6,7 @@ Content for the four tabs of the TCViz product page. Current version: **1.2.1.0*
 variance, prior and target, and its own trend line with the target drawn across it. It shows the
 whole product in one glance and needs no caption.
 
-**Video:** https://www.youtube.com/watch?v=3VbAcI90CQQ
+**Video:** https://www.youtube.com/watch?v=7mkjDpWdkXA
 
 ---
 

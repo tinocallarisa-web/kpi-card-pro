@@ -5,7 +5,7 @@
   "Role_PriorPeriod_Description": "Prior period value for variance calculation (optional).",
   "Role_Target": "Target",
   "Role_Target_Description": "Target or budget value for goal tracking (optional).",
-  "Role_Tooltips": "Tooltips",
+  "Role_Tooltips": "Tooltips (Pro)",
   "Role_Tooltips_Description": "Additional measures for custom tooltip payload (optional).",
   "Object_Card": "Card",
   "Prop_Card_Background": "Background Color",
@@ -113,5 +113,12 @@
   "Msg_Empty": "Añade una medida al campo Valor",
   "Label_Prior": "Anterior",
   "Label_Target": "Objetivo",
-  "Label_Item": "Elemento"
+  "Label_Item": "Elemento",
+  "Role_SecondaryKpis": "KPI secundarios (Pro)",
+  "Role_SecondaryKpis_Description": "Hasta 3 medidas de apoyo, apiladas junto al valor principal.",
+  "Role_SecondaryPrior": "Periodo anterior de los KPI secundarios (Pro)",
+  "Role_SecondaryPrior_Description": "Valor del periodo anterior de cada KPI secundario, emparejado por posicion.",
+  "Obj_SecondaryKpis": "KPI secundarios [Pro]",
+  "Label_Vs": "vs",
+  "Obj_Period": "Valor y comparacion"
 }

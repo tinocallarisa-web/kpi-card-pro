@@ -1,5 +1,22 @@
 # Changelog — KPI Card Pro
 
+## [2.0.0.0] — 2026-09-22
+
+### Added
+- **Secondary KPIs.** Up to three supporting measures, stacked to the right of the main value, each with its own variance. A `Secondary KPIs prior` well pairs the comparison values **by position** — the first prior with the first KPI — which is the only way to relate them without inventing a naming convention the user would have to guess. They carry no selection identity: they are context for the headline, not entities to filter by, and clicking one would have to answer what "filter by Margin" means, which is nothing. The whole column is dropped below a configurable card width instead of being squeezed: compressing the main value to fit context loses the one thing the card exists to say. It applies in small multiples too, measured against the width of each cell rather than of the visual, so it appears when it fits and withdraws when it does not.
+- **Value & comparison: three modes for what the big number shows.** *Total of the period* is unchanged and remains the default. *Latest point in Trend* takes the last point of the series and compares it with an earlier one. *Last N points* sums the last N and compares against the N before — on a monthly series, N = 12 is the rolling year against the previous one, while the sparkline keeps all its points. Both new modes **remove the need for a date table and DATEADD measures**: bind the date field and the visual reads the comparison off the series it already has.
+- **Period label.** Prints which point the value is and which one it is compared against — *Dec 2025 vs Nov 2025*. The visual has no notion of calendar: it steps back a position in the series, so a step of 12 is 12 months only if the series is regular. Printing it is what makes that verifiable instead of assumed, and it also catches the common mistake of binding the date hierarchy, where the series turns out to be years.
+- **Pro preview.** Without a licence, and **in edit mode only**, a Pro feature the user turns on is drawn *working* under a "Pro preview" watermark naming it, instead of being silently ignored. Reading view — and any environment where licences cannot be read — still draws the free result with no watermark, so a published report never uses an unpaid feature. Granted **per feature**, only for the one actually turned on.
+
+### Fixed
+- **The Upgrade bar was being overwritten, so a user told to buy had nothing to click.** Power BI shows one licence notification at a time and the last call replaces the previous one. `notifyLicenseRequired()` ran before `notifyFeatureBlocked()` in the same `update()`, so on the first attempt at a Pro feature the banner wiped out the Upgrade bar — the call that carries the purchase path. The sequence is now `clearLicenseNotification()` → the banner naming the feature → and, after ~10 s, the persistent Upgrade bar.
+- **Variance colours and extra tooltip fields were gated but never announced.** The render blocked them; nothing told the user why. Changing the positive variance colour did nothing, with no explanation. Both now raise the notice and the preview like every other Pro feature.
+- **`Small Multiples (Pro)` lost its `(Pro)` in English.** `displayNameKey` overrides `displayName`, and the `en-US` string dropped the suffix while `es-ES` kept it. `Tooltips` was missing it in both.
+- **Returning from another report page dropped every Pro feature.** Power BI recreates the visual on each page switch, so the first render runs before the licence resolves and the preview is off. The licence then resolved to Free and `applyLicense()` only notified, without repainting — correct before the preview existed, since nothing drawn depended on the licence for a free user. The card stayed on one tile, with no trend and no secondary KPIs, until the user touched a setting.
+
+### Changed
+- **Secondary KPIs follow the same period as the main value.** A card showing December at the top and twenty-four months down the side is not comparing anything; it is showing two different things side by side.
+
 ## [1.2.1.0] — 2026-09-14
 
 ### Fixed

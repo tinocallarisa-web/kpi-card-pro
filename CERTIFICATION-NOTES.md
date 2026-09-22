@@ -9,7 +9,7 @@ https://github.com/tinocallarisa-web/kpi-card-pro/tree/certification
 
 Privacy Policy: https://tinocallarisa-web.github.io/kpi-card-pro/privacy.html
 Terms of Use: https://tinocallarisa-web.github.io/kpi-card-pro/terms.html
-Video walkthrough: https://www.youtube.com/watch?v=3VbAcI90CQQ
+Video walkthrough: https://www.youtube.com/watch?v=7mkjDpWdkXA
 Support: https://tcviz.com
 
 License validation:

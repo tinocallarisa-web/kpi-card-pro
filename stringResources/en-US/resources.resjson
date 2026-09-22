@@ -5,7 +5,7 @@
   "Role_PriorPeriod_Description": "Prior period value for variance calculation (optional).",
   "Role_Target": "Target",
   "Role_Target_Description": "Target or budget value for goal tracking (optional).",
-  "Role_Tooltips": "Tooltips",
+  "Role_Tooltips": "Tooltips (Pro)",
   "Role_Tooltips_Description": "Additional measures for custom tooltip payload (optional).",
   "Object_Card": "Card",
   "Prop_Card_Background": "Background Color",
@@ -68,7 +68,7 @@
   "Layout_Horizontal": "Horizontal Strip",
   "Prop_Metrics_Divider": "Show Dividers",
   "Prop_Metrics_DividerColor": "Divider Color",
-  "Role_SmallMultiples": "Small Multiples",
+  "Role_SmallMultiples": "Small Multiples (Pro)",
   "Role_SmallMultiples_Description": "Dimension to split into multiple KPI cards (optional, Pro).",
   "Object_SmallMultiples": "Small Multiples",
   "Prop_SM_Columns": "Columns",
@@ -113,5 +113,12 @@
   "Msg_Empty": "Add a measure to the Value field well",
   "Label_Prior": "Prior",
   "Label_Target": "Target",
-  "Label_Item": "Item"
+  "Label_Item": "Item",
+  "Role_SecondaryKpis": "Secondary KPIs (Pro)",
+  "Role_SecondaryKpis_Description": "Up to 3 supporting measures, shown stacked beside the main value.",
+  "Role_SecondaryPrior": "Secondary KPIs prior (Pro)",
+  "Role_SecondaryPrior_Description": "Prior-period value for each Secondary KPI, matched by position.",
+  "Obj_SecondaryKpis": "Secondary KPIs [Pro]",
+  "Label_Vs": "vs",
+  "Obj_Period": "Value & comparison"
 }

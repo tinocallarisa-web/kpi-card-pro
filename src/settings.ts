@@ -126,15 +126,15 @@ class VarianceSettings extends FormattingSettingsCard {
         name: "show", displayName: "Show", value: true
     });
     positiveColor = new formattingSettings.ColorPicker({
-        name: "positiveColor", displayName: "Positive Color",
+        name: "positiveColor", displayName: "Positive Color (Pro)",
         value: { value: "#107C10" }
     });
     negativeColor = new formattingSettings.ColorPicker({
-        name: "negativeColor", displayName: "Negative Color",
+        name: "negativeColor", displayName: "Negative Color (Pro)",
         value: { value: "#D13438" }
     });
     neutralColor = new formattingSettings.ColorPicker({
-        name: "neutralColor", displayName: "Neutral Color",
+        name: "neutralColor", displayName: "Neutral Color (Pro)",
         value: { value: "#605E5C" }
     });
     invertColors = new formattingSettings.ToggleSwitch({
@@ -211,6 +211,98 @@ class SecondarySettings extends FormattingSettingsCard {
     name = "secondary";
     displayName = "Prior & Target";
     slices = [this.show, this.fontFamily, this.fontSize, this.color];
+}
+
+// ─── Card: Value & comparison ────────────────────────────────────────────────
+
+class PeriodSettings extends FormattingSettingsCard {
+    /**
+     * "Total" suma todo el periodo del informe y es el comportamiento historico: no se
+     * cambia el defecto porque moveria informes ya publicados.
+     *
+     * "Latest" toma el ultimo punto de la serie de Trend y lo compara con uno anterior,
+     * y con eso desaparece la necesidad de una tabla de fechas y de medidas DATEADD.
+     */
+    valueMode = new formattingSettings.AutoDropdown({
+        name: "valueMode", displayName: "Value shows", value: "total"
+    });
+    /**
+     * Tamaño de la ventana en modo "Last N points": el valor es la suma de los ultimos
+     * N puntos y el prior la de los N anteriores. Con serie mensual y N=12 eso es el
+     * año movil contra el anterior, conservando los 24 puntos de la linea.
+     */
+    windowSize = new formattingSettings.NumUpDown({
+        name: "windowSize", displayName: "Window size (points)", value: 12,
+        options: {
+            minValue: { type: powerbi.visuals.ValidatorType.Min, value: 2 },
+            maxValue: { type: powerbi.visuals.ValidatorType.Max, value: 120 }
+        }
+    });
+    /**
+     * Posicion en la serie, NO un salto de calendario. El visual no sabe si un punto es
+     * un mes o un año: solo que es el anterior. Con un hueco en los datos, 12 atras no
+     * son 12 meses — y por eso existe la etiqueta, que dice contra que se compara.
+     */
+    compareOffset = new formattingSettings.NumUpDown({
+        name: "compareOffset", displayName: "Compare against (points back)", value: 1,
+        options: {
+            minValue: { type: powerbi.visuals.ValidatorType.Min, value: 1 },
+            maxValue: { type: powerbi.visuals.ValidatorType.Max, value: 120 }
+        }
+    });
+    showPeriodLabel = new formattingSettings.ToggleSwitch({
+        name: "showPeriodLabel", displayName: "Show period label", value: true
+    });
+    name = "period";
+    displayName = "Value & comparison";
+    slices = [this.valueMode, this.windowSize, this.compareOffset, this.showPeriodLabel];
+}
+
+// ─── Card: Secondary KPIs [Pro] ──────────────────────────────────────────────
+
+class SecondaryKpisSettings extends FormattingSettingsCard {
+    show = new formattingSettings.ToggleSwitch({
+        name: "show", displayName: "Show", value: true
+    });
+    /**
+     * Debajo de este ancho la columna secundaria se retira entera. Tres KPIs a la
+     * derecha de una tarjeta estrecha comprimen el valor principal hasta hacerlo
+     * ilegible, y el valor principal es el motivo por el que existe la tarjeta.
+     */
+    minWidth = new formattingSettings.NumUpDown({
+        name: "minWidth", displayName: "Hide below width (px)", value: 320,
+        options: {
+            minValue: { type: powerbi.visuals.ValidatorType.Min, value: 120 },
+            maxValue: { type: powerbi.visuals.ValidatorType.Max, value: 1200 }
+        }
+    });
+    showVariance = new formattingSettings.ToggleSwitch({
+        name: "showVariance", displayName: "Show variance", value: true
+    });
+    valueFontSize = new formattingSettings.NumUpDown({
+        name: "valueFontSize", displayName: "Value text size", value: 16,
+        options: {
+            minValue: { type: powerbi.visuals.ValidatorType.Min, value: 7 },
+            maxValue: { type: powerbi.visuals.ValidatorType.Max, value: 48 }
+        }
+    });
+    labelFontSize = new formattingSettings.NumUpDown({
+        name: "labelFontSize", displayName: "Label text size", value: 10,
+        options: {
+            minValue: { type: powerbi.visuals.ValidatorType.Min, value: 6 },
+            maxValue: { type: powerbi.visuals.ValidatorType.Max, value: 32 }
+        }
+    });
+    color = new formattingSettings.ColorPicker({
+        name: "color", displayName: "Value color", value: { value: "#323130" }
+    });
+    labelColor = new formattingSettings.ColorPicker({
+        name: "labelColor", displayName: "Label color", value: { value: "#605E5C" }
+    });
+    name = "secondaryKpis";
+    displayName = "Secondary KPIs [Pro]";
+    slices = [this.show, this.minWidth, this.showVariance,
+              this.valueFontSize, this.labelFontSize, this.color, this.labelColor];
 }
 
 // ─── Card: Image ─────────────────────────────────────────────────────────────
@@ -301,8 +393,10 @@ export class VisualFormattingSettingsModel extends FormattingSettingsModel {
     variance = new VarianceSettings();
     smallMultiples = new SmallMultiplesSettings();
     secondary = new SecondarySettings();
+    period = new PeriodSettings();
+    secondaryKpis = new SecondaryKpisSettings();
     image = new ImageSettings();
     trend = new TrendSettings();
     accessibility = new AccessibilitySettings();
-    cards = [this.card, this.mainValue, this.label, this.variance, this.secondary, this.image, this.trend, this.smallMultiples, this.accessibility];
+    cards = [this.card, this.mainValue, this.label, this.variance, this.secondary, this.period, this.secondaryKpis, this.image, this.trend, this.smallMultiples, this.accessibility];
 }

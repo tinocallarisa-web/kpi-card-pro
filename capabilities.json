@@ -55,6 +55,22 @@
       "kind": "Measure",
       "description": "Additional measures for tooltip (optional, Pro).",
       "descriptionKey": "Role_Tooltips_Description"
+    },
+    {
+      "displayName": "Secondary KPIs (Pro)",
+      "displayNameKey": "Role_SecondaryKpis",
+      "name": "secondaryKpis",
+      "kind": "Measure",
+      "description": "Up to 3 supporting measures, shown stacked beside the main value.",
+      "descriptionKey": "Role_SecondaryKpis_Description"
+    },
+    {
+      "displayName": "Secondary KPIs prior (Pro)",
+      "displayNameKey": "Role_SecondaryPrior",
+      "name": "secondaryPrior",
+      "kind": "Measure",
+      "description": "Prior-period value for each Secondary KPI, matched by position: the first here pairs with the first Secondary KPI.",
+      "descriptionKey": "Role_SecondaryPrior_Description"
     }
   ],
   "dataViewMappings": [
@@ -72,6 +88,12 @@
           },
           "tooltips": {
             "max": 10
+          },
+          "secondaryKpis": {
+            "max": 3
+          },
+          "secondaryPrior": {
+            "max": 3
           },
           "target": {
             "max": 1
@@ -129,6 +151,16 @@
             {
               "bind": {
                 "to": "image"
+              }
+            },
+            {
+              "bind": {
+                "to": "secondaryKpis"
+              }
+            },
+            {
+              "bind": {
+                "to": "secondaryPrior"
               }
             }
           ]
@@ -345,7 +377,7 @@
           }
         },
         "positiveColor": {
-          "displayName": "Positive Color",
+          "displayName": "Positive Color (Pro)",
           "displayNameKey": "Prop_Variance_PositiveColor",
           "type": {
             "fill": {
@@ -356,7 +388,7 @@
           }
         },
         "negativeColor": {
-          "displayName": "Negative Color",
+          "displayName": "Negative Color (Pro)",
           "displayNameKey": "Prop_Variance_NegativeColor",
           "type": {
             "fill": {
@@ -367,7 +399,7 @@
           }
         },
         "neutralColor": {
-          "displayName": "Neutral Color",
+          "displayName": "Neutral Color (Pro)",
           "displayNameKey": "Prop_Variance_NeutralColor",
           "type": {
             "fill": {
@@ -639,6 +671,74 @@
         }
       },
       "displayNameKey": "Object_Image"
+    },
+    "period": {
+      "displayName": "Value & comparison",
+      "displayNameKey": "Obj_Period",
+      "description": "What the big number shows when a field is bound to Trend.",
+      "properties": {
+        "valueMode": {
+          "displayName": "Value shows",
+          "type": {
+            "enumeration": [
+              { "value": "total", "displayName": "Total of the period" },
+              { "value": "latest", "displayName": "Latest point in Trend" },
+              { "value": "window", "displayName": "Last N points in Trend" }
+            ]
+          }
+        },
+        "windowSize": {
+          "displayName": "Window size (points)",
+          "description": "Only for \"Last N points\". 12 on a monthly series gives the last 12 months against the 12 before them.",
+          "type": { "numeric": true }
+        },
+        "compareOffset": {
+          "displayName": "Compare against (points back)",
+          "description": "1 = the previous point. On a monthly series, 12 gives the same month last year. It is a position in the series, not a calendar step: with a gap in the data, 12 back is not 12 months back.",
+          "type": { "numeric": true }
+        },
+        "showPeriodLabel": {
+          "displayName": "Show period label",
+          "description": "Prints which point the value is, and which one it is compared against.",
+          "type": { "bool": true }
+        }
+      }
+    },
+    "secondaryKpis": {
+      "displayName": "Secondary KPIs [Pro]",
+      "displayNameKey": "Obj_SecondaryKpis",
+      "properties": {
+        "show": {
+          "displayName": "Show",
+          "type": { "bool": true }
+        },
+        "minWidth": {
+          "displayName": "Hide below width (px)",
+          "description": "Below this card width the secondary column is dropped, so the main value never gets squeezed.",
+          "type": { "numeric": true }
+        },
+        "showVariance": {
+          "displayName": "Show variance",
+          "description": "Needs a measure in Secondary KPIs prior, matched by position.",
+          "type": { "bool": true }
+        },
+        "valueFontSize": {
+          "displayName": "Value text size",
+          "type": { "numeric": true }
+        },
+        "labelFontSize": {
+          "displayName": "Label text size",
+          "type": { "numeric": true }
+        },
+        "color": {
+          "displayName": "Value color",
+          "type": { "fill": { "solid": { "color": true } } }
+        },
+        "labelColor": {
+          "displayName": "Label color",
+          "type": { "fill": { "solid": { "color": true } } }
+        }
+      }
     },
     "secondary": {
       "displayName": "Prior & Target",

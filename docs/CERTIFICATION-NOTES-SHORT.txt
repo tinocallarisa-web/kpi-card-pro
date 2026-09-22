@@ -1,46 +1,47 @@
-KPI Card Pro v1.2.1.0 - GUID kpiCardProTCViz
-WHY THIS SUBMISSION: licence fix. spIdentifier is the full Service ID
-(publisher.offer.plan); the check now accepts one ending in
-".kpi-card-pro-tcviz". A failed licence lookup never shows purchase prompts.
-Repo (certification branch), full notes in CERTIFICATION-NOTES.md:
-https://github.com/tinocallarisa-web/kpi-card-pro/tree/certification
-Support: https://tinocallarisa-web.github.io/kpi-card-pro/support.html
-Privacy: https://tinocallarisa-web.github.io/kpi-card-pro/privacy.html
-Terms:   https://tinocallarisa-web.github.io/kpi-card-pro/terms.html
-Video:   https://www.youtube.com/watch?v=3VbAcI90CQQ
+KPI Card Pro 2.0.0.0 - GUID kpiCardProTCViz
+Repo, branch certification (full notes in docs/):
+github.com/tinocallarisa-web/kpi-card-pro | tinocallarisa-web.github.io/kpi-card-pro
+Video: youtube.com/watch?v=7mkjDpWdkXA
+
+PLEASE READ FIRST - PRO PREVIEW (NEW IN 2.0.0.0)
+Without a licence, IN EDIT MODE ONLY, a Pro feature the user turns on is drawn
+WORKING under a "Pro preview" watermark naming it. Intentional, not missing
+gating: it is how the user sees what they would be buying. In reading view,
+before the licence resolves, and where licences cannot be read (Publish to Web,
+embed, export) the FREE result is drawn. The gate is options.viewMode, not
+Desktop vs Service, and it is PER FEATURE.
+
+WHAT IS NEW
+Secondary KPIs: up to 3 measures beside the main value, each with its own
+variance. Value & comparison: the big number can be the total (default), the
+latest point of Trend, or the last N points against the N before - these two
+need no date table and no DATEADD, and a label prints what is compared ("Dec
+2025 vs Nov 2025"). Fixed: the Upgrade bar was overwritten by the banner, so a
+user told to buy had nothing to click; the order is now
+clear -> banner -> (~10 s) Upgrade bar.
 
 TESTING - FREE (no licence)
-1. Bind a measure to Value: one card with the formatted number.
-2. Add Prior Period and Target: variance percentage with its arrow, and the
-   "Prior:" / "Target:" line underneath.
-3. Bind a Base64 image column to Image (aggregation: First): a logo appears
-   top-right. An http/https URL is rejected on purpose.
-4. Click the card: it cross-filters. Right-click on the card and on empty
-   space: the context menu appears in both.
-5. Bind a date to Trend, or a category to Small Multiples. Both are Pro: the
-   card keeps the free result and Power BI's own "feature blocked" banner
-   appears. A licence icon also shows while Pro settings are set without one;
-   both clear once a licence resolves.
-6. Same for any setting marked "(Pro)" in the format pane.
-
-TESTING - PRO (active plan)
-7. Trend draws the line inside the card - area, line or bars - with the target
-   drawn period by period across it.
-8. Small Multiples renders one card per category, up to 50, each with its own
-   line. No banner or icon appears.
+1. A measure in Value: one card. Add Prior Period and Target: variance and the
+   "Prior:"/"Target:" line. Click the card: it cross-filters.
+2. A Base64 column in Image (aggregation First): a logo appears. http/https is
+   rejected on purpose, so nothing is fetched.
+3. In EDIT mode bind Small Multiples or Trend, or add Secondary KPIs: each
+   renders WORKING under the watermark, a banner names it, and after ~10 s the
+   Upgrade bar appears. Remove it and both go.
+4. Reading view: free result, no watermark, no notice.
+5. Switch to another report page and back: the state is kept.
+With an active plan the same features render clean.
 
 PRIVACY / NETWORK
-No external calls, telemetry or CDN. Image accepts only
-data:image/<type>;base64 URIs, so nothing is fetched; rendered via <img> src,
-never markup built from user data.
+No external calls, telemetry or CDN; privileges: []. Image accepts only
+data:image/<type>;base64, via <img> src, never markup from user data.
 
 LICENSING
-Plan ID kpi-card-pro-tcviz. Resolved after the first paint, so it never blocks
-rendering; on failure the visual stays Free. Active and Warning both accepted.
-isLicenseUnsupportedEnv and isLicenseInfoAvailable respected, so a Pro user in
-Publish to Web, embedded or PDF export is never prompted to buy. No licensing
-UI of our own, only platform notifications.
+Plan kpi-card-pro-tcviz, matched on a Service ID ending in it. Resolved
+the first paint, never blocking it; on failure it stays Free. Active and
+Warning accepted. isLicenseUnsupportedEnv and isLicenseInfoAvailable
+respected. No licensing UI of our own.
 
-FREE: the complete card, minus the Pro items.
-PRO: the trend line and Small Multiples, plus prefix/suffix, the variance pill,
-extra tooltip measures, and card border, radius, padding and shadow.
+FREE: the complete card. PRO: Trend, Small Multiples, Secondary KPIs, the value
+modes, prefix/suffix, the variance pill and colours, tooltip measures and card
+styling.

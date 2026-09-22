@@ -27,6 +27,11 @@ interface MetricData {
     priorPeriod: number | null;
     target: number | null;
     tooltipFields: Array<{ displayName: string; value: string }>;
+    /** Etiqueta del punto que muestra el valor, y del que se compara. Vacias en modo total. */
+    periodLabel: string;
+    comparePeriodLabel: string;
+    /** KPIs de apoyo a la derecha del valor principal. Su prior se empareja por posicion. */
+    secondary: Array<{ name: string; value: number | null; prior: number | null; series: number[] }>;
     selectionId: powerbi.extensibility.ISelectionId | null;
     isHighlighted: boolean;               // false = dim this card
     trendData: number[];                  // series for the sparkline, empty when unbound
@@ -129,6 +134,22 @@ export class Visual implements IVisual {
     private lastBlockedNotice = "";
     /** The persistent icon is a one-shot: it stays until cleared. */
     private licenseIconShown = false;
+    /** Pending timer for the Upgrade bar, so it can be cancelled and never leaks. */
+    private licenseIconTimer: number | null = null;
+    /** Edit mode, from options.viewMode. NOT Desktop vs Service: both report it. */
+    private editing = false;
+    /**
+     * Pro features drawn for real, under a watermark, so the user sees what they would
+     * be buying before paying for it. Edit mode only, and only once the licence has
+     * resolved — otherwise a Pro customer sees a watermark on the first frame and a
+     * published report ships an unpaid feature.
+     */
+    private proPreview = false;
+    /** Ultimo calculo hecho sobre un dataView con roles, para el retorno de pagina. */
+    private ultimasProFeatures: { labels: string[]; signature: string } | null = null;
+    private watermarkEl: HTMLDivElement | null = null;
+    private watermarkTitle: HTMLDivElement | null = null;
+    private watermarkWhy: HTMLDivElement | null = null;
     /** Solo para el overlay de diagnostico. */
     private dbgMeasureIdx = 0;
 
@@ -206,6 +227,12 @@ export class Visual implements IVisual {
         try {
             const dataView = options?.dataViews?.[0];
 
+            // ViewMode.View = 0. Edit e InFocusEdit son ambos edicion. Esto NO distingue
+            // Desktop de Service: los dos informan de los dos modos, y hacerlo por host
+            // dejaria la vista previa visible en un informe publicado.
+            const viewMode = (options as any).viewMode;
+            if (typeof viewMode === "number") { this.editing = viewMode !== 0; }
+
             // Power BI's viewport is authoritative. Relying on the container being
             // sized (width/height 100%) fails on page return, where the element can
             // still have zero dimensions — the content renders but is invisible until
@@ -238,17 +265,23 @@ export class Visual implements IVisual {
                 dataView
             ) as VisualFormattingSettingsModel;
 
+            // lastDataView se asigna ANTES de parsear. attemptedProFeatures() lo lee, y
+            // asignarlo despues hacia que durante el parseo mirase el dataView ANTERIOR:
+            // al volver de otra pagina, las puertas Pro se resolvian contra un dataView
+            // viejo y las small multiples se quedaban en una sola tarjeta hasta el
+            // siguiente update. Con isPro, que era un booleano estable, no se notaba.
+            const anterior = this.lastDataView;
+            this.lastDataView = dataView;
             const metrics = this.parseDataView(dataView);
 
             // If parsing yields nothing but we already displayed real data, this is a
             // transient update (roles not yet populated on page return). Keep the
             // current display instead of wiping it with the empty placeholder.
             if (metrics.length === 0 && this.hasRenderedData) {
+                this.lastDataView = anterior;   // no dejar el transitorio como bueno
                 this.events.renderingFinished(options);
                 return;
             }
-
-            this.lastDataView = dataView;
 
             const ariaTitle = this.formattingSettings.accessibility.visualTitle.value || "KPI Card Pro";
             this.container.setAttribute("aria-label", ariaTitle);
@@ -297,6 +330,23 @@ export class Visual implements IVisual {
             // notification because the licence was unresolved; nothing re-renders
             // for a Free user, so without this the banner never appears at all.
             this.notifyProFeatureBlocked();
+
+            // Y desde que existe la vista previa, tampoco basta con notificar.
+            //
+            // La previa depende de que la licencia se haya RESUELTO, no de que sea Pro.
+            // Power BI recrea la instancia en cada cambio de pagina, asi que al volver
+            // el primer render ocurre con licenseResolved todavia en null: sin previa,
+            // una sola tarjeta, sin tendencia y sin KPI secundarios. La licencia
+            // resolvia a Free un instante despues y este return se iba sin repintar,
+            // dejando la tarjeta rota hasta tocar cualquier ajuste.
+            //
+            // Antes era inofensivo: para un usuario Free nada de lo que se dibujaba
+            // dependia de la licencia. Ahora si.
+            if (this.computePreview() && this.lastDataView && this.formattingSettings) {
+                try {
+                    this.render(this.parseDataView(this.lastDataView));
+                } catch (_) { /* keep current display */ }
+            }
             return;
         }
         this.isPro = true;
@@ -318,6 +368,19 @@ export class Visual implements IVisual {
      * therefore a real moment of purchase intent.
      */
     private attemptedProFeatures(): { labels: string[]; signature: string } {
+        // Al volver de otra pagina Power BI puede entregar un dataView con valores pero
+        // SIN los roles poblados. Antes eso no importaba: la puerta era this.isPro, un
+        // booleano estable. Ahora decide si se dibujan 50 tarjetas o una, asi que un
+        // dataView sin roles apagaba las small multiples, la tendencia y los KPI
+        // secundarios aunque los campos siguieran en sus pozos.
+        //
+        // Se distingue de una retirada real de campos: al quitar un campo, Power BI si
+        // manda las fuentes, solo que sin ese rol. Sin fuentes es que aun no ha llegado
+        // la metadata, y entonces vale lo ultimo que sabiamos.
+        const fuentesAhora = this.lastDataView?.matrix?.columns?.levels?.[0]?.sources;
+        if (!fuentesAhora?.length && this.ultimasProFeatures) {
+            return this.ultimasProFeatures;
+        }
         // No early return on a missing metadata.objects. A report where the user
         // has changed no formatting property has no objects at all — and that is
         // exactly the case of someone who has only dropped a field into Small
@@ -327,9 +390,12 @@ export class Visual implements IVisual {
 
         const groups: [string, string, string[]][] = [
             ["card styling",   "card",                 ["borderWidth", "borderRadius", "padding", "shadow"]],
-            ["the small multiples layout","smallMultiplesLayout", ["columns", "gap", "showTitle", "titleFontSize", "titleColor"]],
+            ["small multiples layout","smallMultiplesLayout", ["columns", "gap", "showTitle", "titleFontSize", "titleColor"]],
             ["prefix/suffix",  "mainValue",            ["prefix", "suffix"]],
-            ["the variance pill", "variance",          ["showPill"]],
+            ["variance pill", "variance",          ["showPill"]],
+            // Bloqueadas en el render desde siempre, pero nunca anunciadas: el usuario
+            // cambiaba el color y no pasaba nada, sin una palabra que lo explicara.
+            ["variance colours",  "variance",           ["positiveColor", "negativeColor", "neutralColor"]],
         ];
 
         const labels: string[] = [];
@@ -358,17 +424,32 @@ export class Visual implements IVisual {
             && smKids[0].value !== undefined;
         const smHasGrouping = anyGrouping && roles.sm >= 0;
 
+        // Igual que Small Multiples y Trend: el pozo se enlaza en el panel de campos,
+        // no en el de formato, asi que no deja rastro en metadata.objects. Sin esto la
+        // funcion mas visible que hemos añadido se activaria en silencio.
+        const fuentes = (this.lastDataView?.matrix?.columns?.levels?.[0]?.sources ?? []) as any[];
+        const secBound = fuentes.some(src => src?.roles?.["secondaryKpis"]);
+        if (secBound) {
+            labels.push("secondary KPIs");
+            parts.push("role.secondaryKpis=1");
+        }
+
+        // Tooltips extra: tambien es un pozo, tambien estaba gateado en silencio.
+        const tipBound = fuentes.filter(src => src?.roles?.["tooltips"]).length;
+        if (tipBound > 0) {
+            labels.push("extra tooltip fields");
+            parts.push(`role.tooltips=${tipBound}`);
+        }
+
         // Binding Trend is intent too, and it leaves no trace in metadata.objects.
         if (anyGrouping && roles.trend >= 0) {
-            labels.push("the trend line");
+            labels.push("trend line");
             parts.push("role.trend=1");
         }
 
         if (smHasGrouping) {
             const n = smKids.length;
-            labels.push(n > 1
-                ? `small multiples (${n} categories, showing 1)`
-                : "small multiples");
+            labels.push("small multiples");
             parts.push(`role.smallMultiples=${n}`);
         }
 
@@ -384,7 +465,9 @@ export class Visual implements IVisual {
             }
             if (touched) labels.push(label);
         }
-        return { labels, signature: parts.join("|") };
+        const salida = { labels, signature: parts.join("|") };
+        if (fuentesAhora?.length) { this.ultimasProFeatures = salida; }
+        return salida;
     }
 
     /**
@@ -393,8 +476,86 @@ export class Visual implements IVisual {
      * cleared, so leaving one up would tell a paying customer to buy what they
      * have just bought.
      */
+    /**
+     * Lo que se DIBUJA, funcion a funcion.
+     *
+     * La previa no puede concederse en bloque: varios ajustes Pro tienen un valor por
+     * defecto util, asi que un interruptor global los regalaria nada mas insertar el
+     * visual, sin marca de agua y sin aviso, porque el usuario no habria pedido nada.
+     * Solo vale para la funcion que el usuario ha tocado de verdad, que es tambien el
+     * momento en que aparecen la marca y el aviso de compra.
+     */
+    private previewOf(feature: string): boolean {
+        if (this.isPro) return true;
+        // En vivo, no desde el campo: parseDataView corre ANTES de render y es quien
+        // decide el limite de tarjetas, asi que leer un valor cacheado lo dejaria a uno.
+        if (!this.computePreview()) return false;
+        // Coincidencia exacta, no por prefijo: "small multiples layout" empieza igual que
+        // "small multiples", y con prefijo tocar el layout desbloqueaba las 50 tarjetas.
+        return this.attemptedProFeatures().labels.indexOf(feature) >= 0;
+    }
+
+    /** La marca solo aparece si hay alguna funcion Pro realmente pedida. */
+    private updateWatermark(): void {
+        if (!this.watermarkEl) {
+            this.watermarkEl = document.createElement("div");
+            this.watermarkEl.setAttribute("aria-hidden", "true");
+            this.watermarkEl.style.cssText =
+                "position:absolute;left:0;top:0;right:0;bottom:0;display:none;" +
+                "align-items:center;justify-content:center;flex-direction:column;" +
+                "text-align:center;pointer-events:none;z-index:5;" +
+                "font-family:'Segoe UI',sans-serif;font-weight:700;letter-spacing:0.06em;" +
+                "color:#FFFFFF;opacity:0.72;transform:rotate(-20deg);" +
+                "text-shadow:0 0 3px rgba(46,52,64,0.95),0 2px 6px rgba(46,52,64,0.75);";
+            this.watermarkTitle = document.createElement("div");
+            this.watermarkTitle.textContent = "Pro preview";
+            this.watermarkWhy = document.createElement("div");
+            this.watermarkEl.appendChild(this.watermarkTitle);
+            this.watermarkEl.appendChild(this.watermarkWhy);
+            if (getComputedStyle(this.container).position === "static") {
+                this.container.style.position = "relative";
+            }
+        }
+        // El render reconstruye el contenido del contenedor, asi que la marca se
+        // reinserta: encenderla sobre un nodo desconectado no pinta nada.
+        if (this.watermarkEl.parentNode !== this.container) {
+            this.container.appendChild(this.watermarkEl);
+        }
+        const labels = this.attemptedProFeatures().labels;
+        const activa = this.computePreview() && labels.length > 0;
+        this.watermarkEl.style.display = activa ? "flex" : "none";
+        if (!activa) return;
+
+        if (this.watermarkWhy) {
+            // Con cuatro o cinco funciones activas la lista se convertia en un parrafo
+            // cruzando la tarjeta entera y tapaba justo lo que queremos enseñar. Dos y
+            // un contador bastan para saber por que esta la marca.
+            const corta = labels.length <= 2
+                ? labels
+                : labels.slice(0, 2).concat([`+${labels.length - 2}`]);
+            this.watermarkWhy.textContent = corta.join(" · ");
+        }
+        const w = this.container.clientWidth  || 0;
+        const h = this.container.clientHeight || 0;
+        const size = Math.round(Math.max(22, Math.min(80, w / 7.5, h / 3.5)));
+        this.watermarkEl.style.fontSize = `${size}px`;
+        if (this.watermarkWhy) {
+            this.watermarkWhy.style.cssText =
+                `font-size:${Math.round(size * 0.32)}px;font-weight:600;`
+                + "margin-top:0.25em;opacity:0.95;";
+        }
+    }
+
+    private cancelLicenseIcon(): void {
+        if (this.licenseIconTimer !== null) {
+            window.clearTimeout(this.licenseIconTimer);
+            this.licenseIconTimer = null;
+        }
+    }
+
     private clearLicenseNotice(): void {
         this.lastBlockedNotice = "";
+        this.cancelLicenseIcon();
         if (!this.licenseIconShown) return;
         this.licenseIconShown = false;
         try {
@@ -425,6 +586,18 @@ export class Visual implements IVisual {
             `labels=[${a.labels.join(" / ")}]`,
             `sig=${a.signature || "(vacio)"}`,
             `lastNotice=${this.lastBlockedNotice || "(vacio)"} icon=${this.licenseIconShown}`,
+            `colSources=${this.lastDataView?.matrix?.columns?.levels?.[0]?.sources?.length ?? "-"}`
+              + ` roles=[${(this.lastDataView?.matrix?.columns?.levels?.[0]?.sources ?? [])
+                    .map((x: any) => Object.keys(x?.roles ?? {}).join("+") || "?").join(" ")}]`,
+            `rowLevel0Roles=${JSON.stringify(Object.keys(
+                (this.lastDataView?.matrix?.rows?.levels?.[0]?.sources?.[0] as any)?.roles ?? {}))}`,
+            `cache=${this.ultimasProFeatures ? "[" + this.ultimasProFeatures.labels.join(" / ") + "]" : "null"}`,
+            `editing=${this.editing} preview(campo)=${this.proPreview} modo=${this.formattingSettings?.period?.valueMode?.value}`,
+            `computePreview()=${this.computePreview()}`
+              + ` | !isPro=${!this.isPro} editing=${this.editing}`
+              + ` resolved!==null=${licenseResolved !== null} env=${licenseEnvSupported} info=${licenseInfoAvailable}`,
+            `previewOf(small multiples)=${this.previewOf("small multiples")}`
+              + ` previewOf(trend line)=${this.previewOf("trend line")}`,
         ];
 
         // La serie tal y como llega: clave del periodo y valor, en orden de entrega.
@@ -599,38 +772,53 @@ export class Visual implements IVisual {
         // a Pro customer lands here too, so say nothing.
         if (!licenseEnvSupported || !licenseInfoAvailable) return;
 
-        // The persistent icon covers the state, not the action — chiefly a trial
-        // that has run out. The user's Pro settings stay saved, so the cards
-        // silently lose their styling and drop to a single column with nothing to
-        // explain it. The banner below is no help there: it only fires on a
-        // change, and this user changed nothing. Power BI shows the icon in Edit
-        // mode only, so report consumers see nothing.
-        if (!this.licenseIconShown) {
-            this.licenseIconShown = true;
-            try {
-                // const enum: TypeScript inlines General to 0. Referencing the
-                // enum object at runtime would give undefined.
-                (this.licenseManager as any)?.notifyLicenseRequired?.(
-                    LicenseNotificationType.General
-                );
-            } catch (_) { /* best-effort */ }
-        }
-
         // Fires on each fresh change and only then: update() also runs on resize,
-        // selection and data refresh, and the banner must not reappear for those.
+        // selection and data refresh, and the notice must not reappear for those.
         if (signature === this.lastBlockedNotice) return;
         this.lastBlockedNotice = signature;
+        this.licenseIconShown = true;
 
         const list = wanted.length === 1
             ? wanted[0]
             : wanted.slice(0, -1).join(", ") + " and " + wanted[wanted.length - 1];
+        const msg = `KPI Card Pro: ${list} ${wanted.length === 1 ? "is" : "are"} part of the `
+                  + `Pro plan. Get a licence to enable ${wanted.length === 1 ? "it" : "them"}.`;
 
-        try {
-            (this.licenseManager as any)?.notifyFeatureBlocked?.(
-                `KPI Card Pro: ${list} ${wanted.length === 1 ? "is" : "are"} part of the Pro plan. ` +
-                `Get a licence to enable ${wanted.length === 1 ? "it" : "them"}.`
-            );
-        } catch (_) { /* notification is best-effort; never break the render */ }
+        // Power BI shows ONE licence notification at a time and the last call replaces
+        // the one before it. Until 1.2.1.0 notifyLicenseRequired ran first and
+        // notifyFeatureBlocked second, in the same update(), so on the user's first
+        // attempt at a Pro feature the banner wiped out the Upgrade bar — which is the
+        // call that carries the purchase path. They were told to buy and left with
+        // nothing to click. The order is the whole fix.
+        const show = () => {
+            try {
+                (this.licenseManager as any)?.notifyFeatureBlocked?.(msg.slice(0, 500));
+            } catch (_) { /* best-effort */ }
+            this.cancelLicenseIcon();
+            // The Upgrade bar goes last, or the banner above replaces it. It also
+            // covers a trial running out: the user changed nothing, so the banner
+            // would never fire, and the cards silently drop to one column with
+            // nothing explaining why.
+            this.licenseIconTimer = window.setTimeout(() => {
+                this.licenseIconTimer = null;
+                if (this.isPro || !this.licenseIconShown) return;
+                // const enum: TypeScript inlines General to 0. Referencing the
+                // enum object at runtime would give undefined.
+                try {
+                    (this.licenseManager as any)?.notifyLicenseRequired?.(
+                        LicenseNotificationType.General
+                    );
+                } catch (_) { /* best-effort */ }
+            }, 10500);
+        };
+
+        // clearLicenseNotification may return a promise; showing before it settles
+        // would let the clear wipe the banner just raised.
+        let cleared: any;
+        try { cleared = (this.licenseManager as any)?.clearLicenseNotification?.(); }
+        catch (_) { /* best-effort */ }
+        if (cleared && typeof cleared.then === "function") { cleared.then(show, show); }
+        else { show(); }
     }
 
     // ─── Landing Page ────────────────────────────────────────────────────────
@@ -833,6 +1021,134 @@ export class Visual implements IVisual {
         return kids.map(k => this.getNodeValue(k.values ?? {}, measureIdx) ?? 0);
     }
 
+    /**
+     * Los puntos de la serie con su etiqueta, en el mismo orden que seriesFrom().
+     *
+     * La etiqueta es el valor del nodo tal cual lo da Power BI, formateado si es fecha.
+     * No se interpreta: el visual NO sabe si un punto es un mes, una semana o un año,
+     * solo que es el anterior. Por eso se imprime — si alguien puso la jerarquia de
+     * fechas y la serie son años, la etiqueta lo dice y se ve al instante.
+     */
+    private seriesLabelsFrom(node: powerbi.DataViewMatrixNode | undefined): string[] {
+        const kids = this.realChildren(node).slice();
+        const key = (k: powerbi.DataViewMatrixNode): number | null => {
+            const v = k.value as any;
+            if (typeof v === "number") return v;
+            if (v instanceof Date) return v.getTime();
+            return null;
+        };
+        if (kids.length > 1 && kids.every(k => key(k) !== null)) {
+            kids.sort((a, b) => (key(a) as number) - (key(b) as number));
+        }
+        return kids.map(k => {
+            const v = k.value as any;
+            if (v instanceof Date) {
+                try {
+                    return v.toLocaleDateString(this.host.locale || undefined,
+                                                { year: "numeric", month: "short" });
+                } catch (_) { return String(v); }
+            }
+            return v === null || v === undefined ? "" : String(v);
+        });
+    }
+
+    /**
+     * Sustituye valor y prior por el ultimo punto de la serie y uno anterior.
+     *
+     * Solo cuando hay serie y al menos dos puntos: sin punto de comparacion no se
+     * inventa un 0%, se deja el prior a null y la varianza no se dibuja, que es lo que
+     * ya hace buildVariancePill.
+     *
+     * Un Prior Period explicito NO se toca: quien ya tiene sus medidas DAX no debe ver
+     * cambiar su informe por una opcion nueva.
+     */
+    private aplicarUltimoPunto(m: MetricData, labels: string[], priorExplicito: boolean,
+                                  secPriorExplicito: boolean): void {
+        const serie = m.trendData;
+        if (serie.length === 0) return;
+
+        const iUlt = serie.length - 1;
+        m.value = serie[iUlt];
+        m.periodLabel = labels[iUlt] ?? "";
+
+        const salto = Math.max(1, Math.round(this.formattingSettings.period.compareOffset.value ?? 1));
+        const iCmp = iUlt - salto;
+        if (iCmp >= 0) {
+            if (!priorExplicito) { m.priorPeriod = serie[iCmp]; }
+            m.comparePeriodLabel = labels[iCmp] ?? "";
+        } else if (!priorExplicito) {
+            m.priorPeriod = null;
+        }
+        // El objetivo sigue siendo el del mismo punto, no el acumulado.
+        if (m.targetData.length > iUlt) { m.target = m.targetData[iUlt]; }
+
+        // Y los secundarios, el mismo punto: una tarjeta que enseña diciembre arriba y
+        // veinticuatro meses a la derecha no compara nada, compara dos cosas distintas.
+        for (const k of m.secondary) {
+            if (k.series.length === 0) continue;
+            const j = k.series.length - 1;
+            k.value = k.series[j];
+            const jc = j - salto;
+            // El pozo 'Secondary KPIs prior' es el que manda aqui, no el principal:
+            // alguien puede tener medidas propias para el valor grande y no para estos.
+            if (secPriorExplicito) continue;
+            k.prior = jc >= 0 ? k.series[jc] : null;
+        }
+    }
+
+    /**
+     * Ventana movil: el valor es la suma de los ultimos N puntos y el prior la de los N
+     * anteriores. Con serie mensual y N=12, el año movil contra el previo — la
+     * comparacion que de verdad se lleva a un comite — conservando los 24 puntos de la
+     * linea de tendencia.
+     *
+     * Con menos de N puntos se suma lo que hay y no se compara: media ventana contra
+     * una entera daria una caida inventada.
+     */
+    private aplicarVentana(m: MetricData, labels: string[], priorExplicito: boolean,
+                              secPriorExplicito: boolean): void {
+        const serie = m.trendData;
+        const n = serie.length;
+        if (n === 0) return;
+
+        const N = Math.max(2, Math.round(this.formattingSettings.period.windowSize.value ?? 12));
+        const suma = (desde: number, hasta: number) =>
+            serie.slice(Math.max(0, desde), hasta).reduce((a, b) => a + b, 0);
+
+        const iniAct = Math.max(0, n - N);
+        m.value = suma(iniAct, n);
+        m.periodLabel = labels.length
+            ? `${labels[iniAct] ?? ""} – ${labels[n - 1] ?? ""}`
+            : "";
+
+        // Solo se compara si la ventana anterior esta COMPLETA.
+        const iniPrev = n - 2 * N;
+        if (iniPrev >= 0) {
+            if (!priorExplicito) { m.priorPeriod = suma(iniPrev, n - N); }
+            m.comparePeriodLabel = labels.length
+                ? `${labels[iniPrev] ?? ""} – ${labels[n - N - 1] ?? ""}`
+                : "";
+        } else if (!priorExplicito) {
+            m.priorPeriod = null;
+        }
+
+        if (m.targetData.length) {
+            m.target = m.targetData.slice(Math.max(0, m.targetData.length - N))
+                                   .reduce((a, b) => a + b, 0);
+        }
+
+        // Misma ventana para los secundarios, por la misma razon.
+        for (const k of m.secondary) {
+            const ks = k.series;
+            if (ks.length === 0) continue;
+            const sumaK = (d: number, h: number) =>
+                ks.slice(Math.max(0, d), h).reduce((a, b) => a + b, 0);
+            k.value = sumaK(Math.max(0, ks.length - N), ks.length);
+            const iniK = ks.length - 2 * N;
+            if (!secPriorExplicito) { k.prior = iniK >= 0 ? sumaK(iniK, ks.length - N) : null; }
+        }
+    }
+
     private parseDataView(dataView?: DataView): MetricData[] {
         if (!dataView?.matrix) return [];
 
@@ -845,6 +1161,11 @@ export class Visual implements IVisual {
         let targetIdx = -1;
         let imageIdx = -1;
         const tooltipIdxs: number[] = [];
+        // Emparejados por posicion, no por nombre: el primer prior acompaña al primer
+        // KPI secundario. Es la unica forma de relacionarlos sin inventar una
+        // convencion de nombres que el usuario tendria que acertar.
+        const secIdxs: number[] = [];
+        const secPriorIdxs: number[] = [];
 
         if (cols?.levels?.[0]?.sources) {
             cols.levels[0].sources.forEach((src, i) => {
@@ -854,6 +1175,8 @@ export class Visual implements IVisual {
                 else if (roles["target"] && targetIdx === -1) targetIdx = i;
                 else if (roles["image"] && imageIdx === -1) imageIdx = i;
                 else if (roles["tooltips"]) tooltipIdxs.push(i);
+                else if (roles["secondaryKpis"]) secIdxs.push(i);
+                else if (roles["secondaryPrior"]) secPriorIdxs.push(i);
             });
         }
 
@@ -903,13 +1226,24 @@ export class Visual implements IVisual {
                 : null;
             const measureName = cols?.levels?.[0]?.sources?.[measureIdx]?.displayName ?? "Value";
 
-            return [{
+            const unica: MetricData[] = [{
                 name: measureName,
                 value,
                 highlightValue,
                 priorPeriod: prior,
                 target,
                 tooltipFields: [],
+                periodLabel: "",
+                comparePeriodLabel: "",
+                secondary: secIdxs.map((si, k) => ({
+                    series: trendBound ? this.seriesFrom(rows?.root, si) : [],
+                    name: cols?.levels?.[0]?.sources?.[si]?.displayName ?? "",
+                    value: this.nodeOrChildrenValue(valueNode, si) ?? this.getNodeValue(rootValues, si),
+                    prior: secPriorIdxs[k] !== undefined
+                        ? (this.nodeOrChildrenValue(valueNode, secPriorIdxs[k])
+                           ?? this.getNodeValue(rootValues, secPriorIdxs[k]))
+                        : null
+                })),
                 selectionId: null,
                 isHighlighted: true,  // single card always visible
                 // Only Trend bound: the root's children are the points of the series.
@@ -917,11 +1251,18 @@ export class Visual implements IVisual {
                 targetData: trendBound && targetIdx >= 0 ? this.seriesFrom(rows?.root, targetIdx) : [],
                 image: this.nodeOrChildrenText(valueNode, imageIdx)
             }];
+            const modo = this.formattingSettings.period.valueMode.value;
+            if (trendBound && (modo === "latest" || modo === "window")) {
+                const etiquetas = this.seriesLabelsFrom(rows?.root);
+                if (modo === "latest") { this.aplicarUltimoPunto(unica[0], etiquetas, priorIdx >= 0, secPriorIdxs.length > 0); }
+                else                   { this.aplicarVentana(unica[0], etiquetas, priorIdx >= 0, secPriorIdxs.length > 0); }
+            }
+            return unica;
         }
 
         // Small multiples — one card per row
         const metrics: MetricData[] = [];
-        const limit = this.isPro ? 50 : 1;
+        const limit = this.previewOf("small multiples") ? 50 : 1;
 
         // Subtotal nodes are not cards: without this the grid would show an extra
         // "Total" card, and it would eat one of the 50 Pro slots.
@@ -955,6 +1296,16 @@ export class Visual implements IVisual {
                 priorPeriod: prior,
                 target,
                 tooltipFields,
+                periodLabel: "",
+                comparePeriodLabel: "",
+                secondary: secIdxs.map((si, k) => ({
+                    series: trendBound ? this.seriesFrom(child, si) : [],
+                    name: cols?.levels?.[0]?.sources?.[si]?.displayName ?? "",
+                    value: this.nodeOrChildrenValue(child, si),
+                    prior: secPriorIdxs[k] !== undefined
+                        ? this.nodeOrChildrenValue(child, secPriorIdxs[k])
+                        : null
+                })),
                 selectionId,
                 isHighlighted,
                 // With both roles bound, each card's children are its own series.
@@ -962,6 +1313,13 @@ export class Visual implements IVisual {
                 targetData: trendBound && targetIdx >= 0 ? this.seriesFrom(child, targetIdx) : [],
                 image: this.nodeOrChildrenText(child, imageIdx)
             });
+            const modo = this.formattingSettings.period.valueMode.value;
+            if (trendBound && (modo === "latest" || modo === "window")) {
+                const m = metrics[metrics.length - 1];
+                const etiquetas = this.seriesLabelsFrom(child);
+                if (modo === "latest") { this.aplicarUltimoPunto(m, etiquetas, priorIdx >= 0, secPriorIdxs.length > 0); }
+                else                   { this.aplicarVentana(m, etiquetas, priorIdx >= 0, secPriorIdxs.length > 0); }
+            }
         }
 
         return metrics;
@@ -1031,7 +1389,23 @@ export class Visual implements IVisual {
 
     // ─── Render ─────────────────────────────────────────────────────────────
 
+    /**
+     * Se recalcula en CADA render, no solo en update().
+     *
+     * Al volver de otra pagina la licencia aun no se ha resuelto (licenseResolved es
+     * null), asi que la previa sale false. La resolucion termina despues y llama a
+     * render() por su cuenta, sin pasar por update() — y calculandolo solo alli, la
+     * previa se quedaba en false para siempre: una tarjeta, sin tendencia y sin KPI
+     * secundarios, hasta tocar algo. Diagnosticado con el overlay: resolved=false
+     * junto a preview=false, que es imposible salvo por este desfase.
+     */
+    private computePreview(): boolean {
+        return !this.isPro && this.editing && licenseResolved !== null
+            && licenseEnvSupported && licenseInfoAvailable;
+    }
+
     private render(metrics: MetricData[]): void {
+        this.proPreview = this.computePreview();   // solo para el overlay de diagnostico
         // INVARIANT: once real data has been painted, never repaint an empty state.
         // Power BI emits partial updates (e.g. only the Prior Period role, with no
         // Value role) and re-entrant repaints come from several places: the layout
@@ -1055,10 +1429,10 @@ export class Visual implements IVisual {
 
         const cardBg     = hc ? "#000000" : (s.card.background.value?.value ?? themeBg);
         const cardBorder = hc ? "#FFFFFF"  : (s.card.borderColor.value?.value ?? "#E0E0E0");
-        const bw  = this.isPro ? (s.card.borderWidth.value ?? 1) : 1;
-        const br  = this.isPro ? (s.card.borderRadius.value ?? 8) : 8;
-        const pad = this.isPro ? (s.card.padding.value ?? 16) : 16;
-        const shadow = this.isPro ? s.card.shadow.value : true;
+        const bw  = this.previewOf("card styling") ? (s.card.borderWidth.value ?? 1) : 1;
+        const br  = this.previewOf("card styling") ? (s.card.borderRadius.value ?? 8) : 8;
+        const pad = this.previewOf("card styling") ? (s.card.padding.value ?? 16) : 16;
+        const shadow = this.previewOf("card styling") ? s.card.shadow.value : true;
 
         // Explicit pixel sizing from the Power BI viewport, with a 100% fallback.
         const vpW = this.viewport.width  > 0 ? `${this.viewport.width}px`  : "100%";
@@ -1080,7 +1454,20 @@ export class Visual implements IVisual {
             this.renderEmpty(root, hc);
         } else if (metrics.length === 1) {
             const cell = this.buildMetricCell(metrics[0], hc, true, themeFg, themeMuted, 0);
-            root.appendChild(cell);
+            const aside = this.buildSecondaryColumn(metrics[0], hc, this.viewport.width);
+            if (aside) {
+                // Fila: el valor principal manda y los secundarios ocupan lo que sobra.
+                const fila = document.createElement("div");
+                fila.style.cssText = "display:flex; flex-direction:row; align-items:stretch;"
+                                   + " gap:16px; flex:1; min-height:0;";
+                cell.style.flex = "1 1 auto";
+                cell.style.minWidth = "0";
+                fila.appendChild(cell);
+                fila.appendChild(aside);
+                root.appendChild(fila);
+            } else {
+                root.appendChild(cell);
+            }
         } else {
             this.renderGrid(root, metrics, hc, themeFg, themeMuted);
         }
@@ -1098,6 +1485,10 @@ export class Visual implements IVisual {
             this.container.removeChild(this.container.firstChild);
         }
         this.container.appendChild(root);
+        this.dbgOverlay("render");
+        // El swap de arriba vacia el contenedor, asi que la marca se reinserta aqui:
+        // encenderla sobre un nodo desconectado no pinta nada.
+        this.updateWatermark();
 
         this.setupTooltips(root, metrics);
 
@@ -1132,8 +1523,8 @@ export class Visual implements IVisual {
 
     private renderGrid(root: HTMLElement, metrics: MetricData[], hc: boolean, themeFg: string, themeMuted: string): void {
         const s = this.formattingSettings.smallMultiples;
-        const cols = this.isPro ? (s.columns.value ?? 3) : 1;
-        const gap  = this.isPro ? (s.gap.value ?? 12) : 12;
+        const cols = this.previewOf("small multiples layout") ? (s.columns.value ?? 3) : 1;
+        const gap  = this.previewOf("small multiples layout") ? (s.gap.value ?? 12) : 12;
 
         const grid = document.createElement("div");
         grid.className = "kpi-grid";
@@ -1145,12 +1536,20 @@ export class Visual implements IVisual {
             overflow: auto;
         `;
 
+        // Ancho real de una celda: el mismo criterio de ancho minimo que en la tarjeta
+        // grande, pero aplicado a lo que de verdad mide cada tarjeta de la rejilla. Asi
+        // los secundarios salen en small multiples cuando caben y se retiran cuando no,
+        // en lugar de estar prohibidos por decreto.
+        const anchoCelda = this.viewport.width > 0
+            ? Math.floor((this.viewport.width - gap * (cols - 1)) / cols)
+            : 0;
+
         metrics.forEach((metric, idx) => {
             const s2 = this.formattingSettings;
             const palette = this.host.colorPalette;
             const cardBg     = hc ? "#000000" : (s2.card.background.value?.value ?? (palette.background?.value ?? "#FFFFFF"));
             const cardBorder = hc ? "#FFFFFF"  : (s2.card.borderColor.value?.value ?? "#E0E0E0");
-            const cellBr     = this.isPro ? (s2.card.borderRadius.value ?? 8) : 8;
+            const cellBr     = this.previewOf("card styling") ? (s2.card.borderRadius.value ?? 8) : 8;
 
             const wrapper = document.createElement("div");
             wrapper.style.cssText = `
@@ -1168,7 +1567,19 @@ export class Visual implements IVisual {
             wrapper.dataset.selectionIndex = String(idx);
 
             const cell = this.buildMetricCell(metric, hc, false, themeFg, themeMuted, idx);
-            wrapper.appendChild(cell);
+            const aside = this.buildSecondaryColumn(metric, hc, anchoCelda);
+            if (aside) {
+                const fila = document.createElement("div");
+                fila.style.cssText = "display:flex; flex-direction:row; align-items:stretch;"
+                                   + " gap:12px; flex:1; min-height:0;";
+                cell.style.flex = "1 1 auto";
+                cell.style.minWidth = "0";
+                fila.appendChild(cell);
+                fila.appendChild(aside);
+                wrapper.appendChild(fila);
+            } else {
+                wrapper.appendChild(cell);
+            }
             grid.appendChild(wrapper);
         });
 
@@ -1265,7 +1676,7 @@ export class Visual implements IVisual {
         // In grid mode (small multiples), respect smallMultiples.showTitle setting
         const isGridMode = !large;
         const showLabel = isGridMode
-            ? (this.isPro ? s.smallMultiples.showTitle.value : true)
+            ? (this.previewOf("small multiples layout") ? s.smallMultiples.showTitle.value : true)
             : s.label.show.value;
 
         if (showLabel) {
@@ -1274,18 +1685,18 @@ export class Visual implements IVisual {
             labelEl.textContent = metric.name;
             labelEl.title = metric.name;
             labelEl.setAttribute("aria-hidden", "true");
-            const labelFontSize = isGridMode && this.isPro
+            const labelFontSize = isGridMode && this.previewOf("small multiples layout")
                 ? (s.smallMultiples.titleFontSize.value ?? 11)
                 : (s.label.fontSize.value ?? 12);
-            const labelColor = isGridMode && this.isPro
+            const labelColor = isGridMode && this.previewOf("small multiples layout")
                 ? (hc ? "#FFFFFF" : (s.smallMultiples.titleColor.value?.value ?? themeMuted))
                 : (hc ? "#FFFFFF" : (s.label.color.value?.value ?? themeMuted));
             // La fuente sigue la misma regla que el tamano y el color: en rejilla
             // manda Small Multiples, en tarjeta unica manda Label.
-            const labelFont = isGridMode && this.isPro
+            const labelFont = isGridMode && this.previewOf("small multiples layout")
                 ? (s.smallMultiples.titleFontFamily.value || "Segoe UI, sans-serif")
                 : (s.label.fontFamily.value || "Segoe UI, sans-serif");
-            const labelBold = isGridMode && this.isPro
+            const labelBold = isGridMode && this.previewOf("small multiples layout")
                 ? s.smallMultiples.titleBold.value
                 : s.label.bold.value;
             labelEl.style.cssText = `
@@ -1357,6 +1768,22 @@ export class Visual implements IVisual {
         `;
         cell.appendChild(valueEl);
 
+        // ── Etiqueta del periodo ───────────────────────────────────────────
+        // El visual no sabe si un punto es un mes, una semana o un año: solo que es el
+        // anterior. Imprimirlo es lo que convierte "compara con 12 atras" en algo
+        // verificable de un vistazo — y si alguien puso la jerarquia de fechas y la
+        // serie son años, la etiqueta lo delata antes de que el numero se use.
+        if (metric.periodLabel && s.period.showPeriodLabel.value) {
+            const per = document.createElement("div");
+            per.textContent = metric.comparePeriodLabel
+                ? `${metric.periodLabel} ${this.t("Label_Vs", "vs")} ${metric.comparePeriodLabel}`
+                : metric.periodLabel;
+            per.style.cssText = `font-size:${large ? 11 : 10}px;`
+                + `color:${hc ? "#FFFFFF" : (s.secondary.color.value?.value ?? "#605E5C")};`
+                + " white-space:nowrap; overflow:hidden; text-overflow:ellipsis;";
+            cell.appendChild(per);
+        }
+
         // ── Variance ───────────────────────────────────────────────────────
         if (s.variance.show.value && metric.priorPeriod !== null) {
             const pill = this.buildVariancePill(displayValue, metric.priorPeriod, hc);
@@ -1393,7 +1820,7 @@ export class Visual implements IVisual {
 
         // Trend line (Pro). Free renders the card without it; the notification
         // path explains why, so nothing disappears without a word.
-        if (this.isPro && this.formattingSettings.trend.show.value) {
+        if (this.previewOf("trend line") && this.formattingSettings.trend.show.value) {
             const spark = this.buildSparkline(metric, hc);
             if (spark) cell.appendChild(spark);
         }
@@ -1402,6 +1829,81 @@ export class Visual implements IVisual {
     }
 
     // ─── Variance Pill ───────────────────────────────────────────────────────
+
+    /**
+     * Hasta tres KPIs de apoyo apilados a la derecha del valor principal.
+     *
+     * No llevan identidad de seleccion a proposito: son contexto del titular, no
+     * entidades que filtrar. Darles clic obligaria a decidir que significa filtrar
+     * por "Margen", y no significa nada.
+     *
+     * Vale tambien en small multiples, pero ahi la regla de ancho minimo se aplica al
+     * ancho REAL de cada celda, no al del visual. Con cuatro columnas cada tarjeta mide
+     * un cuarto, cae por debajo del minimo y los secundarios se retiran solos: cincuenta
+     * tarjetas con tres KPIs cada una son doscientos numeros, y eso no es un cuadro de
+     * mando. Con una o dos columnas si caben, y entonces se ven.
+     */
+    private buildSecondaryColumn(metric: MetricData, hc: boolean, anchoTarjeta: number): HTMLElement | null {
+        const s = this.formattingSettings.secondaryKpis;
+        if (!s.show.value) return null;
+        if (!this.previewOf("secondary KPIs")) return null;
+
+        const items = (metric.secondary || []).filter(k => k.value !== null).slice(0, 3);
+        if (items.length === 0) return null;
+
+        // Por debajo del ancho minimo se retira la columna entera: comprimir el valor
+        // principal para meter contexto es perder lo unico que la tarjeta tiene que
+        // comunicar. Mejor no enseñar los secundarios que enseñar mal el titular.
+        const minimo = s.minWidth.value ?? 320;
+        if (anchoTarjeta > 0 && anchoTarjeta < minimo) return null;
+
+        const col = document.createElement("div");
+        col.setAttribute("aria-hidden", "true");
+        col.style.cssText = "display:flex; flex-direction:column; justify-content:center;"
+                          + " gap:10px; flex:0 0 auto; max-width:45%; min-width:0;"
+                          + " border-left:1px solid " + (hc ? "#FFFFFF" : "#EDEBE9") + "; padding-left:14px;";
+
+        const valColor   = hc ? "#FFFFFF" : (s.color.value?.value ?? "#323130");
+        const labColor   = hc ? "#FFFFFF" : (s.labelColor.value?.value ?? "#605E5C");
+        const valSize    = s.valueFontSize.value ?? 16;
+        const labSize    = s.labelFontSize.value ?? 10;
+
+        for (const k of items) {
+            const fila = document.createElement("div");
+            fila.style.cssText = "display:flex; flex-direction:column; gap:1px; min-width:0;";
+
+            const lab = document.createElement("div");
+            lab.textContent = k.name;
+            lab.title = k.name;
+            lab.style.cssText = `font-size:${labSize}px; color:${labColor};`
+                              + " white-space:nowrap; overflow:hidden; text-overflow:ellipsis;";
+
+            const linea = document.createElement("div");
+            linea.style.cssText = "display:flex; align-items:baseline; gap:6px; min-width:0;";
+
+            const val = document.createElement("div");
+            val.textContent = this.formatMetricValue(k.value);
+            val.style.cssText = `font-size:${valSize}px; font-weight:600; color:${valColor};`
+                              + " white-space:nowrap; overflow:hidden; text-overflow:ellipsis;";
+            linea.appendChild(val);
+
+            // La varianza necesita su prior emparejado por posicion. Sin el, el KPI
+            // se dibuja igual: media funcion es mejor que un hueco sin explicacion.
+            if (s.showVariance.value && k.prior !== null) {
+                const pill = this.buildVariancePill(k.value, k.prior, hc);
+                if (pill) {
+                    pill.style.transform = "scale(0.82)";
+                    pill.style.transformOrigin = "left center";
+                    linea.appendChild(pill);
+                }
+            }
+
+            fila.appendChild(lab);
+            fila.appendChild(linea);
+            col.appendChild(fila);
+        }
+        return col;
+    }
 
     private buildVariancePill(current: number | null, base: number | null, hc: boolean): HTMLElement | null {
         if (current === null || base === null || base === 0) return null;
@@ -1416,7 +1918,7 @@ export class Visual implements IVisual {
         let color: string;
         if (hc) {
             color = isNeutral ? "#FFFFFF" : (isPositive ? "#00FF00" : "#FF0000");
-        } else if (this.isPro) {
+        } else if (this.previewOf("variance colours")) {
             // Color Palette: use host palette sentiment colors as fallback
             const positiveDefault = (palette as any).foregroundNeutralLight?.value ?? "#107C10";
             const negativeDefault = "#D13438";
@@ -1431,7 +1933,7 @@ export class Visual implements IVisual {
 
         const arrow   = s.showArrow.value ? (isNeutral ? "→" : (diff > 0 ? "▲" : "▼")) : "";
         const pctStr  = `${arrow} ${Math.abs(pct).toFixed(1)}%`;
-        const usePill = this.isPro && s.showPill.value;
+        const usePill = this.previewOf("variance pill") && s.showPill.value;
 
         const pill = document.createElement("div");
         pill.className = "kpi-variance-pill";
@@ -1481,7 +1983,7 @@ export class Visual implements IVisual {
             if (metric.target !== null) {
                 items.push({ displayName: this.t("Role_Target", "Target"), value: this.formatMetricValue(metric.target), color: "#605E5C" });
             }
-            if (this.isPro) {
+            if (this.previewOf("extra tooltip fields")) {
                 for (const tf of metric.tooltipFields) {
                     items.push({ displayName: tf.displayName, value: tf.value });
                 }
@@ -1505,8 +2007,8 @@ export class Visual implements IVisual {
     private formatMetricValue(value: number | null): string {
         if (value === null || value === undefined) return "—";
         const s      = this.formattingSettings.mainValue;
-        const prefix = this.isPro ? (s.prefix.value ?? "") : "";
-        const suffix = this.isPro ? (s.suffix.value ?? "") : "";
+        const prefix = this.previewOf("prefix/suffix") ? (s.prefix.value ?? "") : "";
+        const suffix = this.previewOf("prefix/suffix") ? (s.suffix.value ?? "") : "";
         const decimals = s.decimalPlaces.value ?? 1;
         const unit = String((s.displayUnit.value as any)?.value ?? s.displayUnit.value ?? "auto") as DisplayUnit;
         return `${prefix}${this.applyDisplayUnit(value, unit, decimals)}${suffix}`;
