@@ -81,139 +81,245 @@
   <header>
     <a class="brand" href="https://tcviz.com">TCViz</a>
     <h1>Support</h1>
-    <p class="meta">KPI Card Pro &nbsp;·&nbsp; v1.2.1.0 &nbsp;·&nbsp; docs updated 14 September 2026 &nbsp;·&nbsp; tcviz.com</p>
+    <p class="meta">KPI Card Pro &nbsp;·&nbsp; v2.1.0.0 &nbsp;·&nbsp; docs updated 2 October 2026 &nbsp;·&nbsp; tcviz.com</p>
   </header>
 
   <main>
     <h2>Getting started</h2>
     <p>
       KPI Card Pro needs one measure in the <strong>Value</strong> field well. That alone renders a
-      single card with the formatted value. Everything else is optional:
+      single card with the value, in the format your model gives that measure. Everything else is
+      optional:
     </p>
     <ul>
       <li>Add a measure to <strong>Prior Period</strong> to show the variance, as a percentage with a
         direction arrow and the prior value underneath.</li>
-      <li>Add a measure to <strong>Target</strong> to track against a goal.</li>
-      <li>Add a date to <strong>Trend (Pro)</strong> to draw a trend line inside the card.</li>
+      <li>Add a measure to <strong>Target</strong> to track against a goal &mdash; and switch on
+        <strong>Status (Pro)</strong> to colour the card on track, warning or off track.</li>
+      <li>Add a date to <strong>Trend (Pro)</strong> to draw a trend line inside the card. With a
+        trend bound, the card can also compare periods by itself, with no date table and no DAX.</li>
       <li>Add a category field to <strong>Small Multiples (Pro)</strong> to render one card per
-        category instead of one card in total — each with its own line.</li>
-      <li>Add a Base64 image column to <strong>Image</strong> to show a logo per card.</li>
-      <li>Add measures to <strong>Tooltips</strong> to show more figures on hover.</li>
+        category &mdash; each with its own number, variance and line.</li>
+      <li>Add up to three measures to <strong>Secondary KPIs (Pro)</strong> to show supporting figures
+        beside the main value.</li>
+      <li>Add a Base64 image column to <strong>Image</strong> to show a logo or flag per card.</li>
+      <li>Add measures to <strong>Tooltips (Pro)</strong> to show more figures on hover.</li>
     </ul>
 
     <h2>Field wells</h2>
     <ul>
-      <li><strong>Value</strong> (measure, required) — the number on the card.</li>
-      <li><strong>Prior Period</strong> (measure) — the comparison value. Enables the variance
+      <li><strong>Value</strong> (measure, required) &mdash; the number on the card.</li>
+      <li><strong>Prior Period</strong> (measure) &mdash; the comparison value. Enables the variance
         percentage, its arrow and the &ldquo;Prior:&rdquo; line.</li>
-      <li><strong>Target</strong> (measure) — a goal to compare against.</li>
-      <li><strong>Small Multiples (Pro)</strong> (grouping) — one card per category, up to 50. Without
-        a licence only the first category renders.</li>
-      <li><strong>Trend (Pro)</strong> (grouping) — a date or ordered period. Each distinct value is a
-        point on the line, with the Value measure aggregated at that point. Use a real date column:
-        a month stored as text would be ordered alphabetically. A numeric period is reordered by the
-        visual so the line reads left to right in time.</li>
-      <li><strong>Image</strong> (measure, aggregated as <em>First</em>) — a column holding a Base64
-        data URI (<code>data:image/png;base64,&hellip;</code>), shown in the top-right of each card.
-        External URLs are rejected: the visual makes no network requests of any kind.</li>
-      <li><strong>Tooltips</strong> (measures) — additional figures shown on hover.</li>
+      <li><strong>Target</strong> (measure) &mdash; a goal to compare against, shown on the card and
+        drawn on the trend line period by period.</li>
+      <li><strong>Image</strong> (measure, aggregated as <em>First</em>) &mdash; a column holding a
+        Base64 data URI (<code>data:image/png;base64,&hellip;</code>), shown in the top-right of each
+        card. External URLs are rejected: the visual makes no network requests of any kind.</li>
+      <li><strong>Small Multiples (Pro)</strong> (grouping) &mdash; one card per category, up to 50.</li>
+      <li><strong>Trend (Pro)</strong> (grouping) &mdash; a date or ordered period. Each distinct value
+        is a point on the line. Use a real date column: a month stored as text would be ordered
+        alphabetically. A numeric period is reordered by the visual so the line reads left to right.</li>
+      <li><strong>Tooltips (Pro)</strong> (measures) &mdash; additional figures shown on hover.</li>
+      <li><strong>Secondary KPIs (Pro)</strong> (measures, up to 3) &mdash; supporting figures beside
+        the main value, each with its own variance.</li>
+      <li><strong>Secondary KPIs prior (Pro)</strong> (measures) &mdash; the comparison value for each
+        secondary KPI, paired <strong>by position</strong>: the first prior goes with the first KPI.</li>
     </ul>
 
-    <h2>Format pane</h2>
-    <p>Settings that need a licence carry <strong>(Pro)</strong> in their name.</p>
+    <h2>Number formats</h2>
+    <p>
+      Every figure on the card &mdash; value, prior, target, variance, secondary KPIs and tooltip
+      fields &mdash; uses the format string of its own measure in your model and the language of the
+      report: currency symbol, percentage, thousands separator and decimal mark. A measure formatted
+      as <code>0.00%</code> holding 0.3 is shown as 30.00%.
+    </p>
     <ul>
-      <li><strong>Card</strong> — Background, Border Colour, and <strong>(Pro)</strong> Border Width,
-        Border Radius, Padding, Drop Shadow.</li>
-      <li><strong>Main Value</strong> — Font family, size, bold, colour, display units
-        (Auto / K / M / B), decimal places, and <strong>(Pro)</strong> Prefix and Suffix.</li>
-      <li><strong>Label (single card)</strong> — Show, font family, size, bold, colour. This governs
-        the text above the number <em>when there is a single card</em>. With Small Multiples, that
-        same text is governed by the Small Multiples card instead.</li>
-      <li><strong>Variance</strong> — Show, positive / negative / neutral colours, invert logic (for
-        cost metrics where lower is better), show arrow, font size, and
-        <strong>(Pro)</strong> Show as Pill.</li>
-      <li><strong>Trend (Pro)</strong> — Show, chart type (area, line or bar), colour, line width,
-        area opacity, height, last-point marker, and the target line with its own colour. The target
-        is drawn period by period, not as a flat line, so it follows a target that changes over time.</li>
-      <li><strong>Image</strong> — Show, height, corner radius.</li>
-      <li><strong>Prior &amp; Target</strong> — Show, font family, size and colour of the
-        &ldquo;Prior:&rdquo; and &ldquo;Target:&rdquo; line under the variance.</li>
-      <li><strong>Small Multiples (Pro)</strong> — Columns, gap, and the category title with its
+      <li><strong>Display Units</strong> scale on top of that format: Auto picks K, M or bn; you can
+        also force thousands, millions or billions, or none. A percentage is never scaled.</li>
+      <li><strong>Decimal Places</strong> applies only once you change it. Until then the decimals
+        come from the measure&rsquo;s format.</li>
+      <li>A measure with a <strong>dynamic format string</strong> (a format chosen by DAX row by row)
+        is shown with the format Power BI sends for each value, when it sends one.</li>
+      <li><strong>Prefix and Suffix (Pro)</strong> add free text around the value. With a proper
+        format in the model you rarely need them; never use the suffix &ldquo;%&rdquo; on a raw ratio
+        &mdash; format the measure as a percentage instead.</li>
+    </ul>
+
+    <h2>Status (Pro)</h2>
+    <p>
+      Status compares the value with the <strong>target</strong> or with the <strong>prior
+      period</strong>, as a percentage, and gives each card one of three states.
+    </p>
+    <ul>
+      <li>With the default thresholds of 90% and 100%: 100% or more is <em>on track</em>, from 90% to
+        100% is <em>warning</em>, and below 90% is <em>off track</em>.</li>
+      <li><strong>Lower is better</strong> mirrors it for costs, defects or churn: up to the lower
+        threshold is on track, up to the upper one is warning, above it is off track.</li>
+      <li><strong>Apply color to</strong> the value, to an accent bar on the left of the card, or to
+        both. The three colours are configurable.</li>
+      <li><strong>Show status text</strong> writes the state under the value &mdash; &ldquo;&#9679; On
+        track &middot; 103.1% of target&rdquo; &mdash; so the meaning never depends on colour alone. In
+        high contrast only the text is shown. The tooltip includes the status too.</li>
+      <li>A card with no target (or no prior period, depending on the comparison) shows no status.</li>
+    </ul>
+
+    <h2>Comparing periods without DAX</h2>
+    <p>
+      With a date in <strong>Trend</strong>, <strong>Value &amp; comparison &rarr; Value shows</strong>
+      chooses what the big number is:
+    </p>
+    <ul>
+      <li><strong>Total of the period</strong> &mdash; the whole range (default).</li>
+      <li><strong>Latest point</strong> &mdash; the last point of the series, compared with the one
+        <em>Compare against (points back)</em> earlier: 1 for the previous month on a monthly series,
+        12 for the same month last year.</li>
+      <li><strong>Last N points</strong> &mdash; the sum of the last N points against the N before
+        them: on a monthly series, N = 12 is the rolling year against the previous one.</li>
+    </ul>
+    <p>
+      <strong>Show period label</strong> prints what is compared, for example &ldquo;Dec 2025 vs Nov
+      2025&rdquo;. The visual steps back by positions in the series, so a step of 12 is a year only if
+      the series is monthly &mdash; the label is how you check it. A Prior Period measure you bind
+      yourself always takes precedence.
+    </p>
+
+    <h2>Secondary KPIs (Pro)</h2>
+    <p>
+      Up to three supporting measures with their own variance. <strong>Position</strong> decides
+      where they go:
+    </p>
+    <ul>
+      <li><strong>Right</strong> &mdash; a column beside the value, numbers right-aligned and every
+        variance pill at the same position. Below <em>Min width beside value</em> the column is
+        withdrawn, so the main value is never squeezed.</li>
+      <li><strong>Bottom</strong> &mdash; below the value: in a row when the figures fit, otherwise in
+        a list, one line per KPI, or name above number and pill on very narrow cards.</li>
+      <li><strong>Auto</strong> (default) &mdash; on the right when there is room, below when the card
+        is narrower than the minimum width.</li>
+    </ul>
+    <p>
+      In small multiples <strong>every card uses the same layout</strong>: if one card needs the list,
+      all of them show it. The grid never scrolls sideways; when the cards need more height it scrolls
+      vertically.
+    </p>
+
+    <h2>Format pane</h2>
+    <p>Settings and cards that need a licence carry <strong>(Pro)</strong> in their name.</p>
+    <ul>
+      <li><strong>Card</strong> &mdash; Background, Border Colour, and <strong>(Pro)</strong> Border
+        Width, Border Radius, Padding, Drop Shadow.</li>
+      <li><strong>Main Value</strong> &mdash; Font family, size, bold, colour, display units, decimal
+        places, and <strong>(Pro)</strong> Prefix and Suffix.</li>
+      <li><strong>Label (single card)</strong> &mdash; Show, font family, size, bold, colour. Governs
+        the text above the number when there is a single card; with Small Multiples that text is
+        governed by the Small Multiples card.</li>
+      <li><strong>Variance</strong> &mdash; Show, invert logic (lower is better), show arrow, font
+        size, and <strong>(Pro)</strong> positive / negative / neutral colours and Show as Pill.</li>
+      <li><strong>Status (Pro)</strong> &mdash; Show, compare value with (target or prior period),
+        lower and upper threshold, lower is better, the three colours, apply color to, show status
+        text.</li>
+      <li><strong>Prior &amp; Target</strong> &mdash; Show, font family, size and colour of the
+        &ldquo;Prior:&rdquo; and &ldquo;Target:&rdquo; line.</li>
+      <li><strong>Value &amp; comparison</strong> &mdash; Value shows, window size, compare against
+        (points back), show period label.</li>
+      <li><strong>Secondary KPIs (Pro)</strong> &mdash; Show, position, min width beside value, show
+        variance, value and label text size and colour.</li>
+      <li><strong>Image</strong> &mdash; Show, height, corner radius.</li>
+      <li><strong>Trend (Pro)</strong> &mdash; Show, chart type (area, line or bar), colour, line
+        width, area opacity, height, last-point marker, and the target line with its colour. Hover
+        the line to read the value of any period.</li>
+      <li><strong>Small Multiples (Pro)</strong> &mdash; Columns, gap, and the category title with its
         font family, size, bold and colour.</li>
-      <li><strong>Accessibility</strong> — High contrast handling and the visual title announced to
-        screen readers.</li>
+      <li><strong>Accessibility</strong> &mdash; High contrast handling and the visual title announced
+        to screen readers.</li>
     </ul>
 
     <h2>Free vs Pro</h2>
-    <p>
-      The card is fully functional without a licence. A Pro subscription adds the features listed
-      below; everything else, including all variance colours, is available to everyone.
-    </p>
+    <p>The card is complete without a licence. A Pro subscription adds context around it.</p>
     <ul>
-      <li><strong>Free</strong> — one KPI card with value, prior-period variance and target; display
-        units and decimals; label styling; card background and border colour; all variance colours,
-        invert logic and arrow; native tooltips; high contrast; keyboard focus and screen-reader
-        labels; cross-filtering by clicking the card.</li>
-      <li><strong>Pro</strong> — the trend line inside the card, over a date or period axis, with
-        the target marked; Small Multiples, up to 50 cards from a category field, each with its own
-        line, in a multi-column layout with category titles; prefix and suffix on the main value;
-        the variance pill style; extra measures in tooltips; and the card border width, radius,
-        padding and drop shadow controls.</li>
+      <li><strong>Free</strong> &mdash; one KPI card with value, prior-period variance with its arrow
+        and invert logic, and target; your model&rsquo;s number formats, display units and decimals;
+        label styling; card background and border colour; images; native and modern tooltips;
+        cross-filtering, cross-highlighting and bookmarks; keyboard navigation, screen-reader labels
+        and high contrast.</li>
+      <li><strong>Pro</strong> &mdash; Status colours; the trend line, with its target and hover
+        values, and the period comparisons it enables; Small Multiples, up to 50 cards in one to six
+        columns; Secondary KPIs; prefix and suffix; the variance pill and custom variance colours;
+        extra measures in tooltips; and the card border width, radius, padding and shadow.</li>
     </ul>
     <p>
-      Changing a <strong>(Pro)</strong> setting without a licence leaves the card on the free result
-      and raises Power BI's own notification, which links to the licence. Nothing is lost: the
-      setting is stored and applies as soon as the licence is active.
+      <strong>See it before you buy.</strong> While you edit a report without a licence, every Pro
+      feature you turn on is drawn working under a &ldquo;Pro preview&rdquo; watermark that names it,
+      and Power BI shows its own licence notification with the way to buy. Reading view shows the free
+      result with no watermark, so a published report never uses a feature that has not been paid for.
     </p>
 
     <h2>Accessibility</h2>
     <ul>
-      <li>The card is reachable with <strong>Tab</strong> and selected with
+      <li>Each card is reachable with <strong>Tab</strong> and selected with
         <strong>Enter</strong> or <strong>Space</strong>.</li>
       <li>Right-click opens the standard Power BI context menu, on a card and on empty space.</li>
-      <li>High-contrast themes are honoured: colours follow the Power BI palette.</li>
-      <li>Cards carry ARIA labels announcing the metric name, value and variance. The visual title
-        announced to screen readers is configurable under Accessibility.</li>
+      <li>High-contrast themes are honoured: colours follow the Power BI palette, and Status is shown
+        as text rather than colour.</li>
+      <li>Cards carry ARIA labels announcing the metric name, value, variance and status. The visual
+        title announced to screen readers is configurable under Accessibility.</li>
     </ul>
 
     <h2>Video walkthrough</h2>
     <p>
-      A four-minute tour: building the card, turning it into a grid of small multiples,
-      adding the trend line and the target, and what the Pro plan unlocks.
+      The tour of version 2.1: building the card from three fields, the status colours, one card per
+      country, comparing periods without DAX, the secondary KPIs, and what the Pro plan adds.
     </p>
-    <p><a href="https://www.youtube.com/watch?v=7mkjDpWdkXA">Watch on YouTube</a></p>
+    <p><a href="https://www.youtube.com/watch?v=4fP7zYKnhWo">Watch on YouTube</a></p>
 
     <h2>Frequently asked questions</h2>
+
+    <p><strong>My percentage shows as 0.3.</strong><br />
+      The card uses the format of the measure in your model. Format the measure as a percentage
+      (Measure tools &rarr; Format &rarr; Percentage) and the card shows 30%. Do not add a &ldquo;%&rdquo;
+      suffix to a raw ratio: it would read 0.3%.</p>
+
+    <p><strong>The card shows a different number of decimals from my measure.</strong><br />
+      Check <em>Main Value &rarr; Decimal Places</em>: once you change it, it overrides the measure&rsquo;s
+      format. With display units (K, M) the decimals are chosen to fit the scaled number.</p>
+
+    <p><strong>The status does not appear.</strong><br />
+      Status needs <em>Show</em> on, a target (or a prior period, if you compare with it) and a
+      licence &mdash; or edit mode, where it is drawn under the Pro preview watermark.</p>
+
+    <p><strong>My secondary KPIs moved below the value, or disappeared.</strong><br />
+      With <em>Position: Auto</em> they move below when the card is narrower than <em>Min width beside
+      value</em>, and they switch to a list when the figures do not fit in a row. With <em>Position:
+      Right</em> they are withdrawn below that width instead. Lower the minimum width, use fewer
+      Small Multiples columns, or choose Bottom.</p>
 
     <p><strong>My image does not appear.</strong><br />
       The Image well only accepts Base64 data URIs (<code>data:image/png;base64,&hellip;</code>).
       A link to an image on a web server is rejected on purpose: honouring it would make the visual
       fetch from the network, which it never does. Convert the images in Power Query or with a small
-      script, and set the field's aggregation to <em>First</em>.</p>
-
-    <p><strong>My trend line only goes down, whatever the data does.</strong><br />
-      That was a defect in versions before 1.2.0.0: a numeric period such as a month number was
-      delivered sorted by the measure rather than in time order, so the line was the values sorted
-      from high to low. It is fixed. If you are on an older build, use a real date column.</p>
+      script, and set the field&rsquo;s aggregation to <em>First</em>.</p>
 
     <p><strong>I added a field to Small Multiples and still see one card.</strong><br />
-      Small Multiples is a Pro feature. Without a licence the first category renders and the rest are
-      not drawn; Power BI shows a licence notification when the field is bound.</p>
+      Small Multiples is a Pro feature. Without a licence it is drawn working only in edit mode, under
+      the Pro preview watermark; in reading view the first category renders and Power BI shows its
+      licence notification.</p>
 
-    <p><strong>I bought Pro but the Pro settings do nothing.</strong><br />
+    <p><strong>I bought Pro but the Pro features do not appear.</strong><br />
       Licence validation runs asynchronously after the card first paints, so for a moment the free
-      result is shown. It re-renders with your settings a second later. If it persists, confirm you
-      are signed in with the account that holds the licence, and that it is active under
-      <em>My Account → Licenses</em> in the Microsoft 365 admin center.</p>
+      result is shown. It re-renders with your settings a second later. If it persists, confirm you are
+      signed in with the account that holds the licence, and that it is active in the Microsoft 365
+      admin center.</p>
 
     <p><strong>The variance shows the wrong direction.</strong><br />
-      For metrics where lower is better — cost, defects, churn — switch on <em>Invert</em> under
-      Variance. This is available in both tiers.</p>
+      For metrics where lower is better &mdash; cost, defects, churn &mdash; switch on <em>Invert</em>
+      under Variance, which is free. If you use Status (Pro), switch on <em>Lower is better</em> there
+      too.</p>
 
     <p><strong>Does the visual send my data anywhere?</strong><br />
       No. All calculation and rendering happens inside Power BI. The visual makes no network calls of
-      any kind. The only host API it uses is Microsoft's own licence check, which carries no report
-      data. See the <a href="privacy.html">Privacy Policy</a>.</p>
+      any kind. The only host API it uses is Microsoft&rsquo;s own licence check, which carries no
+      report data. See the <a href="privacy.html">Privacy Policy</a>.</p>
 
     <p><strong>Does it work in Power BI Service?</strong><br />
       Yes. Desktop, Service and the mobile apps are all supported.</p>

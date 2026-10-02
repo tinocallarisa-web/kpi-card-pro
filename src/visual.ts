@@ -9,6 +9,7 @@
 
 import powerbi from "powerbi-visuals-api";
 import { FormattingSettingsService } from "powerbi-visuals-utils-formattingmodel";
+import { valueFormatter } from "powerbi-visuals-utils-formattingutils";
 import { VisualFormattingSettingsModel } from "./settings";
 
 import DataView = powerbi.DataView;
@@ -27,14 +28,18 @@ interface MetricData {
     priorPeriod: number | null;
     target: number | null;
     tooltipFields: Array<{ displayName: string; value: string }>;
+    /** Formato de cada medida en el modelo (source.format). El visual lo respeta: 0,3 con
+     *  formato de porcentaje se pinta 30 %, con la moneda y los separadores del informe. */
+    formats: { value?: string; prior?: string; target?: string };
     /** Etiqueta del punto que muestra el valor, y del que se compara. Vacias en modo total. */
     periodLabel: string;
     comparePeriodLabel: string;
     /** KPIs de apoyo a la derecha del valor principal. Su prior se empareja por posicion. */
-    secondary: Array<{ name: string; value: number | null; prior: number | null; series: number[] }>;
+    secondary: Array<{ name: string; value: number | null; prior: number | null; series: number[]; format?: string }>;
     selectionId: powerbi.extensibility.ISelectionId | null;
     isHighlighted: boolean;               // false = dim this card
     trendData: number[];                  // series for the sparkline, empty when unbound
+    trendLabels: string[];                // etiqueta de cada punto, para el valor al pasar el raton
     targetData: number[];                 // target per period, aligned with trendData
     image: string | null;                 // validated Base64 data URI, or null
 }
@@ -396,6 +401,8 @@ export class Visual implements IVisual {
             // Bloqueadas en el render desde siempre, pero nunca anunciadas: el usuario
             // cambiaba el color y no pasaba nada, sin una palabra que lo explicara.
             ["variance colours",  "variance",           ["positiveColor", "negativeColor", "neutralColor"]],
+            // Estados por umbral (2.1.0.0): encenderlos es la intencion de compra.
+            ["status",            "status",             ["show"]],
         ];
 
         const labels: string[] = [];
@@ -752,6 +759,34 @@ export class Visual implements IVisual {
         }
 
         wrapper.appendChild(svg);
+
+        // VALOR AL PASAR EL RATON (2.1.0.0): guia vertical, punto y etiqueta con el
+        // periodo y su valor formateado. HTML encima del SVG, por la misma razon que el
+        // punto final: el viewBox estirado deformaria la geometria.
+        const guia = document.createElement("div");
+        guia.style.cssText = `position:absolute;top:0;bottom:0;width:1px;background:${color};opacity:0.5;display:none;pointer-events:none;z-index:2;`;
+        const etq = document.createElement("div");
+        etq.style.cssText = "position:absolute;top:-2px;transform:translate(-50%,-100%);padding:1px 6px;border-radius:4px;"
+            + `font:600 10px 'Segoe UI',sans-serif;white-space:nowrap;display:none;pointer-events:none;z-index:3;`
+            + (hc ? "background:#000000;color:#FFFFFF;border:1px solid #FFFFFF;" : "background:rgba(37,36,35,0.88);color:#FFFFFF;");
+        wrapper.appendChild(guia);
+        wrapper.appendChild(etq);
+        const fmtSerie = metric.formats.value;
+        wrapper.addEventListener("mousemove", (e: MouseEvent) => {
+            const r = wrapper.getBoundingClientRect();
+            if (r.width <= 0) return;
+            const fx = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
+            const i = kind === "bar" ? Math.min(data.length - 1, Math.floor(fx * data.length))
+                                     : Math.round(fx * (data.length - 1));
+            const xPct = kind === "bar" ? ((i + 0.5) / data.length) * 100 : (i / (data.length - 1)) * 100;
+            guia.style.left = `${xPct}%`;
+            guia.style.display = "block";
+            const lab = metric.trendLabels[i] ?? "";
+            etq.textContent = `${lab ? lab + ": " : ""}${this.formatMetricValue(data[i], fmtSerie)}`;
+            etq.style.left = `${Math.max(12, Math.min(88, xPct))}%`;
+            etq.style.display = "block";
+        });
+        wrapper.addEventListener("mouseleave", () => { guia.style.display = "none"; etq.style.display = "none"; });
         return wrapper;
     }
 
@@ -1183,6 +1218,21 @@ export class Visual implements IVisual {
         if (measureIdx === -1) return [];
         this.dbgMeasureIdx = measureIdx;
 
+        // FORMATO NATIVO: Power BI entrega el valor crudo y su formato aparte. Sin esto, un
+        // porcentaje 0,3 se pintaba "0.3" y el sufijo % daba "0.3%", un dato falso.
+        const fmtOf = (i: number): string | undefined =>
+            i >= 0 ? ((cols?.levels?.[0]?.sources?.[i] as any)?.format as string | undefined) || undefined : undefined;
+        // FORMATO DINAMICO (2.1.0.0): con general.formatString declarado en capabilities,
+        // una medida con formato dinamico (DAX que decide el formato por fila) trae el suyo
+        // valor a valor. Se usa ese si llega; si no, el de la columna.
+        const fmtFor = (node: powerbi.DataViewMatrixNode | undefined, i: number): string | undefined =>
+            this.dynFormat(node, i) ?? fmtOf(i);
+        const formatsFor = (node: powerbi.DataViewMatrixNode | undefined) => ({
+            value: fmtFor(node, measureIdx),
+            prior: priorIdx >= 0 ? fmtFor(node, priorIdx) : fmtFor(node, measureIdx),
+            target: targetIdx >= 0 ? fmtFor(node, targetIdx) : fmtFor(node, measureIdx)
+        });
+
         // Detect active cross-highlight in the whole matrix
         const hasHighlights = this.detectHighlights(matrix, measureIdx);
 
@@ -1233,11 +1283,13 @@ export class Visual implements IVisual {
                 priorPeriod: prior,
                 target,
                 tooltipFields: [],
+                formats: formatsFor(valueNode),
                 periodLabel: "",
                 comparePeriodLabel: "",
                 secondary: secIdxs.map((si, k) => ({
                     series: trendBound ? this.seriesFrom(rows?.root, si) : [],
                     name: cols?.levels?.[0]?.sources?.[si]?.displayName ?? "",
+                    format: fmtFor(valueNode, si),
                     value: this.nodeOrChildrenValue(valueNode, si) ?? this.getNodeValue(rootValues, si),
                     prior: secPriorIdxs[k] !== undefined
                         ? (this.nodeOrChildrenValue(valueNode, secPriorIdxs[k])
@@ -1248,6 +1300,7 @@ export class Visual implements IVisual {
                 isHighlighted: true,  // single card always visible
                 // Only Trend bound: the root's children are the points of the series.
                 trendData: trendBound ? this.seriesFrom(rows?.root, measureIdx) : [],
+                trendLabels: trendBound ? this.seriesLabelsFrom(rows?.root) : [],
                 targetData: trendBound && targetIdx >= 0 ? this.seriesFrom(rows?.root, targetIdx) : [],
                 image: this.nodeOrChildrenText(valueNode, imageIdx)
             }];
@@ -1282,7 +1335,7 @@ export class Visual implements IVisual {
 
             const tooltipFields = tooltipIdxs.map(ti => ({
                 displayName: cols?.levels?.[0]?.sources?.[ti]?.displayName ?? "",
-                value: this.formatValue(this.nodeOrChildrenValue(child, ti))
+                value: this.formatValue(this.nodeOrChildrenValue(child, ti), fmtFor(child, ti))
             }));
 
             const selectionId = this.host.createSelectionIdBuilder()
@@ -1296,11 +1349,13 @@ export class Visual implements IVisual {
                 priorPeriod: prior,
                 target,
                 tooltipFields,
+                formats: formatsFor(child),
                 periodLabel: "",
                 comparePeriodLabel: "",
                 secondary: secIdxs.map((si, k) => ({
                     series: trendBound ? this.seriesFrom(child, si) : [],
                     name: cols?.levels?.[0]?.sources?.[si]?.displayName ?? "",
+                    format: fmtFor(child, si),
                     value: this.nodeOrChildrenValue(child, si),
                     prior: secPriorIdxs[k] !== undefined
                         ? this.nodeOrChildrenValue(child, secPriorIdxs[k])
@@ -1310,6 +1365,7 @@ export class Visual implements IVisual {
                 isHighlighted,
                 // With both roles bound, each card's children are its own series.
                 trendData: trendBound ? this.seriesFrom(child, measureIdx) : [],
+                trendLabels: trendBound ? this.seriesLabelsFrom(child) : [],
                 targetData: trendBound && targetIdx >= 0 ? this.seriesFrom(child, targetIdx) : [],
                 image: this.nodeOrChildrenText(child, imageIdx)
             });
@@ -1378,6 +1434,55 @@ export class Visual implements IVisual {
         const v = values[idx];
         if (v == null || v.value == null) return null;
         return typeof v.value === "number" ? v.value : null;
+    }
+
+    /**
+     * Formato dinamico de un valor de la matriz (objects.general.formatString), del nodo o,
+     * si el nodo no lo trae, de su primer hijo con dato. La documentacion de Microsoft lo
+     * describe en el mapping categorical; en matrix se lee igual, de forma defensiva.
+     */
+    private dynFormat(node: powerbi.DataViewMatrixNode | undefined, idx: number): string | undefined {
+        const read = (vals: any): string | undefined => {
+            const f = vals?.[idx]?.objects?.general?.formatString;
+            return typeof f === "string" && f ? f : undefined;
+        };
+        const own = read(node?.values);
+        if (own) return own;
+        for (const k of this.realChildren(node)) {
+            const f = read(k.values);
+            if (f) return f;
+        }
+        return undefined;
+    }
+
+    /**
+     * ESTADO (Pro, 2.1.0.0): el valor como % de la referencia (objetivo o periodo
+     * anterior). Umbrales T1 <= T2. Mayor es mejor: >= T2 en linea, >= T1 aviso, si no
+     * desviado. Menor es mejor: <= T1 en linea, <= T2 aviso, si no desviado.
+     */
+    private statusOf(metric: MetricData, value: number | null): { color: string; text: string; word: string } | null {
+        const s = this.formattingSettings.status;
+        if (!s.show.value || !this.previewOf("status") || value === null) return null;
+        const basis = String((s.basis.value as any)?.value ?? s.basis.value ?? "target");
+        const ref = basis === "prior" ? metric.priorPeriod : metric.target;
+        if (ref === null || ref === 0) return null;
+        const pct = (value / Math.abs(ref)) * 100;
+        let t1 = s.lowThreshold.value ?? 90, t2 = s.highThreshold.value ?? 100;
+        if (t1 > t2) { const x = t1; t1 = t2; t2 = x; }
+        let level: "good" | "warn" | "bad";
+        if (!s.lowerIsBetter.value) level = pct >= t2 ? "good" : pct >= t1 ? "warn" : "bad";
+        else                        level = pct <= t1 ? "good" : pct <= t2 ? "warn" : "bad";
+        const color = level === "good" ? (s.goodColor.value?.value ?? "#107C10")
+                    : level === "warn" ? (s.warnColor.value?.value ?? "#C19C00")
+                    : (s.badColor.value?.value ?? "#D13438");
+        const word = level === "good" ? this.t("Status_Good", "On track")
+                   : level === "warn" ? this.t("Status_Warn", "Warning")
+                   : this.t("Status_Bad", "Off track");
+        const pctTxt = this.pctFormatter().format(pct / 100);
+        const text = basis === "prior"
+            ? this.t("Status_OfPrior", "{0} of prior").replace("{0}", pctTxt)
+            : this.t("Status_OfTarget", "{0} of target").replace("{0}", pctTxt);
+        return { color, text, word };
     }
 
     private getNodeHighlight(values: powerbi.DataViewMatrixNodeValue, idx: number): number | null {
@@ -1454,20 +1559,13 @@ export class Visual implements IVisual {
             this.renderEmpty(root, hc);
         } else if (metrics.length === 1) {
             const cell = this.buildMetricCell(metrics[0], hc, true, themeFg, themeMuted, 0);
-            const aside = this.buildSecondaryColumn(metrics[0], hc, this.viewport.width);
-            if (aside) {
-                // Fila: el valor principal manda y los secundarios ocupan lo que sobra.
-                const fila = document.createElement("div");
-                fila.style.cssText = "display:flex; flex-direction:row; align-items:stretch;"
-                                   + " gap:16px; flex:1; min-height:0;";
-                cell.style.flex = "1 1 auto";
-                cell.style.minWidth = "0";
-                fila.appendChild(cell);
-                fila.appendChild(aside);
-                root.appendChild(fila);
-            } else {
-                root.appendChild(cell);
-            }
+            // Tarjeta unica: el ancho minimo solo cuenta si hay sparkline, que es lo
+            // que de verdad necesita anchura. Sin ella el valor ocupa lo que ocupa y
+            // el resto de la tarjeta queda libre; retirar los secundarios por un
+            // numero fijo dejaba "Ventas and PdVs" en el titulo y solo Ventas dentro.
+            // Lo que protege el valor principal sin trend es fitSecondaryColumns().
+            const ancho = this.hasSparkline(metrics[0]) ? this.viewport.width : 0;
+            this.mountSecondary(root, cell, metrics[0], hc, ancho, 16, false);
         } else {
             this.renderGrid(root, metrics, hc, themeFg, themeMuted);
         }
@@ -1485,6 +1583,11 @@ export class Visual implements IVisual {
             this.container.removeChild(this.container.firstChild);
         }
         this.container.appendChild(root);
+        this.fitSecondaryColumns(root);
+        // Segunda pasada con el tamaño final: la barra de desplazamiento de la rejilla
+        // aparece despues del primer ajuste y estrecha las tarjetas, y un numero que cabia
+        // pasaba a salir recortado ("52.6…") sin que nada lo moviera a la lista.
+        requestAnimationFrame(() => { if (root.isConnected) this.fitSecondaryColumns(root); });
         this.dbgOverlay("render");
         // El swap de arriba vacia el contenedor, asi que la marca se reinserta aqui:
         // encenderla sobre un nodo desconectado no pinta nada.
@@ -1530,10 +1633,13 @@ export class Visual implements IVisual {
         grid.className = "kpi-grid";
         grid.style.cssText = `
             display: grid;
-            grid-template-columns: repeat(${cols}, 1fr);
+            grid-template-columns: repeat(${cols}, minmax(0, 1fr));
             gap: ${gap}px;
             flex: 1;
-            overflow: auto;
+            /* Desplazamiento solo VERTICAL. Con overflow:hidden en cada tarjeta (02-10, primer
+               intento) la rejilla perdia el alto minimo de contenido de las tarjetas y las
+               aplastaba hasta cortarlas; el recorte horizontal va aqui, en la rejilla. */
+            overflow-x: hidden; overflow-y: auto;
         `;
 
         // Ancho real de una celda: el mismo criterio de ancho minimo que en la tarjeta
@@ -1561,25 +1667,14 @@ export class Visual implements IVisual {
                 display: flex;
                 flex-direction: column;
                 gap: 2px;
+                min-width: 0;
                 transition: opacity 0.15s ease;
                 opacity: ${metric.isHighlighted ? "1" : "0.3"};
             `;
             wrapper.dataset.selectionIndex = String(idx);
 
             const cell = this.buildMetricCell(metric, hc, false, themeFg, themeMuted, idx);
-            const aside = this.buildSecondaryColumn(metric, hc, anchoCelda);
-            if (aside) {
-                const fila = document.createElement("div");
-                fila.style.cssText = "display:flex; flex-direction:row; align-items:stretch;"
-                                   + " gap:12px; flex:1; min-height:0;";
-                cell.style.flex = "1 1 auto";
-                cell.style.minWidth = "0";
-                fila.appendChild(cell);
-                fila.appendChild(aside);
-                wrapper.appendChild(fila);
-            } else {
-                wrapper.appendChild(cell);
-            }
+            this.mountSecondary(wrapper, cell, metric, hc, anchoCelda, 12, true);
             grid.appendChild(wrapper);
         });
 
@@ -1752,21 +1847,43 @@ export class Visual implements IVisual {
         const displayValue = metric.highlightValue !== null ? metric.highlightValue : metric.value;
         const valueEl = document.createElement("div");
         valueEl.className = "kpi-value";
-        const formatted = this.formatMetricValue(displayValue);
+        const formatted = this.formatMetricValue(displayValue, metric.formats.value);
         valueEl.textContent = formatted;
         valueEl.title = formatted;
         valueEl.setAttribute("aria-label", `${metric.name}: ${formatted}`);
         const fontSize = large
             ? (s.mainValue.fontSize.value ?? 28)
             : Math.max(16, (s.mainValue.fontSize.value ?? 28) * 0.7);
+        // Estado: color del valor y/o barra de acento. En alto contraste se deja el
+        // color del tema y el estado se dice con texto, que es lo que no depende del color.
+        const st = this.statusOf(metric, displayValue);
+        const stApply = String((s.status.applyTo.value as any)?.value ?? s.status.applyTo.value ?? "both");
+        const valueColor = hc ? "#FFFFFF"
+            : (st && stApply !== "accent" ? st.color : (s.mainValue.color.value?.value ?? themeFg));
         valueEl.style.cssText = `
             font-family: ${s.mainValue.fontFamily.value ?? "Segoe UI, sans-serif"};
             font-size: ${fontSize}px;
             font-weight: ${s.mainValue.bold.value ? "700" : "400"};
-            color: ${hc ? "#FFFFFF" : (s.mainValue.color.value?.value ?? themeFg)};
+            color: ${valueColor};
             line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         `;
         cell.appendChild(valueEl);
+        if (st && !hc && stApply !== "value") {
+            cell.style.borderLeft = `4px solid ${st.color}`;
+            cell.style.paddingLeft = "8px";
+        }
+        if (st) {
+            valueEl.setAttribute("aria-label", `${metric.name}: ${formatted}. ${st.word}, ${st.text}`);
+            if (s.status.showText.value) {
+                const stEl = document.createElement("div");
+                stEl.className = "kpi-status";
+                stEl.textContent = `● ${st.word} · ${st.text}`;
+                stEl.style.cssText = `font-size:${large ? 11 : 10}px; font-weight:600;`
+                    + `color:${hc ? "#FFFFFF" : st.color};`
+                    + " white-space:nowrap; overflow:hidden; text-overflow:ellipsis;";
+                cell.appendChild(stEl);
+            }
+        }
 
         // ── Etiqueta del periodo ───────────────────────────────────────────
         // El visual no sabe si un punto es un mes, una semana o un año: solo que es el
@@ -1786,7 +1903,7 @@ export class Visual implements IVisual {
 
         // ── Variance ───────────────────────────────────────────────────────
         if (s.variance.show.value && metric.priorPeriod !== null) {
-            const pill = this.buildVariancePill(displayValue, metric.priorPeriod, hc);
+            const pill = this.buildVariancePill(displayValue, metric.priorPeriod, hc, metric.formats.value);
             if (pill) cell.appendChild(pill);
         }
 
@@ -1803,14 +1920,14 @@ export class Visual implements IVisual {
             `;
             if (metric.priorPeriod !== null) {
                 const ppSpan = document.createElement("span");
-                const ppFormatted = this.formatMetricValue(metric.priorPeriod);
+                const ppFormatted = this.formatMetricValue(metric.priorPeriod, metric.formats.prior);
                 ppSpan.textContent = `${this.t("Label_Prior", "Prior")}: ${ppFormatted}`;
                 ppSpan.title = `Prior Period: ${ppFormatted}`;
                 subRow.appendChild(ppSpan);
             }
             if (metric.target !== null) {
                 const tgSpan = document.createElement("span");
-                const tgFormatted = this.formatMetricValue(metric.target);
+                const tgFormatted = this.formatMetricValue(metric.target, metric.formats.target);
                 tgSpan.textContent = `${this.t("Label_Target", "Target")}: ${tgFormatted}`;
                 tgSpan.title = `${this.t("Label_Target", "Target")}: ${tgFormatted}`;
                 subRow.appendChild(tgSpan);
@@ -1820,7 +1937,7 @@ export class Visual implements IVisual {
 
         // Trend line (Pro). Free renders the card without it; the notification
         // path explains why, so nothing disappears without a word.
-        if (this.previewOf("trend line") && this.formattingSettings.trend.show.value) {
+        if (this.hasSparkline(metric)) {
             const spark = this.buildSparkline(metric, hc);
             if (spark) cell.appendChild(spark);
         }
@@ -1842,8 +1959,12 @@ export class Visual implements IVisual {
      * un cuarto, cae por debajo del minimo y los secundarios se retiran solos: cincuenta
      * tarjetas con tres KPIs cada una son doscientos numeros, y eso no es un cuadro de
      * mando. Con una o dos columnas si caben, y entonces se ven.
+     *
+     * anchoTarjeta = 0 desactiva la regla de ancho minimo (tarjeta unica sin trend);
+     * entonces solo decide fitSecondaryColumns(), midiendo si el valor principal cabe.
      */
-    private buildSecondaryColumn(metric: MetricData, hc: boolean, anchoTarjeta: number): HTMLElement | null {
+    private buildSecondaryColumn(metric: MetricData, hc: boolean, anchoTarjeta: number,
+                                 orient: "right" | "bottom" | "stack" | "stack2" = "right"): HTMLElement | null {
         const s = this.formattingSettings.secondaryKpis;
         if (!s.show.value) return null;
         if (!this.previewOf("secondary KPIs")) return null;
@@ -1857,55 +1978,240 @@ export class Visual implements IVisual {
         const minimo = s.minWidth.value ?? 320;
         if (anchoTarjeta > 0 && anchoTarjeta < minimo) return null;
 
+        const linea = hc ? "#FFFFFF" : "#EDEBE9";
         const col = document.createElement("div");
+        col.className = orient === "right" ? "kpi-secondary-col"
+                      : orient === "bottom" ? "kpi-secondary-row"
+                      : orient === "stack" ? "kpi-secondary-stack" : "kpi-secondary-stack2";
         col.setAttribute("aria-hidden", "true");
-        col.style.cssText = "display:flex; flex-direction:column; justify-content:center;"
-                          + " gap:10px; flex:0 0 auto; max-width:45%; min-width:0;"
-                          + " border-left:1px solid " + (hc ? "#FFFFFF" : "#EDEBE9") + "; padding-left:14px;";
+        // Tres disposiciones (Tino, 02-10-2026):
+        //  - right:  REJILLA de dos columnas. Antes cada pildora iba detras de su numero y
+        //            salian en zigzag, como en Likert. Numeros a la derecha en la primera
+        //            columna, pildoras todas en la misma x; la etiqueta ocupa las dos.
+        //  - bottom: una fila a lo ancho, un KPI por tercio. Es la primera opcion abajo.
+        //  - stack:  uno debajo de otro, en tres columnas alineadas (nombre, numero,
+        //            pildora). fitSecondaryColumns() cambia bottom por stack cuando algun
+        //            numero no cabe: "si caben adelante, si no en lineas multiples".
+        const pie = ` flex:0 0 auto; min-width:0; margin-top:8px; padding-top:8px; border-top:1px solid ${linea};`;
+        col.style.cssText = orient === "right"
+            ? "display:grid; grid-template-columns:max-content max-content; align-content:center;"
+              + " column-gap:6px; row-gap:1px; flex:0 0 auto; max-width:45%; min-width:0;"
+              + ` border-left:1px solid ${linea}; padding-left:14px;`
+            : orient === "bottom"
+            ? "display:flex; flex-direction:row; align-items:flex-start; gap:12px;" + pie
+            : orient === "stack"
+            ? "display:grid; grid-template-columns:minmax(0,1fr) max-content max-content; align-items:center;"
+              + " column-gap:8px; row-gap:3px;" + pie
+            // stack2, la mas compacta para tarjetas muy estrechas: el nombre arriba y
+            // debajo numero y pildora, alineados entre KPIs como la columna derecha.
+            : "display:grid; grid-template-columns:minmax(0,1fr) max-content; align-items:center;"
+              + " column-gap:6px; row-gap:1px;" + pie;
 
         const valColor   = hc ? "#FFFFFF" : (s.color.value?.value ?? "#323130");
         const labColor   = hc ? "#FFFFFF" : (s.labelColor.value?.value ?? "#605E5C");
         const valSize    = s.valueFontSize.value ?? 16;
         const labSize    = s.labelFontSize.value ?? 10;
+        const enRejilla  = orient !== "bottom";
 
-        for (const k of items) {
+        items.forEach((k, i) => {
+            // En rejilla la fila no es una caja: sus piezas son celdas de la rejilla de la
+            // columna, y por eso quedan alineadas entre KPIs.
             const fila = document.createElement("div");
-            fila.style.cssText = "display:flex; flex-direction:column; gap:1px; min-width:0;";
+            fila.style.cssText = enRejilla
+                ? "display:contents;"
+                : "display:flex; flex-direction:column; gap:1px; min-width:0; flex:1 1 0;"
+                  + (i > 0 ? ` border-left:1px solid ${linea}; padding-left:12px;` : "");
 
             const lab = document.createElement("div");
             lab.textContent = k.name;
             lab.title = k.name;
             lab.style.cssText = `font-size:${labSize}px; color:${labColor};`
-                              + " white-space:nowrap; overflow:hidden; text-overflow:ellipsis;";
+                              + " white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0;"
+                              + (orient === "right" || orient === "stack2"
+                                    ? ` grid-column:1 / -1;${i > 0 ? " margin-top:7px;" : ""}` : "");
 
-            const linea = document.createElement("div");
-            linea.style.cssText = "display:flex; align-items:baseline; gap:6px; min-width:0;";
+            const lineaValor = document.createElement("div");
+            lineaValor.style.cssText = enRejilla
+                ? "display:contents;"
+                : "display:flex; align-items:baseline; gap:6px; min-width:0;";
 
             const val = document.createElement("div");
-            val.textContent = this.formatMetricValue(k.value);
+            val.className = "kpi-sec-value";
+            val.textContent = this.formatMetricValue(k.value, k.format);
             val.style.cssText = `font-size:${valSize}px; font-weight:600; color:${valColor};`
-                              + " white-space:nowrap; overflow:hidden; text-overflow:ellipsis;";
-            linea.appendChild(val);
+                              + " white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"
+                              + (enRejilla ? " justify-self:end; text-align:right;" : "");
+            lineaValor.appendChild(val);
 
             // La varianza necesita su prior emparejado por posicion. Sin el, el KPI
             // se dibuja igual: media funcion es mejor que un hueco sin explicacion.
             if (s.showVariance.value && k.prior !== null) {
-                const pill = this.buildVariancePill(k.value, k.prior, hc);
+                const pill = this.buildVariancePill(k.value, k.prior, hc, k.format);
                 if (pill) {
                     pill.style.transform = "scale(0.82)";
                     pill.style.transformOrigin = "left center";
-                    linea.appendChild(pill);
+                    if (enRejilla) { pill.style.justifySelf = "start"; pill.style.alignSelf = "center"; }
+                    lineaValor.appendChild(pill);
                 }
+            } else if (enRejilla) {
+                // Sin pildora la celda queda vacia: la rejilla no se descuadra.
+                lineaValor.appendChild(document.createElement("span"));
             }
 
             fila.appendChild(lab);
-            fila.appendChild(linea);
+            fila.appendChild(lineaValor);
             col.appendChild(fila);
-        }
+        });
         return col;
     }
 
-    private buildVariancePill(current: number | null, base: number | null, hc: boolean): HTMLElement | null {
+    /** Mismas condiciones que buildMetricCell para dibujar la sparkline. */
+    private hasSparkline(metric: MetricData): boolean {
+        return this.previewOf("trend line") && this.formattingSettings.trend.show.value
+            && metric.trendData.length >= 2;
+    }
+
+    /** Para Auto: la version "abajo" que sustituye a una columna derecha que no cabe. */
+    private secondaryFallback = new WeakMap<HTMLElement, () => HTMLElement | null>();
+
+    /**
+     * Coloca la celda principal y sus KPIs secundarios en la tarjeta segun Position:
+     *  - Right:  columna a la derecha (comportamiento de siempre).
+     *  - Bottom: fila bajo el valor, y bajo la sparkline si la hay.
+     *  - Auto:   derecha, salvo que haya sparkline y la tarjeta no llegue al ancho
+     *            minimo: entonces abajo, en vez de retirarlos. Si a la derecha
+     *            recortan el valor principal, fitSecondaryColumns() los baja.
+     * En la rejilla el ancho minimo sigue retirandolos en cualquier modo: ahi la
+     * regla es de densidad, no de sitio.
+     */
+    private mountSecondary(card: HTMLElement, cell: HTMLElement, metric: MetricData,
+                           hc: boolean, ancho: number, gap: number, rejilla: boolean): void {
+        const s = this.formattingSettings.secondaryKpis;
+        const modo = String(s.position.value?.["value"] ?? s.position.value ?? "auto");
+        const minimo = s.minWidth.value ?? 320;
+
+        // Auto y tarjeta estrecha: los secundarios BAJAN, en la tarjeta unica y tambien en
+        // la rejilla (Tino, 02-10-2026: con 6 columnas desaparecian). Debajo hay sitio:
+        // si no caben en fila pasan a lista, y la rejilla se desplaza en vertical. Solo
+        // con Position = Right explicito se retiran por debajo del ancho minimo.
+        let orient: "right" | "bottom" = modo === "bottom" ? "bottom" : "right";
+        if (modo === "auto" && ancho > 0 && ancho < minimo) orient = "bottom";
+        const anchoRegla = orient === "bottom" ? 0 : ancho;
+        void rejilla;
+
+        const aside = this.buildSecondaryColumn(metric, hc, anchoRegla, orient);
+        if (!aside) { card.appendChild(cell); return; }
+
+        if (orient === "bottom") {
+            card.appendChild(cell);
+            card.appendChild(aside);
+            this.registrarLista(aside, card, metric, hc);
+            return;
+        }
+
+        // Fila: el valor principal manda y los secundarios ocupan lo que sobra.
+        const fila = document.createElement("div");
+        fila.style.cssText = "display:flex; flex-direction:row; align-items:stretch;"
+                           + ` gap:${gap}px; flex:1; min-height:0;`;
+        cell.style.flex = "1 1 auto";
+        cell.style.minWidth = "0";
+        fila.appendChild(cell);
+        fila.appendChild(aside);
+        card.appendChild(fila);
+
+        if (modo === "auto") {
+            this.secondaryFallback.set(aside, () => {
+                const abajo = this.buildSecondaryColumn(metric, hc, 0, "bottom");
+                if (abajo) { card.appendChild(abajo); this.registrarLista(abajo, card, metric, hc); }
+                return abajo;
+            });
+        }
+    }
+
+    /**
+     * Alternativas abajo, de mas ancha a mas compacta: fila -> lista (una linea por KPI)
+     * -> lista compacta (nombre encima de numero y pildora). Cada una registra la siguiente.
+     */
+    private registrarLista(fila: HTMLElement, card: HTMLElement, metric: MetricData, hc: boolean,
+                           siguiente: "stack" | "stack2" = "stack"): void {
+        this.secondaryFallback.set(fila, () => {
+            const lista = this.buildSecondaryColumn(metric, hc, 0, siguiente);
+            if (lista && fila.parentElement === card) card.replaceChild(lista, fila);
+            if (lista && siguiente === "stack") this.registrarLista(lista, card, metric, hc, "stack2");
+            return lista;
+        });
+    }
+
+    /**
+     * Red de seguridad, ya con el DOM montado. El titular manda; los secundarios solo
+     * se quedan si caben de verdad:
+     *  - A la derecha, si el valor principal sale recortado (con elipsis) la columna
+     *    se retira; en Auto se prueba antes a bajarla.
+     *  - Abajo, si la fila se sale por el fondo de la tarjeta o alguno de sus textos
+     *    sale recortado, se retira: medio numero es peor que ninguno.
+     * Sin caja de layout (pagina en transicion) clientWidth es 0 y no se toca nada:
+     * ensureLaidOut() vuelve a pintar cuando la hay.
+     */
+    private fitSecondaryColumns(root: HTMLElement): void {
+        const recortado = (el: HTMLElement) => el.clientWidth > 0 && el.scrollWidth > el.clientWidth + 1;
+
+        const encajaAbajo = (row: HTMLElement): boolean => {
+            const card = row.parentElement;
+            if (!card) return false;
+            const cs = getComputedStyle(card);
+            const fondo = card.getBoundingClientRect().bottom
+                - (parseFloat(cs.paddingBottom) || 0) - (parseFloat(cs.borderBottomWidth) || 0);
+            if (row.getBoundingClientRect().bottom > fondo + 1) return false;
+            // Solo los NUMEROS: medio numero es peor que ninguno. Los nombres de los KPI se
+            // recortan con elipsis a proposito (llevan el nombre completo en el title).
+            const numeros = Array.from(row.querySelectorAll(".kpi-sec-value")) as HTMLElement[];
+            return !numeros.some(n => recortado(n));
+        };
+
+        // TODAS LAS TARJETAS CON LA MISMA DISPOSICION (Tino, 02-10-2026: "si va en lista
+        // todas en lista"). Cada paso decide para el conjunto, no tarjeta a tarjeta:
+        //  1. Derecha: si en UNA el valor principal sale recortado, bajan en todas.
+        //  2. Abajo en fila: si en UNA algun numero no cabe, todas pasan a lista.
+        //  3. Si en UNA no caben ni asi (se salen por el fondo), se retiran en todas.
+        // Un numero comprimido a ANCHO CERO tambien esta recortado: en la fila la pildora no
+        // se encoge y el numero si, y con 6 columnas desaparecia entero sin que nada lo
+        // detectara (recortado() exige ancho > 0). Y el bloque no puede salirse de la tarjeta.
+        const numerosCaben = (row: HTMLElement): boolean =>
+            !(Array.from(row.querySelectorAll(".kpi-sec-value")) as HTMLElement[])
+                .some(n => n.scrollWidth > n.clientWidth + 1)
+            && row.scrollWidth <= row.clientWidth + 1;
+        const todos = (sel: string) => Array.from(root.querySelectorAll(sel)) as HTMLElement[];
+        const conCaja = (els: HTMLElement[]) => els.filter(e => e.clientWidth > 0);
+
+        // 1. Columna derecha
+        const cols = todos(".kpi-secondary-col");
+        const algunaRecorta = cols.some(col => {
+            const valor = col.parentElement?.querySelector(".kpi-value") as HTMLElement | null;
+            return !!valor && valor.clientWidth > 0 && recortado(valor);
+        });
+        if (algunaRecorta) {
+            for (const col of cols) {
+                col.parentElement?.removeChild(col);
+                this.secondaryFallback.get(col)?.();
+            }
+        }
+
+        // 2. Fila de abajo -> lista -> lista compacta, siempre todas a la vez
+        for (const sel of [".kpi-secondary-row", ".kpi-secondary-stack"]) {
+            const bloques = conCaja(todos(sel));
+            if (bloques.some(r => !numerosCaben(r))) {
+                for (const r of bloques) this.secondaryFallback.get(r)?.();
+            }
+        }
+
+        // 3. Lo que quede abajo tiene que caber en todas las tarjetas, a lo ancho y a lo alto
+        const abajo = conCaja(todos(".kpi-secondary-row, .kpi-secondary-stack, .kpi-secondary-stack2"));
+        if (abajo.some(r => !encajaAbajo(r) || !numerosCaben(r))) {
+            for (const r of abajo) r.remove();
+        }
+    }
+
+    private buildVariancePill(current: number | null, base: number | null, hc: boolean, format?: string): HTMLElement | null {
         if (current === null || base === null || base === 0) return null;
 
         const s = this.formattingSettings.variance;
@@ -1932,13 +2238,14 @@ export class Visual implements IVisual {
         }
 
         const arrow   = s.showArrow.value ? (isNeutral ? "→" : (diff > 0 ? "▲" : "▼")) : "";
-        const pctStr  = `${arrow} ${Math.abs(pct).toFixed(1)}%`;
+        // El porcentaje de variacion en el idioma del informe: 12,5 % en español, 12.5% en inglés.
+        const pctStr  = `${arrow} ${this.pctFormatter().format(Math.abs(pct) / 100)}`;
         const usePill = this.previewOf("variance pill") && s.showPill.value;
 
         const pill = document.createElement("div");
         pill.className = "kpi-variance-pill";
         pill.textContent = pctStr;
-        pill.title = `Variance: ${pctStr} (${diff >= 0 ? "+" : ""}${this.formatMetricValue(diff)})`;
+        pill.title = `Variance: ${pctStr} (${diff >= 0 ? "+" : ""}${this.formatMetricValue(diff, format)})`;
         pill.setAttribute("aria-label", `Variance ${pctStr}`);
 
         pill.style.cssText = usePill
@@ -1973,15 +2280,19 @@ export class Visual implements IVisual {
             const items: powerbi.extensibility.VisualTooltipDataItem[] = [
                 {
                     displayName: metric.name,
-                    value: this.formatMetricValue(displayValue),
+                    value: this.formatMetricValue(displayValue, metric.formats.value),
                     color: this.formattingSettings.mainValue.color.value?.value ?? "#252423"
                 }
             ];
             if (metric.priorPeriod !== null) {
-                items.push({ displayName: this.t("Role_PriorPeriod", "Prior Period"), value: this.formatMetricValue(metric.priorPeriod), color: "#605E5C" });
+                items.push({ displayName: this.t("Role_PriorPeriod", "Prior Period"), value: this.formatMetricValue(metric.priorPeriod, metric.formats.prior), color: "#605E5C" });
             }
             if (metric.target !== null) {
-                items.push({ displayName: this.t("Role_Target", "Target"), value: this.formatMetricValue(metric.target), color: "#605E5C" });
+                items.push({ displayName: this.t("Role_Target", "Target"), value: this.formatMetricValue(metric.target, metric.formats.target), color: "#605E5C" });
+            }
+            {
+                const stT = this.statusOf(metric, displayValue);
+                if (stT) items.push({ displayName: this.t("Label_Status", "Status"), value: `${stT.word} · ${stT.text}`, color: stT.color });
             }
             if (this.previewOf("extra tooltip fields")) {
                 for (const tf of metric.tooltipFields) {
@@ -2004,29 +2315,70 @@ export class Visual implements IVisual {
 
     // ─── Formatting Helpers ──────────────────────────────────────────────────
 
-    private formatMetricValue(value: number | null): string {
+    /**
+     * FORMATO NATIVO DE POWER BI (valueFormatter): el formato de la medida en el modelo
+     * (moneda, porcentaje, separadores) y el idioma del informe. Display Units y Decimal
+     * Places actuan SOBRE ese formato, como en las tarjetas nativas:
+     *  - Unidades: Auto escala a K/M/B; None, sin escalar. Con un formato de PORCENTAJE no
+     *    se escala nunca: 15 es 1.500 %, no "1,5K%".
+     *  - Decimales: solo si el usuario los ha cambiado en el panel. Si no, los del formato
+     *    de la medida (o los automaticos al escalar).
+     * Prefijo y sufijo (Pro) se añaden despues, tal cual.
+     */
+    private formatMetricValue(value: number | null, format?: string): string {
         if (value === null || value === undefined) return "—";
         const s      = this.formattingSettings.mainValue;
         const prefix = this.previewOf("prefix/suffix") ? (s.prefix.value ?? "") : "";
         const suffix = this.previewOf("prefix/suffix") ? (s.suffix.value ?? "") : "";
-        const decimals = s.decimalPlaces.value ?? 1;
         const unit = String((s.displayUnit.value as any)?.value ?? s.displayUnit.value ?? "auto") as DisplayUnit;
-        return `${prefix}${this.applyDisplayUnit(value, unit, decimals)}${suffix}`;
+        const userDecimals = (this.lastDataView?.metadata?.objects as any)?.mainValue?.decimalPlaces;
+        const precision = typeof userDecimals === "number" ? Math.max(0, Math.min(6, s.decimalPlaces.value ?? userDecimals)) : undefined;
+        return `${prefix}${this.nativeFormat(value, format, unit, precision)}${suffix}`;
     }
 
-    private formatValue(value: number | null): string {
-        if (value === null) return "—";
-        return this.applyDisplayUnit(value, "auto", 1);
+    /** Valores sueltos (campos de tooltip): su formato, sin escalar. */
+    private formatValue(value: number | null, format?: string): string {
+        if (value === null || value === undefined) return "—";
+        return this.nativeFormat(value, format, "none", undefined);
     }
 
-    private applyDisplayUnit(value: number, unit: DisplayUnit, decimals: number): string {
-        const abs = Math.abs(value);
-        if (unit === "none")                                return value.toFixed(decimals);
-        if (unit === "billions"  || (unit === "auto" && abs >= 1e9)) return `${(value / 1e9).toFixed(decimals)}B`;
-        if (unit === "millions"  || (unit === "auto" && abs >= 1e6)) return `${(value / 1e6).toFixed(decimals)}M`;
-        if (unit === "thousands" || (unit === "auto" && abs >= 1e3)) return `${(value / 1e3).toFixed(decimals)}K`;
-        return value.toFixed(decimals);
+    private nativeFormat(value: number, format: string | undefined, unit: DisplayUnit, precision: number | undefined): string {
+        const esPorcentaje = !!format && /%/.test(format.replace(/"[^"]*"|\\./g, ""));
+        let escala: number | undefined;
+        if (!esPorcentaje) {
+            if (unit === "auto") escala = Math.abs(value);
+            else if (unit === "thousands") escala = 1e3;
+            else if (unit === "millions") escala = 1e6;
+            else if (unit === "billions") escala = 1e9;
+        }
+        // Sin escalar y con decimales pedidos, value 0 hace que valueFormatter los aplique.
+        if (escala === undefined && precision !== undefined) escala = 0;
+        try {
+            return valueFormatter.create({
+                format: format || undefined,
+                value: escala,
+                precision,
+                // Sistema de unidades "WholeUnits" (2), el de Bar Chart: con el de por
+                // defecto la libreria pinta 114.635 como "0.11M" en vez de "114.64K".
+                displayUnitSystemType: 2,
+                cultureSelector: this.host.locale
+            }).format(value);
+        } catch (_) {
+            return String(value);
+        }
     }
+
+    /** Porcentaje de variacion con un decimal, en el idioma del informe. */
+    private pctFormatter(): valueFormatter.IValueFormatter {
+        const loc = this.host.locale || "";
+        if (!this.pctFmt || this.pctFmtLocale !== loc) {
+            this.pctFmt = valueFormatter.create({ format: "0.0%", cultureSelector: loc });
+            this.pctFmtLocale = loc;
+        }
+        return this.pctFmt;
+    }
+    private pctFmt: valueFormatter.IValueFormatter | null = null;
+    private pctFmtLocale = "";
 
     // ─── Formatting Pane API ─────────────────────────────────────────────────
 

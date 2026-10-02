@@ -1,22 +1,26 @@
 # KPI Card Pro — TCViz Web Product Page Content
 
-Content for the four tabs of the TCViz product page. Current version: **1.2.1.0**.
+Content for the four tabs of the TCViz product page. Current version: **2.1.0.0**.
 
-**Hero image:** the twelve-card grid — one card per subchannel, each with its logo, value,
-variance, prior and target, and its own trend line with the target drawn across it. It shows the
-whole product in one glance and needs no caption.
+The live page is generated from `src/data.jsx` in the **tcviz-web** repository
+(https://tcviz.com/product/horizon-kpi/). This file is the draft: copy the changes there.
 
-**Video:** https://www.youtube.com/watch?v=7mkjDpWdkXA
+**Hero image:** the country grid with Status on — green, amber and red accent bars, each card with
+its flag, value, variance, prior and target, and its own trend line. It shows the whole product,
+including what is new in 2.1, in one glance.
+
+**Video:** https://www.youtube.com/watch?v=4fP7zYKnhWo
 
 ---
 
 ## TAB 1: OVERVIEW
 
-### One KPI card. Twelve at a glance.
+### On track or off track — on the card itself.
 
-A KPI card should answer three questions at once: what is the number, how does it compare, and
-where is it heading. KPI Card Pro does all three in the space of a tile — and then turns that one
-card into a grid, one per channel, product or region, each with its own trend.
+A number on a dashboard is only half an answer: is it good, against target, against last month?
+KPI Card Pro puts the answer on the card — the value, its variance, the target, a trend line and a
+status that says on track, warning or off track — and turns that one card into a grid, one per
+channel, product or region.
 
 **The problem it solves**
 A KPI in Power BI usually means a big number and nothing else. To show the comparison you add a
@@ -24,17 +28,19 @@ second visual, for the trend a third, and to break it down by category you copy 
 value. What was one figure becomes a page nobody maintains.
 
 **How it works**
-Drop a measure into Value and you have a card. Add Prior Period and it shows the variance with its
-direction. Add Target and it tracks the goal. Add a date to Trend and the card grows a line. Add a
-category to Small Multiples and the single card becomes a grid — each card keeping its own number,
-its own variance and its own line.
+Drop a measure into Value and you have a card, in the number format of your model. Add Prior
+Period and it shows the variance with its direction. Add Target and switch on Status to colour the
+card. Add a date to Trend and the card grows a line — and compares periods by itself, no DAX. Add a
+category to Small Multiples and the single card becomes a grid, each card with its own figures.
 
 **Who it's for**
 Anyone building executive dashboards where space is scarce and the reader has ten seconds:
 commercial reporting by channel, operations by site, finance by cost centre.
 
 **At a glance**
-- Value, prior-period variance and target in a single card
+- Value, prior-period variance and target in a single card, in your model's number formats
+- **New:** status — on track, warning or off track against target or prior period
+- Up to three secondary KPIs beside the headline, placed automatically
 - A trend line inside the card, with the target drawn period by period
 - One card per category, up to 50, each with its own line
 - A logo per category from an image column in your model
@@ -48,22 +54,31 @@ commercial reporting by channel, operations by site, finance by cost centre.
 Everything below is free except the items marked **(Pro)**.
 
 ### The number
-- The measure, formatted with display units (Auto / K / M / B) and decimal places
+- The measure in **its own format from your model** — currency, percentage, separators — and in
+  the report's language
+- Display units (Auto / K / M / B) on top of that format; decimals only when you set them
 - Font family, size, weight and colour
-- **(Pro)** Prefix and suffix — `$`, `€`, `%`, `pts` — without touching the measure
+- **(Pro)** Prefix and suffix for free text such as `pts`
 
 ### The comparison
 - Variance against a prior period, as a percentage with a direction arrow
 - The prior value and the target shown underneath, with their own font, size and colour
-- Positive, negative and neutral colours, all configurable
 - Invert the logic for cost, defects or churn, where a decrease is good
-- **(Pro)** Pill style for the variance badge
+- **(Pro)** Pill style and custom positive, negative and neutral colours
+- **(Pro)** Status: two thresholds, three states, colour on the value or an accent bar, and the
+  state written in words so it never depends on colour alone
+- **(Pro)** Comparisons without a date table: latest point or last N points against the N before
 
 ### The trend **(Pro)**
 - A line inside the card over any date or ordered period: area, line or bars
 - Colour, line width, area opacity, height and a marker on the last point
 - The target drawn period by period across the chart, in its own colour, so a target that changes
   over time is followed rather than flattened
+- Hover the line to read the value of any period
+
+### Secondary KPIs **(Pro)**
+- Up to three supporting measures with their own variance
+- Beside the value, or below it in a row or a list, whichever fits — the same layout on every card
 
 ### One card per category **(Pro)**
 - Up to 50 cards from a category field, each with its own value, variance and line
@@ -77,7 +92,7 @@ Everything below is free except the items marked **(Pro)**.
 - Cross-filtering by clicking a card, with multi-select
 - Cross-highlighting from other visuals dims the cards that are out of scope
 - Bookmarks restore the selection
-- Native and report tooltips, with **(Pro)** extra measures
+- Native, modern and report tooltips, with **(Pro)** extra measures
 - Right-click context menu on a card and on empty space
 
 ### Accessibility
@@ -90,27 +105,29 @@ Everything below is free except the items marked **(Pro)**.
 | | Free | Pro |
 |---|---|---|
 | The card: value, variance, target | ✓ | ✓ |
-| Display units, decimals, fonts and colours | ✓ | ✓ |
-| All variance colours and the invert logic | ✓ | ✓ |
+| Your model's number formats, display units, decimals, fonts and colours | ✓ | ✓ |
+| Variance arrow and the invert logic | ✓ | ✓ |
 | Image per card | ✓ | ✓ |
 | Cross-filtering, bookmarks, keyboard, high contrast | ✓ | ✓ |
-| **Trend line inside the card** | — | **✓** |
+| **Status: on track / warning / off track** | — | **✓** |
+| **Trend line inside the card**, hover values, period comparisons | — | **✓** |
+| **Secondary KPIs**, up to 3 | — | **✓** |
 | **Small Multiples**, up to 50 cards | — | **✓** |
 | Prefix and suffix | — | **✓** |
-| Variance pill | — | **✓** |
+| Variance pill and custom colours | — | **✓** |
 | Extra tooltip measures | — | **✓** |
 | Card border, radius, padding, shadow | — | **✓** |
 
-Changing a `(Pro)` setting without a licence leaves the card on the free result and Power BI shows
-its own notification with the link to get one. Nothing is lost: the setting is stored and applies
-as soon as the licence is active. A 30-day free trial is available on AppSource.
+While you edit without a licence, a Pro feature you turn on is drawn working under a "Pro preview"
+watermark, and Power BI shows its own notification with the link to get one. Reading view shows the
+free result. A 30-day free trial is available on AppSource.
 
 ---
 
 ## TAB 3: TECHNICAL
 
 **Specs**
-- API version: 5.10.0
+- API version: 5.11.0
 - Platform: Power BI Desktop, Service and mobile
 - Interface languages: English, Spanish
 
@@ -121,7 +138,14 @@ as soon as the licence is active. A 30-day free trial is available on AppSource.
 - **Trend (Pro)** (grouping) — a date or ordered period; the axis of the line
 - **Small Multiples (Pro)** (grouping) — one card per category, up to 50
 - **Image** (measure, aggregated as *First*) — a Base64 data URI per card
-- **Tooltips** (measures) — extra figures on hover
+- **Tooltips (Pro)** (measures) — extra figures on hover
+- **Secondary KPIs (Pro)** (measures, up to 3) — supporting figures beside the value
+- **Secondary KPIs prior (Pro)** (measures) — their comparison values, paired by position
+
+**Number formats**
+Every figure uses its own measure's format string and the report locale through Power BI's
+`valueFormatter`. Display units scale on top of it and a percentage is never scaled. Dynamic format
+strings are declared and used when Power BI sends a per-value format.
 
 **Data handling**
 Matrix data view with the Total/SubTotal API enabled for row subtotals, so each card's figure uses
@@ -149,6 +173,24 @@ buy what they already own.
 ---
 
 ## TAB 4: CHANGELOG
+
+### 2.1.0.0 — October 2026
+- **Added:** Status — on track, warning or off track against target or prior period, also written
+  as text
+- **Added:** hover value on the trend line; modern visual tooltips; dynamic format strings
+- **Changed:** numbers use your model's format and the report's language; decimals apply only when
+  you set them
+- **Changed:** secondary KPIs place themselves — right, row or list — the same on every card; the
+  grid never scrolls sideways
+- **Fixed:** a percentage measure shown as 0.3; Auto units showing 114,635 as 0.11M; secondary KPIs
+  disappearing with seven-digit figures
+
+### 2.0.0.0 — September 2026
+- **Added:** up to three secondary KPIs beside the main value
+- **Added:** period comparisons without a date table — latest point or last N points — with a
+  label that prints what is compared
+- **Added:** the Pro preview: Pro features drawn working under a watermark while you edit
+- **Fixed:** the Upgrade bar was overwritten by the banner, leaving nothing to click
 
 ### 1.2.0.0 — September 2026
 - **Added:** the trend line inside the card, over a date or period axis, with the target drawn

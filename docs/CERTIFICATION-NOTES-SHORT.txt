@@ -1,35 +1,33 @@
-KPI Card Pro 2.0.0.0 - GUID kpiCardProTCViz
-Repo, branch certification (full notes in docs/):
+KPI Card Pro 2.1.0.0 - GUID kpiCardProTCViz
+Repo, branch certification (full notes: CERTIFICATION-NOTES.md):
 github.com/tinocallarisa-web/kpi-card-pro | tinocallarisa-web.github.io/kpi-card-pro
-Video: youtube.com/watch?v=7mkjDpWdkXA
+Video: youtube.com/watch?v=4fP7zYKnhWo
 
-PLEASE READ FIRST - PRO PREVIEW (NEW IN 2.0.0.0)
+PLEASE READ FIRST - PRO PREVIEW
 Without a licence, IN EDIT MODE ONLY, a Pro feature the user turns on is drawn
 WORKING under a "Pro preview" watermark naming it. Intentional, not missing
-gating: it is how the user sees what they would be buying. In reading view,
-before the licence resolves, and where licences cannot be read (Publish to Web,
-embed, export) the FREE result is drawn. The gate is options.viewMode, not
-Desktop vs Service, and it is PER FEATURE.
+gating. In reading view, before the licence resolves, and where licences cannot
+be read (Publish to Web, embed, export) the FREE result is drawn. Per feature.
 
-WHAT IS NEW
-Secondary KPIs: up to 3 measures beside the main value, each with its own
-variance. Value & comparison: the big number can be the total (default), the
-latest point of Trend, or the last N points against the N before - these two
-need no date table and no DATEADD, and a label prints what is compared ("Dec
-2025 vs Nov 2025"). Fixed: the Upgrade bar was overwritten by the banner, so a
-user told to buy had nothing to click; the order is now
-clear -> banner -> (~10 s) Upgrade bar.
+WHAT IS NEW IN 2.1
+Status (Pro): value as % of target or prior, two thresholds, three states, also
+written as text. Numbers use each measure's format string and the report locale
+(valueFormatter); general.formatString declared for dynamic formats. Secondary
+KPIs: right, row or list, same layout on every card; grid scrolls vertically
+only. Trend hover value. supportEnhancedTooltips. Exactly one renderingStarted
+and one renderingFinished/Failed per update(); the licence repaint emits none.
 
 TESTING - FREE (no licence)
 1. A measure in Value: one card. Add Prior Period and Target: variance and the
    "Prior:"/"Target:" line. Click the card: it cross-filters.
-2. A Base64 column in Image (aggregation First): a logo appears. http/https is
-   rejected on purpose, so nothing is fetched.
-3. In EDIT mode bind Small Multiples or Trend, or add Secondary KPIs: each
-   renders WORKING under the watermark, a banner names it, and after ~10 s the
-   Upgrade bar appears. Remove it and both go.
+2. Format the measure as a percentage in the model: the card shows it as %.
+3. In EDIT mode turn on Status, bind Small Multiples or Trend, or add Secondary
+   KPIs: each renders WORKING under the watermark, a banner names it, and after
+   ~10 s the Upgrade bar appears. Remove it and both go.
 4. Reading view: free result, no watermark, no notice.
-5. Switch to another report page and back: the state is kept.
+5. Small Multiples with 6 columns: secondary KPIs move below, in a list if
+   needed, the same on every card; no horizontal scroll.
+6. Switch to another report page and back: the state is kept.
 With an active plan the same features render clean.
 
 PRIVACY / NETWORK
@@ -37,11 +35,11 @@ No external calls, telemetry or CDN; privileges: []. Image accepts only
 data:image/<type>;base64, via <img> src, never markup from user data.
 
 LICENSING
-Plan kpi-card-pro-tcviz, matched on a Service ID ending in it. Resolved
-the first paint, never blocking it; on failure it stays Free. Active and
-Warning accepted. isLicenseUnsupportedEnv and isLicenseInfoAvailable
-respected. No licensing UI of our own.
+Plan kpi-card-pro-tcviz, matched on a Service ID ending in it. Requested after
+the first paint, never blocking it; on failure it stays Free. Active and Warning
+accepted. isLicenseUnsupportedEnv and isLicenseInfoAvailable respected. No
+licensing UI of our own.
 
-FREE: the complete card. PRO: Trend, Small Multiples, Secondary KPIs, the value
-modes, prefix/suffix, the variance pill and colours, tooltip measures and card
-styling.
+FREE: the complete card. PRO: Status, Trend, Small Multiples, Secondary KPIs, the
+value modes, prefix/suffix, the variance pill and colours, tooltip measures and
+card styling.

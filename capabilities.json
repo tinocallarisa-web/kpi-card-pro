@@ -49,7 +49,7 @@
       "descriptionKey": "Role_Trend_Description"
     },
     {
-      "displayName": "Tooltips",
+      "displayName": "Tooltips (Pro)",
       "displayNameKey": "Role_Tooltips",
       "name": "tooltips",
       "kind": "Measure",
@@ -500,6 +500,44 @@
         }
       }
     },
+    "status": {
+      "displayName": "Status (Pro)",
+      "displayNameKey": "Object_Status",
+      "description": "Colours the card by how the value compares with the target or the prior period: on track, warning or off track.",
+      "descriptionKey": "Object_Status_Desc",
+      "properties": {
+        "show": { "displayName": "Show", "displayNameKey": "Prop_Status_Show", "type": { "bool": true } },
+        "basis": {
+          "displayName": "Compare value with", "displayNameKey": "Prop_Status_Basis",
+          "type": { "enumeration": [
+            { "value": "target", "displayName": "Target (% achieved)", "displayNameKey": "Enum_Status_Target" },
+            { "value": "prior", "displayName": "Prior period (% of prior)", "displayNameKey": "Enum_Status_Prior" }
+          ] }
+        },
+        "lowThreshold": { "displayName": "Lower threshold (%)", "displayNameKey": "Prop_Status_Low", "type": { "numeric": true } },
+        "highThreshold": { "displayName": "Upper threshold (%)", "displayNameKey": "Prop_Status_High", "type": { "numeric": true } },
+        "lowerIsBetter": { "displayName": "Lower is better", "displayNameKey": "Prop_Status_LowerBetter", "type": { "bool": true } },
+        "goodColor": { "displayName": "On track color", "displayNameKey": "Prop_Status_Good", "type": { "fill": { "solid": { "color": true } } } },
+        "warnColor": { "displayName": "Warning color", "displayNameKey": "Prop_Status_Warn", "type": { "fill": { "solid": { "color": true } } } },
+        "badColor": { "displayName": "Off track color", "displayNameKey": "Prop_Status_Bad", "type": { "fill": { "solid": { "color": true } } } },
+        "applyTo": {
+          "displayName": "Apply color to", "displayNameKey": "Prop_Status_ApplyTo",
+          "type": { "enumeration": [
+            { "value": "both", "displayName": "Value and accent bar", "displayNameKey": "Enum_Status_Both" },
+            { "value": "value", "displayName": "Value", "displayNameKey": "Enum_Status_Value" },
+            { "value": "accent", "displayName": "Accent bar", "displayNameKey": "Enum_Status_Accent" }
+          ] }
+        },
+        "showText": { "displayName": "Show status text", "displayNameKey": "Prop_Status_ShowText", "type": { "bool": true } }
+      }
+    },
+    "general": {
+      "displayName": "General",
+      "displayNameKey": "Object_General",
+      "properties": {
+        "formatString": { "type": { "formatting": { "formatString": true } } }
+      }
+    },
     "accessibility": {
       "displayName": "Accessibility",
       "displayNameKey": "Object_Accessibility",
@@ -712,9 +750,20 @@
           "displayName": "Show",
           "type": { "bool": true }
         },
+        "position": {
+          "displayName": "Position",
+          "description": "Right of the value, below it, or Auto: right, moving below when a trend line needs the width.",
+          "type": {
+            "enumeration": [
+              { "value": "auto", "displayName": "Auto" },
+              { "value": "right", "displayName": "Right" },
+              { "value": "bottom", "displayName": "Bottom" }
+            ]
+          }
+        },
         "minWidth": {
-          "displayName": "Hide below width (px)",
-          "description": "Below this card width the secondary column is dropped, so the main value never gets squeezed.",
+          "displayName": "Min width beside value (px)",
+          "description": "Below this card width the secondary KPIs move below the value (Auto) or are hidden (Right). Applies to every card in small multiples, and to a single card with a trend line.",
           "type": { "numeric": true }
         },
         "showVariance": {
@@ -796,7 +845,8 @@
     },
     "roles": [
       "tooltips"
-    ]
+    ],
+    "supportEnhancedTooltips": true
   },
   "subtotals": {
     "matrix": {

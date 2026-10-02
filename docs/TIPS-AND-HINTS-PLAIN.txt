@@ -17,7 +17,8 @@ GETTING STARTED
 1. Add KPI Card Pro to your report page.
 2. Drag a measure to the Value field well — the card renders immediately.
 3. Optionally add a Prior Period measure to see variance vs. previous period.
-4. Optionally add a Target measure to display target tracking.
+4. Optionally add a Target measure to display target tracking, and switch
+   on Status (Pro) to colour the card on track, warning or off track.
 5. Add a date to Trend (Pro) and the card grows a trend line.
 6. Use a dimension field in Small Multiples (Pro) to split into multiple
    cards, each with its own line.
@@ -94,18 +95,26 @@ FORMAT PANE — QUICK REFERENCE
 Card ................. Background, border colour. Pro: border width, radius,
                        padding, drop shadow.
 Main Value ........... Font family, size, bold, colour, display units
-                       (Auto / K / M / B), decimals. Pro: prefix, suffix.
+                       (Auto / K / M / B), decimals. The number keeps the
+                       format of the measure in your model; decimals apply
+                       only once you change them. Pro: prefix, suffix.
 Label (single card) .. Show, font family, size, bold, colour. Governs the name
                        above the number WHEN THERE IS ONE CARD; with Small
                        Multiples that text is governed by that card.
 Variance ............. Show, invert logic, show arrow, font size. Pro: pill
                        style and the positive / negative / neutral colours.
+Status (Pro) ......... Compare with target or prior period, lower and
+                       upper threshold (90% / 100%), lower is better, the
+                       three colours, apply to value / accent bar / both,
+                       status text.
 Prior & Target ....... Show, font family, size and colour of the
                        "Prior:" / "Target:" line.
 Value & comparison ... What the big number shows: total, latest point or last
                        N points. Window size, points back, period label.
-Secondary KPIs (Pro) . Show, hide below card width, show variance, value and
-                       label text size, value and label colour.
+Secondary KPIs (Pro) . Show, position (Auto / Right / Bottom), min width
+                       beside value, show variance, text sizes and colours.
+                       Below the value they go in a row or a list, whichever
+                       fits, the same on every card.
 Trend (Pro) .......... Show, chart type (area / line / bar), colour, line
                        width, area opacity, height, last-point marker, target
                        line and its colour.
@@ -123,14 +132,17 @@ The card is complete without a licence. Settings that need one say (Pro).
 
 Free:
 - Single KPI card with value, prior-period variance and target
-- Display units, decimals, label, card background and border colour
+- Your model's number formats, display units, decimals, label, card
+  background and border colour
 - Invert logic and the direction arrow
 - Image per card
-- Native tooltips, cross-filtering, bookmarks, context menu
+- Native and modern tooltips, cross-filtering, bookmarks, context menu
 - Keyboard navigation and high contrast
 
 Pro:
+- Status: on track, warning or off track against target or prior period
 - The trend line inside the card, with the target drawn period by period
+  and the value of any period on hover
 - Small Multiples: one card per category, up to 50, each with its own line
 - Multi-column layout with category titles
 - Secondary KPIs: up to three supporting measures with their own variance
@@ -181,8 +193,13 @@ TIPS & BEST PRACTICES
   30.5% against 30.4% reads as +0.55%, not +0.1 pp. If you want percentage
   points, leave its prior empty and add the difference as its own measure:
   Margin % delta = [Margin %] - [Margin % LM].
-- Use Prefix ($, €) and Suffix (%, pts) to give the value context without
-  changing the measure.
+- Format the measure in the model (currency, percentage, decimals) and the
+  card follows it, in the report's language. Never put a "%" suffix on a raw
+  ratio: 0.3 would read 0.3%. Keep Prefix and Suffix for text such as "pts".
+- Status reads best with a target. For costs, switch on Lower is better: up
+  to the lower threshold is on track.
+- With many Small Multiples columns, leave Secondary KPIs on Auto: they move
+  below the value and into a list instead of disappearing.
 - Right-click any card for the Power BI context menu: drill-through,
   spotlight, export data.
 
@@ -206,7 +223,12 @@ HR overview:
   Target = Headcount Plan | Trend = Month
 
 Finance KPI:
-  Value = EBITDA | Prefix = $ | Display Units = Millions | Invert = OFF
+  Value = EBITDA (formatted as currency in the model)
+  Display Units = Millions | Invert = OFF
+
+Sales against budget, with status:
+  Value = Revenue | Target = Revenue Budget | Small Multiples = Country
+  Status = ON, compare with Target, thresholds 90 / 100
 
 Cost tracking:
   Value = Total Costs | Trend = Month | Value shows = Latest point in Trend

@@ -39,14 +39,65 @@
   <header>
     <a class="brand" href="https://tcviz.com">TCViz</a>
     <h1>Changelog</h1>
-    <p class="meta">KPI Card Pro &nbsp;·&nbsp; current version 1.2.1.0</p>
+    <p class="meta">KPI Card Pro &nbsp;·&nbsp; current version 2.1.0.0</p>
   </header>
 
   <main>
     <div class="rel">
       <div class="rel-head">
-        <span class="rel-ver">1.2.1.0</span>
+        <span class="rel-ver">2.1.0.0</span>
         <span class="tag tag-cur">Current</span>
+        <span class="rel-date">2026-10-02</span>
+      </div>
+      <h4><span class="tag tag-add">Added</span></h4>
+    <ul>
+      <li><strong>Status (Pro).</strong> The value as a percentage of the target or of the prior period, against two thresholds, in three states: on track, warning and off track. *Lower is better* mirrors the logic for costs, defects or churn. The colour goes to the value, to an accent bar on the left of the card, or to both, and the state is also written under the value — "● On track · 103.1% of target" — so it never depends on colour alone. In high contrast only the words are shown. The tooltip carries it too.</li>
+      <li><strong>Hover value on the trend line.</strong> A guide and a label with the period and its value, in the measure's own format.</li>
+      <li><strong>Modern visual tooltips</strong> (<code>supportEnhancedTooltips</code>).</li>
+      <li><strong>Dynamic format strings.</strong> The visual declares <code>general.formatString</code>, so when a measure's format is chosen by DAX row by row, Power BI can send it value by value and the card uses it; otherwise the measure's format applies.</li>
+    </ul>
+      <h4><span class="tag tag-chg">Changed</span></h4>
+    <ul>
+      <li><strong>Numbers keep the format of your model.</strong> Every figure — value, prior, target, variance, secondary KPIs, tooltip fields — uses its own measure's format string and the report's language through Power BI's <code>valueFormatter</code>: currency, percentage, thousands separators and decimal mark. Display Units still scale on top of it, Auto picks K, M or bn, and a percentage is never scaled.</li>
+      <li><strong>Decimal Places applies only when you set it.</strong> Until now it forced one decimal on every card and overrode a <code>0.00%</code> defined in the model. Reports that never touched it now show the decimals of the measure's format.</li>
+      <li><strong>The variance percentage follows the report's language</strong> — 12,5% in Spanish, 12.5% in English.</li>
+      <li><strong>Secondary KPIs place themselves.</strong> *Position* is Auto, Right or Bottom. On the right they form two aligned columns, numbers right-aligned and every pill at the same x. Below the value they go in a row when they fit and in a list when they do not — one line per KPI, or name above number and pill on very narrow cards — and <strong>every card in a grid uses the same layout</strong>. In Auto, narrow cards move them below instead of hiding them, also in small multiples; only *Right* withdraws them below *Min width beside value*.</li>
+      <li><strong>The grid never scrolls sideways.</strong> Columns always fit the width; when the cards need more height, the grid scrolls vertically.</li>
+    </ul>
+      <h4><span class="tag tag-fix">Fixed</span></h4>
+    <ul>
+      <li><strong>A percentage measure was drawn as 0.3 instead of 30%,</strong> and the free-text suffix "%" produced 0.3% — a wrong number. The format now comes from the model.</li>
+      <li><strong>Auto display units showed 114,635 as "0.11M".</strong> It now reads 114.64K.</li>
+      <li><strong>Secondary KPIs disappeared below the value with seven-digit figures,</strong> because the number was squeezed to zero width beside its pill and the whole row was withdrawn. The row now turns into a list instead.</li>
+      <li><strong>Secondary KPI pills zig-zagged,</strong> each placed right after a number of different width.</li>
+      <li><strong><code>npm run eslint</code></strong> — the exact command certification runs — was missing, and the lint reported twelve errors in two Node build scripts. They are now excluded, as in the rest of TCViz's visuals.</li>
+    </ul>
+    <div class="rel">
+      <div class="rel-head">
+        <span class="rel-ver">2.0.0.0</span>
+        <span class="rel-date">2026-09-22</span>
+      </div>
+      <h4><span class="tag tag-add">Added</span></h4>
+    <ul>
+      <li><strong>Secondary KPIs.</strong> Up to three supporting measures, stacked to the right of the main value, each with its own variance. A <code>Secondary KPIs prior</code> well pairs the comparison values <strong>by position</strong> — the first prior with the first KPI — which is the only way to relate them without inventing a naming convention the user would have to guess. They carry no selection identity: they are context for the headline, not entities to filter by, and clicking one would have to answer what "filter by Margin" means, which is nothing. The whole column is dropped below a configurable card width instead of being squeezed: compressing the main value to fit context loses the one thing the card exists to say. It applies in small multiples too, measured against the width of each cell rather than of the visual, so it appears when it fits and withdraws when it does not.</li>
+      <li><strong>Value &amp; comparison: three modes for what the big number shows.</strong> *Total of the period* is unchanged and remains the default. *Latest point in Trend* takes the last point of the series and compares it with an earlier one. *Last N points* sums the last N and compares against the N before — on a monthly series, N = 12 is the rolling year against the previous one, while the sparkline keeps all its points. Both new modes <strong>remove the need for a date table and DATEADD measures</strong>: bind the date field and the visual reads the comparison off the series it already has.</li>
+      <li><strong>Period label.</strong> Prints which point the value is and which one it is compared against — *Dec 2025 vs Nov 2025*. The visual has no notion of calendar: it steps back a position in the series, so a step of 12 is 12 months only if the series is regular. Printing it is what makes that verifiable instead of assumed, and it also catches the common mistake of binding the date hierarchy, where the series turns out to be years.</li>
+      <li><strong>Pro preview.</strong> Without a licence, and <strong>in edit mode only</strong>, a Pro feature the user turns on is drawn *working* under a "Pro preview" watermark naming it, instead of being silently ignored. Reading view — and any environment where licences cannot be read — still draws the free result with no watermark, so a published report never uses an unpaid feature. Granted <strong>per feature</strong>, only for the one actually turned on.</li>
+    </ul>
+      <h4><span class="tag tag-fix">Fixed</span></h4>
+    <ul>
+      <li><strong>The Upgrade bar was being overwritten, so a user told to buy had nothing to click.</strong> Power BI shows one licence notification at a time and the last call replaces the previous one. <code>notifyLicenseRequired()</code> ran before <code>notifyFeatureBlocked()</code> in the same <code>update()</code>, so on the first attempt at a Pro feature the banner wiped out the Upgrade bar — the call that carries the purchase path. The sequence is now <code>clearLicenseNotification()</code> → the banner naming the feature → and, after ~10 s, the persistent Upgrade bar.</li>
+      <li><strong>Variance colours and extra tooltip fields were gated but never announced.</strong> The render blocked them; nothing told the user why. Changing the positive variance colour did nothing, with no explanation. Both now raise the notice and the preview like every other Pro feature.</li>
+      <li><strong><code>Small Multiples (Pro)</code> lost its <code>(Pro)</code> in English.</strong> <code>displayNameKey</code> overrides <code>displayName</code>, and the <code>en-US</code> string dropped the suffix while <code>es-ES</code> kept it. <code>Tooltips</code> was missing it in both.</li>
+      <li><strong>Returning from another report page dropped every Pro feature.</strong> Power BI recreates the visual on each page switch, so the first render runs before the licence resolves and the preview is off. The licence then resolved to Free and <code>applyLicense()</code> only notified, without repainting — correct before the preview existed, since nothing drawn depended on the licence for a free user. The card stayed on one tile, with no trend and no secondary KPIs, until the user touched a setting.</li>
+    </ul>
+      <h4><span class="tag tag-chg">Changed</span></h4>
+    <ul>
+      <li><strong>Secondary KPIs follow the same period as the main value.</strong> A card showing December at the top and twenty-four months down the side is not comparing anything; it is showing two different things side by side.</li>
+    </ul>
+    <div class="rel">
+      <div class="rel-head">
+        <span class="rel-ver">1.2.1.0</span>
         <span class="rel-date">2026-09-14</span>
       </div>
       <h4><span class="tag tag-fix">Fixed</span></h4>

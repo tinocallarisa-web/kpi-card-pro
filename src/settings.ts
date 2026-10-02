@@ -270,11 +270,24 @@ class SecondaryKpisSettings extends FormattingSettingsCard {
      * ilegible, y el valor principal es el motivo por el que existe la tarjeta.
      */
     minWidth = new formattingSettings.NumUpDown({
-        name: "minWidth", displayName: "Hide below width (px)", value: 320,
+        name: "minWidth", displayName: "Min width beside value (px)", value: 320,
         options: {
             minValue: { type: powerbi.visuals.ValidatorType.Min, value: 120 },
             maxValue: { type: powerbi.visuals.ValidatorType.Max, value: 1200 }
         }
+    });
+    /**
+     * Donde van los secundarios. Auto: a la derecha, y abajo cuando hay sparkline y
+     * la tarjeta es estrecha (o cuando a la derecha recortarian el valor principal).
+     */
+    position = new formattingSettings.ItemDropdown({
+        name: "position", displayName: "Position",
+        items: [
+            { value: "auto",   displayName: "Auto" },
+            { value: "right",  displayName: "Right" },
+            { value: "bottom", displayName: "Bottom" }
+        ],
+        value: { value: "auto", displayName: "Auto" }
     });
     showVariance = new formattingSettings.ToggleSwitch({
         name: "showVariance", displayName: "Show variance", value: true
@@ -300,8 +313,8 @@ class SecondaryKpisSettings extends FormattingSettingsCard {
         name: "labelColor", displayName: "Label color", value: { value: "#605E5C" }
     });
     name = "secondaryKpis";
-    displayName = "Secondary KPIs [Pro]";
-    slices = [this.show, this.minWidth, this.showVariance,
+    displayName = "Secondary KPIs (Pro)";
+    slices = [this.show, this.position, this.minWidth, this.showVariance,
               this.valueFontSize, this.labelFontSize, this.color, this.labelColor];
 }
 
@@ -369,6 +382,61 @@ class TrendSettings extends FormattingSettingsCard {
               this.height, this.showDot, this.showTargetLine, this.targetColor];
 }
 
+// ─── Card: Status (Pro) ──────────────────────────────────────────────────────
+// Estados por umbral (2.1.0.0): el valor como % de una referencia (objetivo o periodo
+// anterior) decide si la tarjeta va bien, en aviso o mal. Es la funcion estrella del
+// competidor directo (Card with States); aqui sale del objetivo que el visual ya tiene.
+
+class StatusSettings extends FormattingSettingsCard {
+    show = new formattingSettings.ToggleSwitch({
+        name: "show", displayName: "Show", value: false
+    });
+    basis = new formattingSettings.ItemDropdown({
+        name: "basis", displayName: "Compare value with",
+        items: [
+            { value: "target", displayName: "Target (% achieved)" },
+            { value: "prior",  displayName: "Prior period (% of prior)" }
+        ],
+        value: { value: "target", displayName: "Target (% achieved)" }
+    });
+    lowThreshold = new formattingSettings.NumUpDown({
+        name: "lowThreshold", displayName: "Lower threshold (%)", value: 90,
+        options: { minValue: { type: powerbi.visuals.ValidatorType.Min, value: 0 }, maxValue: { type: powerbi.visuals.ValidatorType.Max, value: 1000 } }
+    });
+    highThreshold = new formattingSettings.NumUpDown({
+        name: "highThreshold", displayName: "Upper threshold (%)", value: 100,
+        options: { minValue: { type: powerbi.visuals.ValidatorType.Min, value: 0 }, maxValue: { type: powerbi.visuals.ValidatorType.Max, value: 1000 } }
+    });
+    lowerIsBetter = new formattingSettings.ToggleSwitch({
+        name: "lowerIsBetter", displayName: "Lower is better", value: false
+    });
+    goodColor = new formattingSettings.ColorPicker({
+        name: "goodColor", displayName: "On track color", value: { value: "#107C10" }
+    });
+    warnColor = new formattingSettings.ColorPicker({
+        name: "warnColor", displayName: "Warning color", value: { value: "#C19C00" }
+    });
+    badColor = new formattingSettings.ColorPicker({
+        name: "badColor", displayName: "Off track color", value: { value: "#D13438" }
+    });
+    applyTo = new formattingSettings.ItemDropdown({
+        name: "applyTo", displayName: "Apply color to",
+        items: [
+            { value: "both",   displayName: "Value and accent bar" },
+            { value: "value",  displayName: "Value" },
+            { value: "accent", displayName: "Accent bar" }
+        ],
+        value: { value: "both", displayName: "Value and accent bar" }
+    });
+    showText = new formattingSettings.ToggleSwitch({
+        name: "showText", displayName: "Show status text", value: true
+    });
+    name = "status";
+    displayName = "Status (Pro)";
+    slices = [this.show, this.basis, this.lowThreshold, this.highThreshold, this.lowerIsBetter,
+              this.goodColor, this.warnColor, this.badColor, this.applyTo, this.showText];
+}
+
 // ─── Card: Accessibility ─────────────────────────────────────────────────────
 
 class AccessibilitySettings extends FormattingSettingsCard {
@@ -397,6 +465,7 @@ export class VisualFormattingSettingsModel extends FormattingSettingsModel {
     secondaryKpis = new SecondaryKpisSettings();
     image = new ImageSettings();
     trend = new TrendSettings();
+    status = new StatusSettings();
     accessibility = new AccessibilitySettings();
-    cards = [this.card, this.mainValue, this.label, this.variance, this.secondary, this.period, this.secondaryKpis, this.image, this.trend, this.smallMultiples, this.accessibility];
+    cards = [this.card, this.mainValue, this.label, this.variance, this.status, this.secondary, this.period, this.secondaryKpis, this.image, this.trend, this.smallMultiples, this.accessibility];
 }

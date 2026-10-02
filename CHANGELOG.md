@@ -1,5 +1,27 @@
 # Changelog — KPI Card Pro
 
+## [2.1.0.0] — 2026-10-02
+
+### Added
+- **Status (Pro).** The value as a percentage of the target or of the prior period, against two thresholds, in three states: on track, warning and off track. *Lower is better* mirrors the logic for costs, defects or churn. The colour goes to the value, to an accent bar on the left of the card, or to both, and the state is also written under the value — "● On track · 103.1% of target" — so it never depends on colour alone. In high contrast only the words are shown. The tooltip carries it too.
+- **Hover value on the trend line.** A guide and a label with the period and its value, in the measure's own format.
+- **Modern visual tooltips** (`supportEnhancedTooltips`).
+- **Dynamic format strings.** The visual declares `general.formatString`, so when a measure's format is chosen by DAX row by row, Power BI can send it value by value and the card uses it; otherwise the measure's format applies.
+
+### Changed
+- **Numbers keep the format of your model.** Every figure — value, prior, target, variance, secondary KPIs, tooltip fields — uses its own measure's format string and the report's language through Power BI's `valueFormatter`: currency, percentage, thousands separators and decimal mark. Display Units still scale on top of it, Auto picks K, M or bn, and a percentage is never scaled.
+- **Decimal Places applies only when you set it.** Until now it forced one decimal on every card and overrode a `0.00%` defined in the model. Reports that never touched it now show the decimals of the measure's format.
+- **The variance percentage follows the report's language** — 12,5% in Spanish, 12.5% in English.
+- **Secondary KPIs place themselves.** *Position* is Auto, Right or Bottom. On the right they form two aligned columns, numbers right-aligned and every pill at the same x. Below the value they go in a row when they fit and in a list when they do not — one line per KPI, or name above number and pill on very narrow cards — and **every card in a grid uses the same layout**. In Auto, narrow cards move them below instead of hiding them, also in small multiples; only *Right* withdraws them below *Min width beside value*.
+- **The grid never scrolls sideways.** Columns always fit the width; when the cards need more height, the grid scrolls vertically.
+
+### Fixed
+- **A percentage measure was drawn as 0.3 instead of 30%,** and the free-text suffix "%" produced 0.3% — a wrong number. The format now comes from the model.
+- **Auto display units showed 114,635 as "0.11M".** It now reads 114.64K.
+- **Secondary KPIs disappeared below the value with seven-digit figures,** because the number was squeezed to zero width beside its pill and the whole row was withdrawn. The row now turns into a list instead.
+- **Secondary KPI pills zig-zagged,** each placed right after a number of different width.
+- **`npm run eslint`** — the exact command certification runs — was missing, and the lint reported twelve errors in two Node build scripts. They are now excluded, as in the rest of TCViz's visuals.
+
 ## [2.0.0.0] — 2026-09-22
 
 ### Added

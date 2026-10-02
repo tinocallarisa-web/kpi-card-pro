@@ -1,6 +1,6 @@
-KPI CARD PRO — YOUTUBE TAGS
+KPI CARD PRO — YOUTUBE TAGS (v2.1.0.0)
 ================================================================
 YouTube corta a los 500 caracteres contando comas y espacios.
-Este bloque mide 300: pegalo entero.
+Este bloque mide 318: pégalo entero.
 
-power bi, power bi visual, power bi custom visual, kpi card, kpi power bi, power bi kpi card, small multiples, power bi small multiples, sparkline, trend line, variance, prior period, year over year, no dax, executive dashboard, power bi dashboard, data visualization, appsource, tcviz, power bi tips
+power bi, power bi visual, power bi custom visual, kpi card, power bi kpi card, kpi status, on track off track, kpi target, small multiples, power bi small multiples, sparkline, variance, prior period, year over year, no dax, executive dashboard, power bi dashboard, number format, data visualization, appsource, tcviz

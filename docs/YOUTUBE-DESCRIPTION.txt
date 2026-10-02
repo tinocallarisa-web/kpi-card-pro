@@ -1,25 +1,25 @@
-KPI CARD PRO v2.0.0.0 — YOUTUBE
+KPI CARD PRO v2.1.0.0 — YOUTUBE
 ================================================================
 
 
 TÍTULO (el 1 es el que recomiendo)
 ----------------------------------------------------------------
-1. Four KPIs in one card, no DAX — KPI Card Pro for Power BI
-2. Power BI KPI card with secondary KPIs, trend line and small multiples
-3. Stop writing DATEADD: Power BI KPI cards that compare by themselves
-4. One KPI card, twelve at a glance — KPI Card Pro for Power BI
+1. On track or off track? Power BI KPI cards that tell you — KPI Card Pro
+2. Power BI KPI cards with status colours, targets and no DAX
+3. Twelve KPI cards in one Power BI visual — status, trend and variance
+4. Stop writing DATEADD: Power BI KPI cards that compare by themselves
+5. KPI Card Pro for Power BI: one tile, every number in context
 
-Por qué el 1: dice las dos cosas nuevas —varios KPIs en una tarjeta y sin
-DAX— antes que el nombre del producto, cabe entero en el listado (58
-caracteres) y lleva "Power BI", que es lo que la gente escribe al buscar.
-"no DAX" es el gancho: quien ha escrito DATEADD tres veces esta semana lo
-entiende en dos segundos.
+Por qué el 1: la novedad que se entiende de un vistazo es el estado —verde,
+ámbar, rojo contra el objetivo—, y la pregunta "¿vamos bien o no?" es la que
+se hace quien busca una tarjeta de KPI. Lleva "Power BI" (lo que la gente
+escribe) y cabe en el listado (70 caracteres; el límite son 100).
 
-Evita poner "2.0" en el título: no aporta nada a quien no conoce el visual
+Sin número de versión en el título: no dice nada a quien no conoce el visual
 y envejece con cada versión.
 
 Versión en español, si el audio es en español:
-   Cuatro KPIs en una tarjeta, sin DAX — KPI Card Pro para Power BI
+   ¿Vas en línea o desviado? Tarjetas KPI de Power BI que te lo dicen
 
 
 DESCRIPCIÓN
@@ -29,35 +29,42 @@ desplegar, así que empiezan por el problema y no por el nombre.
 
 >>> EMPIEZA AQUÍ >>>
 
-A KPI card should answer three questions at once: what is the number, how
-does it compare, and where is it heading. KPI Card Pro answers all three in
-the space of a tile — and now puts up to three supporting metrics beside the
-headline, so "Sales 5.2M" arrives with Margin, Orders and Average ticket
-next to it.
+A number on a dashboard is only half an answer. 9.7M in revenue — is that
+good? Against target, against last month, compared with the other countries?
+KPI Card Pro puts the answer on the card: the value, its variance, the target,
+the trend, and now a status that says on track, warning or off track at a
+glance.
 
-And it compares by itself. Comparing against the previous period normally
-means a date table, DATEADD and one measure per KPI. Bind your date field to
-Trend and the card reads the comparison off the series it already draws:
-the latest month against the previous one, or the rolling twelve months
-against the twelve before them.
+And it does it without DAX. Bind your date field and the card compares the
+latest month with the previous one, or the last twelve months with the twelve
+before them. Bind a category and you get one card per country, product or
+team, all with the same layout.
 
-WHAT IS NEW IN 2.0
-• Secondary KPIs — up to three measures beside the main value, each with its
-  own variance. They step aside below a card width you set, so the headline
-  is never squeezed.
-• Three ways to read the number — the total, the latest point of the trend,
-  or the last N points against the N before.
-• A period label that prints what is being compared: "Dec 2025 vs Nov 2025".
+NEW IN 2.1
+• Status — the value as a percentage of the target or the prior period, with
+  two thresholds and three colours (on track, warning, off track). "Lower is
+  better" for costs and churn. The status is also written in words, so it
+  never depends on colour alone.
+• Your number formats — currency, percentages, separators and the language of
+  your report are taken from the measure in your model, the way native Power BI
+  cards do. Display units and decimals still work on top of them.
+• Secondary KPIs that rearrange themselves — beside the value, in a row or in
+  a list, whichever fits, and the same on every card.
+• Hover the trend line to read the value of any period.
+[SOLO SI LO HAS PROBADO EN DESKTOP — si no, borra esta línea:]
+• Dynamic format strings — a measure whose format changes by row (currency
+  per country, % or units per KPI) is shown with its own format on each card.
 
 FREE
 The complete card: value, variance against a prior period with its arrow and
-the invert logic for costs and churn, target, images, display units,
-cross-filtering, bookmarks, keyboard navigation and high contrast.
+the invert logic for costs and churn, target, images, display units, your
+model's number formats, cross-filtering, bookmarks, keyboard navigation and
+high contrast.
 
 PRO
-The trend line, Small Multiples — one card per category, up to fifty —, the
-Secondary KPIs, the comparison modes, prefix and suffix, the variance pill
-and its colours, extra tooltip measures, and the card styling.
+Status colours, the trend line, Small Multiples — one card per category, up
+to fifty —, Secondary KPIs, the comparison modes, prefix and suffix, the
+variance pill and its colours, extra tooltip measures, and the card styling.
 
 Try it before you buy: while you edit without a licence, every Pro feature
 you turn on is drawn working under a "Pro preview" watermark. Reading view
@@ -70,33 +77,63 @@ service. Images must already be in your model as Base64 — links to images on
 a web server are rejected on purpose, which is what makes that claim true.
 
 CHAPTERS
-0:00 [ajustar] The problem with one number on a card
-0:00 [ajustar] Field wells in ninety seconds
-0:00 [ajustar] Three KPIs beside the headline
+0:00 [ajustar] A number is only half an answer
+0:00 [ajustar] Three fields: value, prior period, target
+0:00 [ajustar] Status: on track, warning, off track
+0:00 [ajustar] One card per country with Small Multiples
 0:00 [ajustar] Comparing without a date table
-0:00 [ajustar] Small multiples: one card per country
+0:00 [ajustar] Secondary KPIs that fit themselves
+0:00 [ajustar] Your number formats, kept
 0:00 [ajustar] Pro preview, and what Free gives you
 
 LINKS
-Get it on AppSource: [pegar el enlace de la oferta]
+Get it on Microsoft AppSource: https://marketplace.microsoft.com/en-us/product/tino_callarisa.kpicard-pro?tab=Overview
+Product page: https://tcviz.com/product/horizon-kpi/
 Documentation: https://tinocallarisa-web.github.io/kpi-card-pro/support.html
 Support: support@tcviz.com
 
 More Power BI custom visuals: https://tcviz.com
 
+#PowerBI #KPI #DataVisualization
+
 <<< TERMINA AQUÍ <<<
 
 Los tiempos de CHAPTERS están a 0:00 a propósito: hay que ajustarlos al
-montaje. YouTube solo genera los marcadores si el primero es 0:00 y hay tres
-o más.
+montaje (la intro dura 4 s, así que el primer capítulo real empieza en 0:04
+si quieres marcarlo). YouTube solo genera los marcadores si el primero es
+0:00 y hay tres o más, separados al menos 10 s.
+
+Los tres hashtags del final son los que YouTube enseña encima del título.
+Más de tres no se muestran y más de quince anulan todos.
+
+
+VERSIÓN CORTA (Shorts, LinkedIn, comunidad)
+----------------------------------------------------------------
+Is this KPI on track? KPI Card Pro answers on the card itself: value,
+variance, target, trend and a status in green, amber or red — one card per
+country or product, no DAX. Free on Microsoft AppSource, with a Pro preview
+you can try while you edit.
+https://marketplace.microsoft.com/en-us/product/tino_callarisa.kpicard-pro?tab=Overview
+#PowerBI #KPI #DataVisualization
 
 
 MINIATURA
 ----------------------------------------------------------------
-Una tarjeta grande con el número principal y los tres KPIs secundarios a la
-derecha, bien legibles. Es lo único que distingue este visual de las otras
-treinta y cinco tarjetas del marketplace, y se entiende a 300 píxeles. Si la
-miniatura es el logo o una captura general de Power BI, el título da igual.
+Tres o cuatro tarjetas de la rejilla, una en verde, otra en ámbar y otra en
+rojo, con su barra de color y el texto "On track / Warning / Off track" bien
+legible. El estado es lo nuevo y lo que distingue este visual de las otras
+treinta y cinco tarjetas del marketplace, y se entiende a 300 píxeles. Fondo
+claro y acentos de la paleta actual (azul #2B6CB0, verde #3E9C5B).
+
+
+COMPROBADO EL 02-10-2026
+----------------------------------------------------------------
+• Página de producto (tcviz.com/product/horizon-kpi/): responde 200.
+• Documentación (support.html): responde 200.
+• Enlace de AppSource: es el que figura en el repo; el marketplace devuelve 403
+  a las peticiones automáticas, ábrelo tú una vez antes de publicar.
+• "Free on Microsoft AppSource" de la versión corta: el tier gratuito existe;
+  si la oferta solo tuviera plan de pago, cámbialo.
 
 
 URL PARA PARTNER CENTER
@@ -106,5 +143,5 @@ Solo la forma canónica:
 
 youtu.be, /shorts/ y /embed/ son rechazo automático por la política 100.3.3.3.
 Cuando tengas el id nuevo hay que cambiarlo en docs/APPSOURCE-LISTING.md,
-docs/CERTIFICATION-NOTES-SHORT.txt, la infografía Y EN PARTNER CENTER.
-El único que Microsoft revisa es el último.
+docs/CERTIFICATION-NOTES-SHORT.txt, support.html, la infografía Y EN PARTNER
+CENTER. El único que Microsoft revisa es el último.
