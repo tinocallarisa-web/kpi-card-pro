@@ -1,22 +1,26 @@
-# AppSource listing copy — KPI Card Pro v2.1.0.0
+# AppSource listing copy — KPI Card Pro v2.2.0.0
 
 Copy ready to paste into Partner Center. **The marketplace description is the documentation most
 people read and the one that goes stale fastest** — update it on every release, not only when the
 code changes.
 
-**This version changes what the buyer sees** (status colours, number formats, secondary KPIs that
-rearrange themselves): the description, the short description and the "What's new" block all
-change, and the certification notes must be pasted again.
+**This version changes what the buyer sees** (color rules on the background or border, style
+templates, a setup guide inside the visual, clickable trend points, twelve languages): the
+description, the short description and the "What's new" block all change, the screenshots change,
+and the certification notes must be pasted again.
+
+Rules for this listing: no comparisons with other marketplace visuals, not even implied; compare
+only with Power BI's own card. "Power BI" always with that capitalisation (rejection 100.7.1).
 
 ---
 
 ## Short description (max 100 characters)
 
 ```
-KPI cards with status, variance, target and trend — one per category, in your number formats.
+KPI cards with color rules, variance, target and trend — one per category, set up in a minute.
 ```
 
-*(93 characters)*
+*(95 characters)*
 
 ---
 
@@ -25,14 +29,17 @@ KPI cards with status, variance, target and trend — one per category, in your 
 ```
 A number on a dashboard is only half an answer. 9.7M in revenue — is that good? Against target, against last month, compared with the other countries? A plain card leaves the reader to work it out.
 
-KPI Card Pro puts the answer on the card: the value, its variance, the target, a trend line and a status that says on track, warning or off track. Add a category and the single card becomes a grid — up to fifty cards, one per country, product or team, each with its own figures and line.
+KPI Card Pro puts the answer on the card: the value, its variance, the target, a trend line and a color that says on track, warning or off track. Add a category and the single card becomes a grid — up to fifty cards, one per country, product or team, each with its own figures and line.
 
-WHAT IS NEW IN 2.1
+WHAT IS NEW IN 2.2
 
-• Status — the value as a percentage of the target or the prior period, with two thresholds and three colours. "Lower is better" mirrors it for costs and churn. The state is also written under the value, so it never depends on colour alone.
-• Your number formats — currency, percentages, separators and the language of your report come from the measure in your model, as in native visuals. Display units and decimals still work on top.
-• Secondary KPIs that rearrange themselves — beside the value, in a row or in a list, whichever fits, and the same on every card.
-• Hover the trend line to read any period. Modern visual tooltips are supported.
+• Click a point of the trend line to filter the whole report by that period — and by that card, in a grid
+• Color rules on the target, the prior period or the value itself, painted on the number, an accent bar, the card background or its border
+• Six style templates, from Clean to Midnight, applied in one click
+• A setup guide inside the visual: it ticks off each field as you add it and shows the templates with your own number
+• A layout that fits any size: the number shrinks instead of being cut off, and the grid picks how many columns fit
+• Format on the canvas, screen-reader summaries, keyboard navigation through cards and trend points
+• Format pane in twelve languages
 
 NO DATE TABLE, NO DAX
 
@@ -52,12 +59,13 @@ WHAT YOU GET
 
 • Variance against a prior period, with a direction arrow and invert logic for costs
 • A target, on the card and drawn on the trend line period by period
+• Color rules with three states, written under the value too, so meaning never depends on colour alone
 • A trend line: area, line or bars, over any date or ordered period
-• One card per category, in one to six columns
+• One card per category, in up to six columns that adapt to the width
 • A logo or flag on each card, from Base64 images already in your model
-• Cross-filtering, cross-highlighting and bookmarks
-• Keyboard navigation, screen-reader labels and high-contrast support
-• English and Spanish interface
+• Your model's number formats, in the language of the report
+• Cross-filtering by card and by period, cross-highlighting and bookmarks
+• Keyboard navigation, screen-reader summaries and high-contrast support
 
 PRIVACY
 
@@ -65,9 +73,9 @@ No network calls of any kind: no telemetry, no analytics, no CDN. Everything hap
 
 FREE AND PRO
 
-The card is complete without a licence: value, variance with its arrow and invert logic, target, your number formats, images, cross-filtering, bookmarks, keyboard and high contrast.
+The card is complete without a licence: value, variance with its arrow and invert logic, target, your number formats, images, style templates, the setup guide, the size-adaptive layout, format on the canvas, cross-filtering, bookmarks, keyboard, screen readers and high contrast.
 
-Pro adds the context: status colours, the trend line and its period comparisons, Small Multiples, Secondary KPIs, prefix and suffix, the variance pill and colours, extra tooltip measures, and the card border, radius, padding and shadow.
+Pro adds the context: color rules, the trend line with clickable points and its period comparisons, Small Multiples, Secondary KPIs, prefix and suffix, the variance pill and colours, extra tooltip measures, and the card border, radius, padding and shadow.
 
 SEE IT BEFORE YOU BUY
 
@@ -75,7 +83,8 @@ While you edit a report without a licence, every Pro feature you turn on is draw
 
 30-day free trial on AppSource.
 
-Video, documentation and sample data: https://tinocallarisa-web.github.io/kpi-card-pro/support.html
+Video, documentation, FAQ and sample data: https://tinocallarisa-web.github.io/kpi-card-pro/support.html
+Questions: https://github.com/tinocallarisa-web/kpi-card-pro/discussions
 Support: support@tcviz.com
 ```
 
@@ -91,6 +100,9 @@ Support: support@tcviz.com
 | Repository (certification branch) | https://github.com/tinocallarisa-web/kpi-card-pro/tree/certification |
 | Demo video | https://www.youtube.com/watch?v=4fP7zYKnhWo |
 
+No new video for 2.2 (decision 12-10-2026): the existing one still shows features that work the
+same way. The novelties are told in the description and in the screenshots.
+
 **The certification notes field caps at 2,500 characters** (counting CRLF) and truncates without
 warning, mid-word. Paste `docs/CERTIFICATION-NOTES-SHORT.txt`. The full notes live in
 `CERTIFICATION-NOTES.md` in the repository, linked from the short version.
@@ -102,19 +114,23 @@ from Partner Center, so correcting it in `pbiviz.json` alone changes nothing.
 
 ## Listing images
 
-`docs/infographic.png` (1366×768) is regenerated from `docs/infographic.html`. Reload the HTML with
-a forced refresh before downloading, or the browser serves a cached page and the PNG silently
-carries the old text.
+| Asset | File | Notes |
+|---|---|---|
+| Offer screenshot 1 | `docs/infographic.png` (from `docs/infographic.html`) | 1366×768, general guide for 2.2 |
+| Offer screenshot 2 | `docs/infographic-styles.png` (from `docs/infographic-styles.html`) | 1366×768, templates and color rules |
+| Offer logo | `assets/logo_300x300.png` | New Nord icon. Uploaded by hand: it does not travel in the package |
+| Package icon | `assets/icon.png` | 36×36, embedded in the `.pbiviz` |
 
 ---
 
-## Before submitting
+## Before submitting — what must be pasted by hand in Partner Center
 
-- [ ] Long description and short description pasted into the offer
-- [ ] Video field: `https://www.youtube.com/watch?v=4fP7zYKnhWo` (canonical form only)
-- [ ] Support, privacy and terms URLs checked with a real request, not assumed
-- [ ] Certification notes pasted from `docs/CERTIFICATION-NOTES-SHORT.txt` — Partner Center clears
-      that field on every resubmission
-- [ ] Version 2.1.0.0 is above the version currently published (check Partner Center)
-- [ ] New infographic uploaded
-- [ ] Sample .pbix includes the Tips & Hints page, updated for this version
+Editing this file changes nothing in the offer.
+
+- [ ] Long description and short description
+- [ ] Screenshots: the two infographics above, replacing the 2.1 one
+- [ ] Offer logo: `assets/logo_300x300.png`
+- [ ] Video field unchanged: `https://www.youtube.com/watch?v=4fP7zYKnhWo` (canonical form only)
+- [ ] Certification notes from `docs/CERTIFICATION-NOTES-SHORT.txt` — the field is cleared on every resubmission
+- [ ] Version 2.2.0.0 is above the version currently published (2.1.0.0)
+- [ ] Support, privacy and terms URLs checked with a real request

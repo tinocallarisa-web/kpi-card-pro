@@ -1,117 +1,105 @@
-# KPI Card Pro — Tips & Hints (Sample File)
+# KPI Card Pro 2.2 — Tips & Hints (Sample File)
 
 Copia estos textos como Text Boxes en Power BI Desktop dentro del archivo .pbix de muestra.
 Crea una página llamada "Tips & Hints" o "How to use" y añade un bloque por sección.
+Para pegar sin perder formato, usa `docs/TIPS-AND-HINTS-PLAIN.txt` (mismo contenido, sin tablas).
 
 ---
 
-## TEXT BOX 1 — Título de página (encabezado grande)
+## TEXT BOX 1 — Título
 
 KPI Card Pro — How to use this visual
 
 ---
 
-## TEXT BOX 2 — Bloque "Getting Started"
-
-**Getting Started**
+## TEXT BOX 2 — Getting Started
 
 1. Add KPI Card Pro to your report page.
 2. Drag a measure to the **Value** field well — the card renders immediately.
-3. Optionally add a **Prior Period** measure to see variance vs. previous period.
-4. Optionally add a **Target** measure to display target tracking.
-5. Add a date to **Trend** (Pro) and the card grows a trend line.
-6. Use a dimension field in **Small Multiples** (Pro) to split into multiple cards, each with
-   its own line.
-7. Bind a Base64 image column to **Image** to show a logo on each card.
+3. Follow the **setup guide** inside the visual: it lists the optional fields, ticks each one as you
+   add it, and lets you pick a style template with one click. It only shows while you edit; reopen it
+   from *Format → Style template → Setup guide*.
+4. Optional fields: **Prior Period** (variance), **Target** (goal and color rules), **Trend** (Pro, a
+   date), **Small Multiples** (Pro, a category), **Secondary KPIs** (Pro).
 
 ---
 
-## TEXT BOX 3 — Bloque "Field Wells"
+## TEXT BOX 3 — Field Wells
 
-**Field Wells**
-
-• **Value** (required) — The main KPI measure. Example: Total Sales, Revenue, Headcount.
-• **Prior Period** (optional) — A measure for the previous period. The visual calculates variance % automatically.
-• **Target** (optional) — A budget or target measure displayed below the main value.
-• **Small Multiples** (optional, Pro) — A category dimension (e.g. Region, Product) to render one card per member, up to 50 cards.
-• **Trend** (optional, Pro) — A date or ordered period. Draws the trend line inside each card.
-• **Image** (optional) — A column with a Base64 data URI (`data:image/png;base64,...`), shown
-  top-right of the card. Set the aggregation to *First*. External URLs are rejected.
-• **Tooltips** (optional) — Additional measures shown on hover. The extra measures are Pro.
-
----
-
-## TEXT BOX 4 — Bloque "Format Pane"
-
-**Format Pane — Quick Reference**
-
-• **Card** — Background color, border color/width/radius, padding, drop shadow.
-• **Main Value** — Font family, size, bold, color, display units (Auto / K / M / B), decimal places, prefix and suffix (Pro).
-• **Label (single card)** — Show, font family, size, bold, color. Governs the name above the
-  number *when there is one card*; with Small Multiples that text is governed by that card.
-• **Variance** — Show/hide, positive/negative/neutral colors, invert logic (for cost metrics where lower = better), arrow, pill style (Pro).
-• **Trend (Pro)** — Show, chart type (area / line / bar), color, line width, area opacity,
-  height, last-point marker, target line and its color.
-• **Image** — Show, height, corner radius.
-• **Prior & Target** — Show, font family, size and color of the "Prior:" / "Target:" line.
-• **Small Multiples (Pro)** — Columns (1–6), gap, category title with font, size, bold and color.
-• **Accessibility** — High Contrast mode toggle, custom ARIA title for screen readers.
+| Well | What it does |
+|---|---|
+| **Value** (required) | The main KPI measure. |
+| **Prior Period** | The previous period; the visual calculates the variance. |
+| **Target** | A budget or target, below the value and on the trend line period by period. |
+| **Trend** (Pro) | A date or ordered period: trend line; click a point to filter by it. |
+| **Small Multiples** (Pro) | One card per category member, up to 50. |
+| **Secondary KPIs** (Pro) | Up to three supporting measures beside the value. |
+| **Image** | A Base64 data URI, aggregation *First*. Web links are rejected. |
+| **Tooltips** (Pro) | Extra measures on hover. |
 
 ---
 
-## TEXT BOX 5 — Bloque "Free vs Pro"
+## TEXT BOX 4 — Color rules and templates
 
-**Free vs. Pro**
+- **Color rules (Pro)** compare the value with the Target, the Prior Period or the value itself, with two
+  thresholds: on track, warning, off track. Paint the number, an accent bar, the card background or its
+  border. *Lower is better* mirrors the logic for costs and churn. The state is also written as text.
+- **Style templates** (free): Classic, Clean, Bold, Minimal, Soft, Midnight. A template only fills what
+  you have not changed yourself.
+
+---
+
+## TEXT BOX 5 — No date table, no DAX
+
+With a date in Trend, *Format → Value & comparison → Value shows*: **Total of the period**, **Latest
+point** (against the previous point, or 12 back for the same month last year) or **Last N points**
+(the rolling twelve months). The card prints what it compares — "Dec 2025 vs Nov 2025".
+
+---
+
+## TEXT BOX 6 — Filtering
+
+- Small Multiples: click a card to filter the page; the others dim.
+- Trend: click a point of the line to filter by that period (and card).
+- Ctrl+click adds, click again removes, click empty space to clear.
+- Keyboard: arrows between cards; on the trend line, arrows between points and Enter to filter.
+
+---
+
+## TEXT BOX 7 — Free vs Pro
 
 | Feature | Free | Pro |
 |---|---|---|
-| Single KPI card | ✅ | ✅ |
-| Prior Period variance | ✅ | ✅ |
-| Target display | ✅ | ✅ |
-| Tooltips (native) | ✅ | ✅ |
-| Variance colors and invert logic | ✅ | ✅ |
-| Image per card | ✅ | ✅ |
-| Bookmarks, keyboard, high contrast | ✅ | ✅ |
-| **Trend line inside the card** | ❌ | ✅ |
+| Value, variance, target, your number formats, images | ✅ | ✅ |
+| Style templates, setup guide, size-adaptive layout | ✅ | ✅ |
+| Format on the canvas, 12 languages | ✅ | ✅ |
+| Cross-filtering, bookmarks, keyboard, screen readers, high contrast | ✅ | ✅ |
+| **Color rules** | ❌ | ✅ |
+| **Trend line** and period comparisons | ❌ | ✅ |
 | Small Multiples (up to 50) | ❌ | ✅ |
-| Multi-column layout | ❌ | ✅ |
-| Prefix / Suffix | ❌ | ✅ |
-| Variance pill style | ❌ | ✅ |
-| Extended tooltip measures | ❌ | ✅ |
-| Card border, radius, padding, shadow | ❌ | ✅ |
+| Secondary KPIs | ❌ | ✅ |
+| Prefix / suffix, variance pill and colours, extra tooltips | ❌ | ✅ |
+| Card border width, radius, padding, shadow | ❌ | ✅ |
 
-To unlock Pro features, get a license from Microsoft AppSource.
-
----
-
-## TEXT BOX 6 — Bloque "Tips"
-
-**Tips & Best Practices**
-
-• Use **Auto** display units to handle values from hundreds to billions without manual configuration.
-• For cost or effort metrics where a decrease is positive, enable **Invert (Lower is Better)** in the Variance section.
-• In Small Multiples mode, set columns to match the number of categories for a clean row layout.
-• Use **Prefix** ($, €) and **Suffix** (%, pts) to give the value instant context without changing the measure format.
-• Enable **High Contrast Mode** in the Accessibility section to meet WCAG 2.1 requirements.
-• Right-click any card to access the Power BI context menu (drill-through, spotlight, export data).
-• In **Trend**, use a real date column. A month stored as text would be ordered alphabetically.
-• The target line is drawn period by period, so it follows a target that changes over time.
+Without a licence, Pro features are drawn working in edit mode under a "Pro preview" watermark; reading
+view shows the free result.
 
 ---
 
-## TEXT BOX 7 — Bloque "Example Configurations"
+## TEXT BOX 8 — Tips
 
-**Example Configurations**
+- Format percentages in the model: the card uses that format. Never add a "%" suffix to a raw ratio.
+- **Auto** display units handle values from hundreds to billions.
+- For costs or effort, switch on **Invert (lower is better)** in Variance.
+- In **Trend**, use a real date column: a month stored as text sorts alphabetically.
+- Small visual? The number shrinks to stay whole and the extras step aside — trend first.
+- In format mode, click the number, the label, the trend line or the card to format it right there.
+- Right-click a card for the Power BI context menu (drill-through, export data).
 
-**Sales Dashboard:**
-Value = Total Revenue | Prior Period = Revenue LY | Target = Revenue Budget |
-Trend = Date | Small Multiples = Region | Image = Region logo (Base64)
+---
 
-**HR Overview:**
-Value = Headcount | Prior Period = Headcount Previous Month | Target = Headcount Plan
+## TEXT BOX 9 — Example configurations
 
-**Finance KPI:**
-Value = EBITDA | Prefix = $ | Display Units = Millions | Invert = OFF
-
-**Cost Tracking:**
-Value = Total Costs | Prior Period = Costs LY | Invert = ON (lower is better)
+- **Sales dashboard:** Value = Total Revenue · Target = Revenue Budget · Trend = Date · Small Multiples = Region · Color rules on Target, applied to the background.
+- **HR overview:** Value = Headcount · Prior Period = Headcount previous month · Target = Headcount plan.
+- **Cost tracking:** Value = Total Costs · Trend = Date · Value shows = Latest point · Invert = ON · Color rules with *Lower is better*.

@@ -1,4 +1,4 @@
-# KPI Card Pro — Certification Notes — v2.1.0.0
+# KPI Card Pro — Certification Notes — v2.2.0.0
 
 > The text pasted into Partner Center is `docs/CERTIFICATION-NOTES-SHORT.txt` (the field caps at
 > 2,500 characters and is cleared on every resubmission). This file is the complete reference the
@@ -32,6 +32,47 @@ report therefore never uses an unpaid Pro feature. The gate is the host view mod
 (`options.viewMode !== 0`), not Desktop versus Service, and it is granted **per feature**.
 
 ---
+
+## Filter out — note 1180.2.2.3 on 2.1.0.0, fixed in 2.2.0.0
+
+2.1.0.0 passed certification with the soft failure *"Your visual does not appear to filter outwards
+to other visuals"*. The cause was not missing selection: in Small Multiples a click already called
+`selectionManager.select()`, but the card itself did not change, so nothing on screen showed it, and
+the single card had nothing selectable at all. In 2.2.0.0:
+
+1. **Small Multiples:** click a card — the rest of the page filters by its category, the selected card
+   stays sharp and the others dim to 30%. `aria-pressed` reflects it.
+2. **Trend:** every point of the line carries its own selection ID (chained with the card's in small
+   multiples), so a click filters by that period — March of Spain, not March of every card. Selected
+   points are marked with a ring; in bar trends the other bars dim.
+3. **Ctrl+click** adds, a second click removes, a click on empty space calls `selectionManager.clear()`.
+4. Our own selection does not arrive through `registerOnSelectCallback` (only external changes such as
+   bookmarks do), so after `select()` the visual repaints through `render()` — not `update()`, so no
+   rendering events are emitted outside `update()`.
+5. A single card with no Small Multiples and no Trend has no category to filter by, like the native
+   Card; with Trend it filters through its points.
+
+## What is new in 2.2.0.0
+
+- **Color rules (Pro)** replace Status with the same settings plus *Value itself* as basis and the card
+  background or border as targets. Power BI's conditional formatting (fx) is documented as not supported
+  for matrix-based visuals, and this visual uses the matrix mapping to combine Small Multiples and Trend,
+  so the rules are custom conditional formatting.
+- **Style templates** (free) apply only to properties absent from `metadata.objects`, and only to free
+  properties, so a template cannot unlock Pro card styling.
+- **Setup guide** (free): a panel inside the visual in edit mode only (never in reading view, never in
+  format mode). It reads which wells are bound and offers the templates. Its two buttons call
+  `persistProperties` for `style.template` and `style.guide` — always from a user click, never from the
+  selection callback.
+- **On-object formatting** (`supportsOnObjectFormatting`, `enablePointerEventsFormatMode`): number,
+  label, variance, trend and card, with styles and shortcuts. In format mode a click formats and does not
+  select.
+- **Size-adaptive layout:** the main number shrinks to fit; Small Multiples columns are a maximum; a
+  short single card withdraws its extras in a fixed order.
+- **Accessibility:** each card's `aria-label` carries value, period, variance, target and status; arrow
+  keys, Home and End move between cards; the trend is a `role="slider"` with `aria-valuetext` per point.
+- **Localisation:** 12 languages. The Format pane was English-only up to 2.1 because the settings had no
+  keys; the keys in `capabilities.json` are now applied at runtime (`src/i18n.ts`).
 
 ## What is new in 2.1.0.0
 

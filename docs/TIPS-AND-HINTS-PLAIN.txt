@@ -1,4 +1,4 @@
-KPI CARD PRO — TIPS & HINTS (versión para pegar)
+KPI CARD PRO 2.2 — TIPS & HINTS (versión para pegar)
 ================================================================
 Los text boxes de Power BI no soportan tablas markdown: al pegar se pierde
 el formato. Esta versión usa listas con puntos guía, que sobreviven al
@@ -16,15 +16,13 @@ GETTING STARTED
 
 1. Add KPI Card Pro to your report page.
 2. Drag a measure to the Value field well — the card renders immediately.
-3. Optionally add a Prior Period measure to see variance vs. previous period.
-4. Optionally add a Target measure to display target tracking, and switch
-   on Status (Pro) to colour the card on track, warning or off track.
-5. Add a date to Trend (Pro) and the card grows a trend line.
-6. Use a dimension field in Small Multiples (Pro) to split into multiple
-   cards, each with its own line.
-7. Add up to three measures to Secondary KPIs (Pro) and they appear beside
-   the main value, each with its own variance.
-8. Bind a Base64 image column to Image to show a logo on each card.
+3. Follow the setup guide inside the visual: it lists the optional fields,
+   ticks each one as you add it, and lets you pick a style template with
+   one click. It only shows while you edit; reopen it from
+   Format > Style template > Setup guide.
+4. Optional fields: Prior Period (variance), Target (goal and color rules),
+   Trend (Pro, a date: trend line and period comparisons), Small Multiples
+   (Pro, a category: one card per item), Secondary KPIs (Pro).
 
 
 TEXT BOX 3 — Field Wells
@@ -34,202 +32,99 @@ FIELD WELLS
 Value (required) ......... The main KPI measure. Total Sales, Revenue,
                            Headcount.
 Prior Period (optional) .. A measure for the previous period. The visual
-                           calculates the variance. See "No date table, no
-                           DAX" below — with Trend bound you may not need it.
-Target (optional) ........ A budget or target measure, shown below the value.
-Trend (Pro) .............. A date or ordered period. Draws the trend line
-                           inside each card, and feeds the comparison modes.
-Secondary KPIs (Pro) ..... Up to 3 supporting measures, stacked to the right
-                           of the main value. Margin %, Orders, Avg ticket.
-Secondary KPIs prior (Pro) Their comparison values, MATCHED BY POSITION: the
-                           first here pairs with the first Secondary KPI.
-                           Optional — with Trend bound the visual works it
-                           out from the series.
-Image (optional) ......... A column with a Base64 data URI
-                           (data:image/png;base64,...), shown top-right.
-                           Set the aggregation to First. External URLs are
-                           rejected.
-Small Multiples (Pro) .... A category dimension. One card per value, up to 50.
-Tooltips (Pro) ........... Additional measures shown on hover.
+                           calculates the variance. With Trend bound you
+                           may not need it — see "No date table, no DAX".
+Target (optional) ........ A budget or target, shown below the value and
+                           drawn on the trend line period by period.
+Trend (Pro) .............. A date or ordered period. Draws the trend line;
+                           click a point to filter the report by it.
+Small Multiples (Pro) .... A category. One card per member, up to 50.
+Secondary KPIs (Pro) ..... Up to three supporting measures beside the value.
+Image (optional) ......... A Base64 data URI (data:image/png;base64,...),
+                           aggregation First. Web links are rejected.
+Tooltips (Pro) ........... Extra measures shown on hover.
 
 
-TEXT BOX 4 — No date table, no DAX
+TEXT BOX 4 — Color rules and templates
+----------------------------------------------------------------
+COLOR RULES (PRO) AND STYLE TEMPLATES
+
+- Color rules compare the value with the Target, the Prior Period or the
+  value itself, with two thresholds: on track, warning, off track.
+- Paint the number, an accent bar, the card background or its border.
+  "Lower is better" mirrors the logic for costs and churn.
+- The state is also written under the value, so it never depends on
+  colour alone.
+- Style templates (free): Classic, Clean, Bold, Minimal, Soft, Midnight.
+  A template only fills what you have not changed yourself.
+
+
+TEXT BOX 5 — No date table, no DAX
 ----------------------------------------------------------------
 NO DATE TABLE, NO DAX
 
-Comparing against the previous period normally means a date table marked as
-such, DATEADD, and one measure per KPI. With a date field in Trend, the card
-reads the comparison off the series it already draws.
-
-Format pane > Value & comparison > Value shows:
-
-  Total of the period .... The whole range. The default, unchanged.
-  Latest point in Trend .. The last point of the series, compared against an
-                           earlier one. "Compare against (points back)" = 1
-                           is the previous point; 12 on a monthly series is
-                           the same month last year.
-  Last N points .......... The last N summed, against the N before them.
-                           "Window size" = 12 on a monthly series is the
-                           rolling year against the previous one, and the
-                           sparkline keeps every point.
-
-The card prints what it is comparing — "Dec 2025 vs Nov 2025". Read it: the
-visual steps back a POSITION in the series, not a calendar step. Twelve back
-is twelve months only if the series is regular; with a month missing it is
-not, and the label is what tells you.
-
-Two conditions, both about the data and neither about formulas:
-- The Trend field must be a date or a number. Text like "Jan, Feb" cannot be
-  ordered, and the visual cannot tell that the order is wrong.
-- There must be at least two points. With one there is nothing to compare
-  and no variance is drawn — no invented 0%.
-
-A Prior Period measure of your own always wins when it is bound. Nothing
-changes for a report that already has one.
+With a date in Trend, Format > Value & comparison > Value shows:
+- Total of the period — the whole range.
+- Latest point — the last month against the previous one, or against the
+  same month last year (Compare against = 12 on a monthly series).
+- Last N points — the rolling twelve months against the twelve before.
+The card prints what it compares, for example "Dec 2025 vs Nov 2025".
 
 
-TEXT BOX 5 — Format Pane
+TEXT BOX 6 — Filtering
 ----------------------------------------------------------------
-FORMAT PANE — QUICK REFERENCE
+FILTERING
 
-Card ................. Background, border colour. Pro: border width, radius,
-                       padding, drop shadow.
-Main Value ........... Font family, size, bold, colour, display units
-                       (Auto / K / M / B), decimals. The number keeps the
-                       format of the measure in your model; decimals apply
-                       only once you change them. Pro: prefix, suffix.
-Label (single card) .. Show, font family, size, bold, colour. Governs the name
-                       above the number WHEN THERE IS ONE CARD; with Small
-                       Multiples that text is governed by that card.
-Variance ............. Show, invert logic, show arrow, font size. Pro: pill
-                       style and the positive / negative / neutral colours.
-Status (Pro) ......... Compare with target or prior period, lower and
-                       upper threshold (90% / 100%), lower is better, the
-                       three colours, apply to value / accent bar / both,
-                       status text.
-Prior & Target ....... Show, font family, size and colour of the
-                       "Prior:" / "Target:" line.
-Value & comparison ... What the big number shows: total, latest point or last
-                       N points. Window size, points back, period label.
-Secondary KPIs (Pro) . Show, position (Auto / Right / Bottom), min width
-                       beside value, show variance, text sizes and colours.
-                       Below the value they go in a row or a list, whichever
-                       fits, the same on every card.
-Trend (Pro) .......... Show, chart type (area / line / bar), colour, line
-                       width, area opacity, height, last-point marker, target
-                       line and its colour.
-Image ................ Show, height, corner radius.
-Small Multiples (Pro)  Columns (1–6), gap, category title with font, size,
-                       bold and colour.
-Accessibility ........ High contrast, ARIA title for screen readers.
+- Small Multiples: click a card to filter the page; the others dim.
+- Trend: click a point of the line to filter by that period (and card).
+- Ctrl+click adds, click again removes, click empty space to clear.
+- Keyboard: arrow keys between cards; on the trend line, arrows move
+  between points and Enter filters.
 
 
-TEXT BOX 6 — Free vs Pro
+TEXT BOX 7 — Free vs Pro
 ----------------------------------------------------------------
 FREE VS PRO
 
-The card is complete without a licence. Settings that need one say (Pro).
+Free: value, variance with arrow and invert, target, your number formats,
+images, style templates, the setup guide, the layout that adapts to the
+size of the visual, format on the canvas, cross-filtering, bookmarks,
+keyboard, screen readers, high contrast, 12 languages.
 
-Free:
-- Single KPI card with value, prior-period variance and target
-- Your model's number formats, display units, decimals, label, card
-  background and border colour
-- Invert logic and the direction arrow
-- Image per card
-- Native and modern tooltips, cross-filtering, bookmarks, context menu
-- Keyboard navigation and high contrast
+Pro: color rules, the trend line and its period comparisons, Small
+Multiples, Secondary KPIs, prefix and suffix, variance pill and colours,
+extra tooltip measures, card border, radius, padding and shadow.
 
-Pro:
-- Status: on track, warning or off track against target or prior period
-- The trend line inside the card, with the target drawn period by period
-  and the value of any period on hover
-- Small Multiples: one card per category, up to 50, each with its own line
-- Multi-column layout with category titles
-- Secondary KPIs: up to three supporting measures with their own variance
-- The Latest point and Last N points comparison modes
-- Prefix and suffix on the main value
-- Variance pill style and its positive / negative / neutral colours
-- Extra measures in tooltips
-- Card border width, radius, padding and drop shadow
-
-TRY PRO BEFORE YOU BUY
-
-While you are editing a report WITHOUT a licence, a Pro feature you turn on
-is drawn WORKING, under a "Pro preview" watermark that names it, and Power
-BI shows its own notice with the Upgrade option. Turn it off and the
-watermark goes with it.
-
-In READING VIEW — and anywhere Power BI cannot check licences, such as
-Publish to Web, embedding or export — the free result is drawn with no
-watermark and no prompt, so a published report never uses a feature you have
-not paid for. The preview applies only to the setting you actually changed,
-not to every Pro option at once.
-
-30-day free trial on Microsoft AppSource.
+Without a licence, Pro features are drawn working in edit mode under a
+"Pro preview" watermark; reading view shows the free result.
 
 
-TEXT BOX 7 — Tips
+TEXT BOX 8 — Tips
 ----------------------------------------------------------------
 TIPS & BEST PRACTICES
 
-- Use Auto display units to handle values from hundreds to billions without
-  configuring anything.
-- For cost or effort metrics where a decrease is good, enable Invert (Lower
-  is Better) under Variance.
-- In Trend, use a real date column. A month stored as text would be ordered
-  alphabetically and the line would mean nothing — and so would the
-  comparison modes, which read that same order.
-- The target line is drawn period by period, so it follows a target that
-  changes over time.
-- In Small Multiples, set columns to match the number of categories for a
-  clean row layout.
-- Secondary KPIs follow the same period as the main value. A card showing
-  December at the top and two years down the side would be comparing two
-  different things.
-- Ratios need a measure, not a column. A "Margin %" stored per row is summed
-  by default and the total is nonsense. Store the components and write
-  Margin % = DIVIDE(SUM(Margin), SUM(Revenue)).
-- When a secondary KPI is itself a percentage, its variance is relative:
-  30.5% against 30.4% reads as +0.55%, not +0.1 pp. If you want percentage
-  points, leave its prior empty and add the difference as its own measure:
-  Margin % delta = [Margin %] - [Margin % LM].
-- Format the measure in the model (currency, percentage, decimals) and the
-  card follows it, in the report's language. Never put a "%" suffix on a raw
-  ratio: 0.3 would read 0.3%. Keep Prefix and Suffix for text such as "pts".
-- Status reads best with a target. For costs, switch on Lower is better: up
-  to the lower threshold is on track.
-- With many Small Multiples columns, leave Secondary KPIs on Auto: they move
-  below the value and into a list instead of disappearing.
-- Right-click any card for the Power BI context menu: drill-through,
-  spotlight, export data.
+- Format percentages in the model (Measure tools > Format > Percentage):
+  the card uses that format. Never add a "%" suffix to a raw ratio.
+- Auto display units handle values from hundreds to billions.
+- For costs or effort, switch on Invert (lower is better) in Variance.
+- In Trend, use a real date column: a month stored as text sorts
+  alphabetically.
+- Small visual? The number shrinks to stay whole and the extras step
+  aside — trend first. Make it taller to bring them back.
+- In format mode, click the number, the label, the trend line or the card
+  to format it right there.
+- Right-click a card for the Power BI context menu (drill-through, export).
 
 
-TEXT BOX 8 — Example Configurations
+TEXT BOX 9 — Example configurations
 ----------------------------------------------------------------
 EXAMPLE CONFIGURATIONS
 
-Executive sales card:
-  Value = Total Revenue | Trend = Month
-  Secondary KPIs = Margin %, Orders, Avg ticket
-  Value shows = Last N points, Window size = 12
-  No Prior Period measure needed: the rolling year is read off the series.
+Sales dashboard: Value = Total Revenue | Target = Revenue Budget |
+Trend = Date | Small Multiples = Region | Color rules on Target, background.
 
-Sales dashboard by region:
-  Value = Total Revenue | Prior Period = Revenue LY | Target = Revenue Budget
-  Trend = Date | Small Multiples = Region | Image = Region flag (Base64)
+HR overview: Value = Headcount | Prior Period = Headcount previous month |
+Target = Headcount plan.
 
-HR overview:
-  Value = Headcount | Prior Period = Headcount Previous Month
-  Target = Headcount Plan | Trend = Month
-
-Finance KPI:
-  Value = EBITDA (formatted as currency in the model)
-  Display Units = Millions | Invert = OFF
-
-Sales against budget, with status:
-  Value = Revenue | Target = Revenue Budget | Small Multiples = Country
-  Status = ON, compare with Target, thresholds 90 / 100
-
-Cost tracking:
-  Value = Total Costs | Trend = Month | Value shows = Latest point in Trend
-  Invert = ON (lower is better)
+Cost tracking: Value = Total Costs | Trend = Date | Value shows = Latest
+point | Invert = ON | Color rules: Lower is better.

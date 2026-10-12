@@ -6,7 +6,7 @@
 
 [![AppSource](https://img.shields.io/badge/AppSource-Published-0078D4?logo=microsoft)](https://marketplace.microsoft.com/en-us/product/tino_callarisa.kpicard-pro?tab=Overview)
 [![Power BI API](https://img.shields.io/badge/API-5.11.0-yellow)](https://github.com/microsoft/powerbi-visuals-api)
-[![Version](https://img.shields.io/badge/version-2.1.0.0-brightgreen)](pbiviz.json)
+[![Version](https://img.shields.io/badge/version-2.2.0.0-brightgreen)](pbiviz.json)
 [![License](https://img.shields.io/badge/License-Proprietary-red)](https://tinocallarisa-web.github.io/kpi-card-pro/terms.html)
 
 📖 **[Documentation & Support](https://tinocallarisa-web.github.io/kpi-card-pro/support.html)** ·
@@ -19,10 +19,15 @@
 
 Drop a measure into **Value** and you have a card, in the number format of your model. Add
 **Prior Period** and it shows the variance with a direction arrow. Add **Target** and switch on
-**Status** to colour the card on track, warning or off track. Add a date to **Trend** and the card
+**Color rules** to colour the number, the background or the border on track, warning or off track. Add a date to **Trend** and the card
 grows a trend line — and can compare periods by itself, with no date table and no DAX. Add a
 category to **Small Multiples** and the single card becomes a grid, one card per category. Add up
 to three **Secondary KPIs** to show supporting figures beside the headline.
+
+New in 2.2: click a trend point to filter by that period; selection drawn on the card; six style
+templates; a setup guide inside the visual (edit mode only); format on the canvas; a layout that
+adapts to the size of the visual; screen-reader summaries and keyboard navigation through cards and
+trend points; the Format pane in twelve languages.
 
 ## Data roles
 
@@ -56,8 +61,9 @@ format pane.
 | Model number formats, display units, decimal places, label styling | ✓ | ✓ |
 | Card background and border colour, images | ✓ | ✓ |
 | Native and modern tooltips, cross-filtering, cross-highlighting, bookmarks, context menu | ✓ | ✓ |
-| Keyboard focus, ARIA labels, high contrast | ✓ | ✓ |
-| **Status** — on track / warning / off track against target or prior period | ✗ | **✓** |
+| Keyboard navigation, screen-reader summaries, high contrast | ✓ | ✓ |
+| Style templates, setup guide, size-adaptive layout, format on the canvas | ✓ | ✓ |
+| **Color rules** — on track / warning / off track on target, prior or the value itself | ✗ | **✓** |
 | **Trend line** — area, line or bars, target per period, hover values, period comparisons | ✗ | **✓** |
 | **Small Multiples** — up to 50 cards, 1–6 columns, category titles | ✗ | **✓** |
 | **Secondary KPIs** — up to 3, auto layout | ✗ | **✓** |
@@ -75,7 +81,8 @@ Power BI shows its licence notification. Reading view shows the free result.
 - **Main Value** — Font family, size, bold, colour, display units, decimal places · *(Pro)* Prefix, Suffix
 - **Label (single card)** — Show, font family, size, bold, colour
 - **Variance** — Show, invert, show arrow, font size · *(Pro)* positive / negative / neutral colours, Show as Pill
-- **Status (Pro)** — Show, compare with target or prior, lower and upper threshold, lower is better, colours, apply color to, show status text
+- **Color rules (Pro)** — Show, compare with target, prior or the value itself, lower and upper threshold, lower is better, colours, apply to the value, an accent bar, the background or the border, show status text
+- **Style template** — Classic, Clean, Bold, Minimal, Soft, Midnight; setup guide on or off
 - **Prior & Target** — Show, font family, size, colour
 - **Value & comparison** — Value shows (total, latest point, last N points), window size, compare against, show period label
 - **Secondary KPIs (Pro)** — Show, position (auto / right / bottom), min width beside value, show variance, text sizes and colours

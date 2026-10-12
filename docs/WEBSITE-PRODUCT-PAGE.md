@@ -1,6 +1,6 @@
 # KPI Card Pro — TCViz Web Product Page Content
 
-Content for the four tabs of the TCViz product page. Current version: **2.1.0.0**.
+Content for the four tabs of the TCViz product page. Current version: **2.2.0.0**.
 
 The live page is generated from `src/data.jsx` in the **tcviz-web** repository
 (https://tcviz.com/product/horizon-kpi/). This file is the draft: copy the changes there.
@@ -29,7 +29,7 @@ value. What was one figure becomes a page nobody maintains.
 
 **How it works**
 Drop a measure into Value and you have a card, in the number format of your model. Add Prior
-Period and it shows the variance with its direction. Add Target and switch on Status to colour the
+Period and it shows the variance with its direction. Add Target and switch on Color rules to colour the
 card. Add a date to Trend and the card grows a line — and compares periods by itself, no DAX. Add a
 category to Small Multiples and the single card becomes a grid, each card with its own figures.
 
@@ -39,7 +39,7 @@ commercial reporting by channel, operations by site, finance by cost centre.
 
 **At a glance**
 - Value, prior-period variance and target in a single card, in your model's number formats
-- **New:** status — on track, warning or off track against target or prior period
+- **New in 2.2:** click a trend point to filter by that period; setup guide; six style templates; color rules on the background or border
 - Up to three secondary KPIs beside the headline, placed automatically
 - A trend line inside the card, with the target drawn period by period
 - One card per category, up to 50, each with its own line
@@ -65,8 +65,8 @@ Everything below is free except the items marked **(Pro)**.
 - The prior value and the target shown underneath, with their own font, size and colour
 - Invert the logic for cost, defects or churn, where a decrease is good
 - **(Pro)** Pill style and custom positive, negative and neutral colours
-- **(Pro)** Status: two thresholds, three states, colour on the value or an accent bar, and the
-  state written in words so it never depends on colour alone
+- **(Pro)** Color rules: two thresholds, three states, on the target, the prior or the value itself; colour on the
+  value, an accent bar, the background or the border, and the state written in words so it never depends on colour alone
 - **(Pro)** Comparisons without a date table: latest point or last N points against the N before
 
 ### The trend **(Pro)**
@@ -89,16 +89,24 @@ Everything below is free except the items marked **(Pro)**.
 - Height and corner radius
 
 ### In the report
-- Cross-filtering by clicking a card, with multi-select
+- Cross-filtering by clicking a card, or a point of the trend line to filter by that period, with multi-select
+- The selected card stays sharp and the others dim; selected points are marked
 - Cross-highlighting from other visuals dims the cards that are out of scope
 - Bookmarks restore the selection
 - Native, modern and report tooltips, with **(Pro)** extra measures
 - Right-click context menu on a card and on empty space
 
 ### Accessibility
-- Keyboard focus and activation, with ARIA labels announcing name, value and variance
+- Screen readers hear each card in full: value, period, variance, target and status
+- Arrow keys move between cards; the trend line is a keyboard slider that announces each point
 - High-contrast themes follow the Power BI palette
-- English and Spanish interface
+- Format pane in twelve languages
+
+### Set up and style
+- A setup guide inside the visual, while you edit: it ticks off each field as you add it and offers the templates
+- Six style templates — Classic, Clean, Bold, Minimal, Soft, Midnight — that never override what you set
+- Format on the canvas: click the number, label, trend line or card to format it
+- The number shrinks to fit any size; the grid picks how many columns fit
 
 ### Free vs Pro
 
@@ -109,7 +117,7 @@ Everything below is free except the items marked **(Pro)**.
 | Variance arrow and the invert logic | ✓ | ✓ |
 | Image per card | ✓ | ✓ |
 | Cross-filtering, bookmarks, keyboard, high contrast | ✓ | ✓ |
-| **Status: on track / warning / off track** | — | **✓** |
+| **Color rules: on track / warning / off track** | — | **✓** |
 | **Trend line inside the card**, hover values, period comparisons | — | **✓** |
 | **Secondary KPIs**, up to 3 | — | **✓** |
 | **Small Multiples**, up to 50 cards | — | **✓** |
@@ -173,6 +181,13 @@ buy what they already own.
 ---
 
 ## TAB 4: CHANGELOG
+
+### 2.2.0.0 — October 2026
+- **Added:** click a trend point to filter the report by that period (and card); selection drawn on the card
+- **Added:** Color rules on the value itself, applied to the background or the border
+- **Added:** six style templates; a setup guide inside the visual; format on the canvas; twelve languages
+- **Changed:** the layout adapts to the size of the visual; screen-reader summaries and keyboard navigation
+- **Fixed:** clicking a card filtered the report with no visible change on the card; the Format pane was always in English
 
 ### 2.1.0.0 — October 2026
 - **Added:** Status — on track, warning or off track against target or prior period, also written
