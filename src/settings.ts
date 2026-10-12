@@ -459,10 +459,15 @@ class StyleSettings extends FormattingSettingsCard {
         ],
         value: { value: "classic", displayName: "Classic" }
     });
+    guide = new formattingSettings.ToggleSwitch({
+        name: "guide", displayName: "Setup guide",
+        description: "Shows the step-by-step setup panel while you edit. It never appears in reading view.",
+        value: true
+    });
     name = "style";
     displayName = "Style template";
     description = "Fills only what you have not set yourself: any setting you change wins.";
-    slices = [this.template];
+    slices = [this.template, this.guide];
 }
 
 // ─── Card: Accessibility ─────────────────────────────────────────────────────

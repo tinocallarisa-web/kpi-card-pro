@@ -183,7 +183,8 @@
             { "value": "soft", "displayName": "Soft", "displayNameKey": "Enum_Style_Soft" },
             { "value": "midnight", "displayName": "Midnight", "displayNameKey": "Enum_Style_Midnight" }
           ] }
-        }
+        },
+        "guide": { "displayName": "Setup guide", "displayNameKey": "Prop_Style_Guide", "type": { "bool": true } }
       }
     },
     "card": {

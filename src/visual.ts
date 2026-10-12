@@ -205,6 +205,9 @@ export class Visual implements IVisual {
     private watermarkWhy: HTMLDivElement | null = null;
     /** Solo para el overlay de diagnostico. */
     private dbgMeasureIdx = 0;
+    /** Paso del asistente de configuración (2 = comparación, 3 = estilo). El 1 es la
+     *  pantalla de inicio: mientras no hay medida no hay tarjeta sobre la que flotar. */
+    private guideStep = 2;
     /** Claves de lo seleccionado al pintar: tarjetas y puntos de la tendencia. */
     private selKeys: Set<string> = new Set();
 
@@ -1083,6 +1086,137 @@ export class Visual implements IVisual {
         else { show(); }
     }
 
+    // ─── Asistente de configuración (2.2.0.0) ────────────────────────────────
+
+    /**
+     * Panel flotante que guía la configuración mientras se edita. No puede tocar los pozos
+     * de campos (eso solo lo hace el usuario en Power BI): comprueba lo que ya está, explica
+     * qué da cada campo y aplica la plantilla elegida. Al terminar o cerrarlo se guarda
+     * style.guide = false; se reabre desde Formato → Plantilla de estilo.
+     * persistProperties sale de un clic del usuario, nunca del callback de selección.
+     */
+    private buildGuide(hc: boolean): HTMLElement {
+        const azul = hc ? "#FFFF00" : "#2B6CB0";
+        const fg = hc ? "#FFFFFF" : "#252423";
+        const muted = hc ? "#FFFFFF" : "#605E5C";
+        const g = document.createElement("div");
+        g.className = "kpi-guide";
+        g.setAttribute("role", "dialog");
+        g.setAttribute("aria-label", this.t("Guide_Title", "Setup guide"));
+        g.style.cssText = "position:absolute;left:8px;right:8px;bottom:8px;max-height:calc(100% - 16px);overflow:auto;"
+            + `background:${hc ? "#000000" : "#FFFFFF"};border:1px solid ${azul};border-radius:8px;`
+            + "box-shadow:0 4px 16px rgba(0,0,0,0.18);padding:10px 12px;box-sizing:border-box;z-index:20;"
+            + `font:12px/1.4 'Segoe UI',sans-serif;color:${fg};text-align:left;cursor:default;`;
+        // Los clics dentro del asistente no seleccionan tarjetas ni limpian la selección.
+        g.addEventListener("click", e => e.stopPropagation());
+        g.addEventListener("keydown", e => e.stopPropagation());
+
+        const terminar = () => {
+            this.guideStep = 2;
+            this.host.persistProperties({ merge: [{ objectName: "style", selector: null as any, properties: { guide: false } }] });
+        };
+        const boton = (texto: string, principal: boolean, accion: () => void): HTMLButtonElement => {
+            const b = document.createElement("button");
+            b.type = "button";
+            b.textContent = texto;
+            b.style.cssText = "font:600 12px 'Segoe UI',sans-serif;border-radius:4px;padding:3px 12px;cursor:pointer;"
+                + (principal ? `background:${azul};color:${hc ? "#000000" : "#FFFFFF"};border:1px solid ${azul};`
+                             : `background:transparent;color:${azul};border:1px solid ${azul};`);
+            b.addEventListener("click", accion);
+            return b;
+        };
+
+        const cab = document.createElement("div");
+        cab.style.cssText = "display:flex;align-items:center;gap:8px;margin-bottom:4px;";
+        const paso = document.createElement("div");
+        paso.textContent = this.t("Guide_Step", "Setup · step {0} of 3").replace("{0}", String(this.guideStep));
+        paso.style.cssText = `font-weight:700;color:${azul};flex:1;`;
+        const cerrar = document.createElement("button");
+        cerrar.type = "button";
+        cerrar.textContent = "✕";
+        cerrar.title = this.t("Guide_Close", "Close the guide");
+        cerrar.setAttribute("aria-label", cerrar.title);
+        cerrar.style.cssText = `border:none;background:transparent;color:${muted};cursor:pointer;font-size:13px;`;
+        cerrar.addEventListener("click", terminar);
+        cab.appendChild(paso); cab.appendChild(cerrar);
+        g.appendChild(cab);
+
+        const titulo = document.createElement("div");
+        titulo.style.cssText = "font-weight:600;font-size:13px;margin-bottom:6px;";
+        g.appendChild(titulo);
+        const pie = document.createElement("div");
+        pie.style.cssText = "display:flex;gap:8px;justify-content:flex-end;margin-top:8px;";
+
+        if (this.guideStep !== 3) {
+            titulo.textContent = this.t("Guide_Compare", "Add a comparison");
+            const fuentes = (this.lastDataView?.matrix?.columns?.levels?.[0]?.sources ?? []) as any[];
+            const tiene = (rol: string) => fuentes.some(f => f?.roles?.[rol]);
+            const filas = this.rowRoles(this.lastDataView?.matrix?.rows);
+            const items: [boolean, string, string][] = [
+                [tiene("priorPeriod"), this.t("Guide_Prior", "Prior period"), this.t("Guide_PriorWhy", "variance against the previous period")],
+                [tiene("target"), this.t("Guide_Target", "Target"), this.t("Guide_TargetWhy", "% achieved and colour rules (Pro)")],
+                [filas.trend >= 0, this.t("Guide_Trend", "Trend (a date field)"), this.t("Guide_TrendWhy", "trend line, and latest period vs previous without DAX (Pro)")],
+                [filas.sm >= 0, this.t("Guide_SM", "Small multiples (a category)"), this.t("Guide_SMWhy", "one card per country, product or team (Pro)")]
+            ];
+            const lista = document.createElement("div");
+            lista.setAttribute("role", "list");
+            for (const [hecho, nombre, porque] of items) {
+                const f = document.createElement("div");
+                f.setAttribute("role", "listitem");
+                f.style.cssText = "display:flex;gap:6px;align-items:baseline;margin:2px 0;";
+                const marca = document.createElement("span");
+                marca.textContent = hecho ? "✓" : "○";
+                marca.setAttribute("aria-label", hecho ? this.t("Guide_Done", "added") : this.t("Guide_Todo", "not added"));
+                marca.style.cssText = `font-weight:700;color:${hecho ? (hc ? "#00FF00" : "#107C10") : muted};width:12px;flex-shrink:0;`;
+                const txt = document.createElement("span");
+                const b = document.createElement("b");
+                b.textContent = nombre;
+                txt.appendChild(b);
+                txt.appendChild(document.createTextNode(" — " + porque));
+                txt.style.color = hecho ? muted : fg;
+                f.appendChild(marca); f.appendChild(txt);
+                lista.appendChild(f);
+            }
+            g.appendChild(lista);
+            const nota = document.createElement("div");
+            nota.textContent = this.t("Guide_Wells", "Drag the fields into the field wells; this list updates by itself. All optional.");
+            nota.style.cssText = `color:${muted};font-size:11px;margin-top:4px;`;
+            g.appendChild(nota);
+            pie.appendChild(boton(this.t("Guide_Next", "Next"), true, () => { this.guideStep = 3; this.repaint(); }));
+        } else {
+            titulo.textContent = this.t("Guide_Style", "Pick a style");
+            const actual = String((this.formattingSettings.style.template.value as any)?.value ?? "classic");
+            const rejilla = document.createElement("div");
+            rejilla.style.cssText = "display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:6px;";
+            for (const nombre of Object.keys(TEMPLATES)) {
+                const val = (card: string, prop: string, def: string) =>
+                    String((TEMPLATES[nombre].find(([c, p]) => c === card && p === prop) || [])[2] ?? def);
+                const chip = document.createElement("button");
+                chip.type = "button";
+                chip.setAttribute("aria-pressed", String(nombre === actual));
+                chip.style.cssText = `border:${nombre === actual ? 2 : 1}px solid ${nombre === actual ? azul : "#C8C6C4"};`
+                    + `border-radius:6px;padding:6px;cursor:pointer;text-align:left;background:${val("card", "background", "#FFFFFF")};`;
+                const num = document.createElement("div");
+                num.textContent = "14.4K";
+                num.style.cssText = `font:${val("mainValue", "bold", "true") === "false" ? 400 : 700} 15px 'Segoe UI',sans-serif;`
+                    + `color:${val("mainValue", "color", "#252423")};`;
+                const etq = document.createElement("div");
+                etq.textContent = nombre.charAt(0).toUpperCase() + nombre.slice(1);
+                etq.style.cssText = `font:11px 'Segoe UI',sans-serif;color:${val("label", "color", "#6B6B6B")};`;
+                chip.appendChild(num); chip.appendChild(etq);
+                chip.addEventListener("click", () => {
+                    this.host.persistProperties({ merge: [{ objectName: "style", selector: null as any, properties: { template: nombre } }] });
+                });
+                rejilla.appendChild(chip);
+            }
+            g.appendChild(rejilla);
+            pie.appendChild(boton(this.t("Guide_Back", "Back"), false, () => { this.guideStep = 2; this.repaint(); }));
+            pie.appendChild(boton(this.t("Guide_Finish", "Finish"), true, terminar));
+        }
+        g.appendChild(pie);
+        return g;
+    }
+
     // ─── Landing Page ────────────────────────────────────────────────────────
 
     private renderLandingPage(): void {
@@ -1138,6 +1272,11 @@ export class Visual implements IVisual {
         title.textContent = "KPI Card Pro";
         title.style.cssText = `font-size: 15px; font-weight: 700; color: ${fg};`;
         landing.appendChild(title);
+
+        const paso = document.createElement("div");
+        paso.textContent = this.t("Guide_Step", "Setup · step {0} of 3").replace("{0}", "1");
+        paso.style.cssText = `font-size: 11px; font-weight: 700; letter-spacing: .3px; color: ${isHC ? fg : "#2B6CB0"};`;
+        landing.appendChild(paso);
 
         const hint = document.createElement("div");
         hint.textContent = this.t("Msg_Landing", "Add a measure to the Value field well to get started.");
@@ -1843,6 +1982,12 @@ export class Visual implements IVisual {
         // pointer-events: none, so it could never be hovered and never showed.
         // Power BI's own notifications replace it, and they carry a purchase path.
         this.notifyProFeatureBlocked();
+
+        // Asistente de configuración (2.2.0.0): solo editando y con datos.
+        if (metrics.length > 0 && this.editing && s.style.guide.value
+            && (this.host as any).allowInteractions !== false) {
+            root.appendChild(this.buildGuide(hc));
+        }
 
         // ── Atomic swap: clear ONLY after building succeeded ──────────────
         // If anything above threw, the container keeps its previous content.
