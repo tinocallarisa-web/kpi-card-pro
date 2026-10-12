@@ -1713,10 +1713,11 @@ export class Visual implements IVisual {
         }
         this.container.appendChild(root);
         this.fitSecondaryColumns(root);
+        this.fitToSize(root);
         // Segunda pasada con el tamaño final: la barra de desplazamiento de la rejilla
         // aparece despues del primer ajuste y estrecha las tarjetas, y un numero que cabia
         // pasaba a salir recortado ("52.6…") sin que nada lo moviera a la lista.
-        requestAnimationFrame(() => { if (root.isConnected) this.fitSecondaryColumns(root); });
+        requestAnimationFrame(() => { if (root.isConnected) { this.fitSecondaryColumns(root); this.fitToSize(root); } });
         this.dbgOverlay("render");
         // El swap de arriba vacia el contenedor, asi que la marca se reinserta aqui:
         // encenderla sobre un nodo desconectado no pinta nada.
@@ -1755,8 +1756,15 @@ export class Visual implements IVisual {
 
     private renderGrid(root: HTMLElement, metrics: MetricData[], hc: boolean, themeFg: string, themeMuted: string): void {
         const s = this.formattingSettings.smallMultiples;
-        const cols = this.previewOf("small multiples layout") ? (s.columns.value ?? 3) : 1;
         const gap  = this.previewOf("small multiples layout") ? (s.gap.value ?? 12) : 12;
+        // Las columnas elegidas son un máximo: si no caben con un ancho mínimo legible por
+        // tarjeta, se usan menos (2.2.0.0). Con 3 columnas en 300 px cada tarjeta medía 70.
+        const pedidas = this.previewOf("small multiples layout") ? (s.columns.value ?? 3) : 1;
+        const ANCHO_MIN = 150;
+        const caben = this.viewport.width > 0
+            ? Math.max(1, Math.floor((this.viewport.width + gap) / (ANCHO_MIN + gap)))
+            : pedidas;
+        const cols = Math.max(1, Math.min(pedidas, caben));
 
         const grid = document.createElement("div");
         grid.className = "kpi-grid";
@@ -2283,6 +2291,50 @@ export class Visual implements IVisual {
      * Sin caja de layout (pagina en transicion) clientWidth es 0 y no se toca nada:
      * ensureLaidOut() vuelve a pintar cuando la hay.
      */
+    /**
+     * ADAPTACION AL TAMAÑO (2.2.0.0). Dos reglas, en este orden:
+     *  1. El número principal nunca se corta: si no cabe, se encoge (hasta 10 px). En la
+     *     rejilla todas las tarjetas toman el tamaño de la que más lo necesita, para que se
+     *     sigan comparando de un vistazo.
+     *  2. Si la tarjeta única no cabe a lo alto, se retira lo accesorio por prioridad:
+     *     tendencia, prior/target, KPIs secundarios, texto del estado, variación y etiqueta.
+     *     El número se queda siempre. Antes el contenido se salía por abajo, cortado.
+     * Va después de fitSecondaryColumns(): primero se aparta la columna derecha, que es
+     * lo que más espacio quita al número.
+     */
+    private fitToSize(root: HTMLElement): void {
+        const valores = Array.from(root.querySelectorAll(".kpi-value")) as HTMLElement[];
+        // Ancho real del texto con un Range: scrollWidth se redondea a entero y un número que
+        // se pasa por décimas de píxel salía con elipsis aunque scrollWidth == clientWidth.
+        const anchoTexto = (el: HTMLElement): number => {
+            const r = document.createRange();
+            r.selectNodeContents(el);
+            return r.getBoundingClientRect().width;
+        };
+        let escala = 1;
+        for (const v of valores) {
+            if (v.clientWidth <= 0) continue;
+            const w = anchoTexto(v);
+            if (w > v.clientWidth - 0.5) { escala = Math.min(escala, (v.clientWidth - 1) / w); }
+        }
+        if (escala < 1) {
+            for (const v of valores) {
+                const actual = parseFloat(v.style.fontSize) || 28;
+                v.style.fontSize = `${Math.max(10, Math.floor(actual * escala))}px`;
+            }
+        }
+
+        if (root.querySelector(".kpi-grid")) return;   // la rejilla se desplaza; la tarjeta única no
+        const desborda = () => root.scrollHeight > root.clientHeight + 1;
+        const orden = [".kpi-sparkline", ".kpi-sub-row",
+                       ".kpi-secondary-row, .kpi-secondary-stack, .kpi-secondary-stack2, .kpi-secondary-col",
+                       ".kpi-status", ".kpi-variance-pill", ".kpi-label"];
+        for (const sel of orden) {
+            if (!desborda()) break;
+            root.querySelectorAll(sel).forEach(e => (e as HTMLElement).style.display = "none");
+        }
+    }
+
     private fitSecondaryColumns(root: HTMLElement): void {
         const recortado = (el: HTMLElement) => el.clientWidth > 0 && el.scrollWidth > el.clientWidth + 1;
 
