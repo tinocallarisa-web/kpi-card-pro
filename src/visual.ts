@@ -12,6 +12,7 @@ import { FormattingSettingsService } from "powerbi-visuals-utils-formattingmodel
 import { valueFormatter } from "powerbi-visuals-utils-formattingutils";
 import { VisualFormattingSettingsModel } from "./settings";
 import { I18N } from "./i18n";
+import { STRINGS } from "./strings";
 import {
     HtmlSubSelectableClass, HtmlSubSelectionHelper, SubSelectableDisplayNameAttribute,
     SubSelectableObjectNameAttribute, SubSelectableTypeAttribute,
@@ -1485,13 +1486,31 @@ export class Visual implements IVisual {
      * extra card called "Total".
      */
     /** Cadena localizada, con el ingles como respaldo si falta la clave. */
+    /**
+     * Texto en el idioma de Power BI. Primero la tabla del bundle (src/strings.ts): Power BI Desktop solo
+     * resuelve con getDisplayName las claves declaradas en capabilities.json, y los textos del propio
+     * visual —asistente, estado, avisos— no lo están; en 2.2 el panel salía en español y el asistente en
+     * inglés. Después el gestor de Power BI (claves del panel) y, si nada responde, el inglés.
+     */
     private t(key: string, fallback: string): string {
+        const propio = this.stringsFor()?.[key];
+        if (propio) return propio;
         try {
             const v = this.localization?.getDisplayName(key);
             return v && v !== key ? v : fallback;
         } catch (_) {
             return fallback;
         }
+    }
+
+    private stringsFor(): Record<string, string> | undefined {
+        const loc = String((this.host as any).locale || "");
+        if (!loc || /^en/i.test(loc)) return undefined;
+        if (STRINGS[loc]) return STRINGS[loc];
+        // es-MX, fr-CA, pt...: el idioma sin región; pt sin región es pt-BR, el primero por orden.
+        const lang = loc.split("-")[0].toLowerCase();
+        const k = Object.keys(STRINGS).sort().find(x => x.toLowerCase().startsWith(lang + "-"));
+        return k ? STRINGS[k] : undefined;
     }
 
     private realChildren(node: powerbi.DataViewMatrixNode | undefined): powerbi.DataViewMatrixNode[] {
