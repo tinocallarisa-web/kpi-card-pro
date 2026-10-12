@@ -1242,7 +1242,7 @@ export class Visual implements IVisual {
      * style.guide = false; se reabre desde Formato → Plantilla de estilo.
      * persistProperties sale de un clic del usuario, nunca del callback de selección.
      */
-    private buildGuide(hc: boolean): HTMLElement {
+    private buildGuide(hc: boolean, muestra: string): HTMLElement {
         const azul = hc ? "#FFFF00" : "#2B6CB0";
         const fg = hc ? "#FFFFFF" : "#252423";
         const muted = hc ? "#FFFFFF" : "#605E5C";
@@ -1344,7 +1344,7 @@ export class Visual implements IVisual {
                 chip.style.cssText = `border:${nombre === actual ? 2 : 1}px solid ${nombre === actual ? azul : "#C8C6C4"};`
                     + `border-radius:6px;padding:6px;cursor:pointer;text-align:left;background:${val("card", "background", "#FFFFFF")};`;
                 const num = document.createElement("div");
-                num.textContent = "14.4K";
+                num.textContent = muestra;   // el número del propio informe, no uno de ejemplo
                 num.style.cssText = `font:${val("mainValue", "bold", "true") === "false" ? 400 : 700} 15px 'Segoe UI',sans-serif;`
                     + `color:${val("mainValue", "color", "#252423")};`;
                 const etq = document.createElement("div");
@@ -2134,7 +2134,8 @@ export class Visual implements IVisual {
         // Asistente de configuración (2.2.0.0): solo editando y con datos.
         if (metrics.length > 0 && this.editing && !this.formatMode && s.style.guide.value
             && (this.host as any).allowInteractions !== false) {
-            root.appendChild(this.buildGuide(hc));
+            const m0 = metrics[0];
+            root.appendChild(this.buildGuide(hc, this.formatMetricValue(m0.highlightValue !== null ? m0.highlightValue : m0.value, m0.formats.value)));
         }
 
         // ── Atomic swap: clear ONLY after building succeeded ──────────────
