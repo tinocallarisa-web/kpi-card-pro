@@ -395,17 +395,20 @@ class StatusSettings extends FormattingSettingsCard {
         name: "basis", displayName: "Compare value with",
         items: [
             { value: "target", displayName: "Target (% achieved)" },
-            { value: "prior",  displayName: "Prior period (% of prior)" }
+            { value: "prior",  displayName: "Prior period (% of prior)" },
+            { value: "value",  displayName: "Value itself" }
         ],
         value: { value: "target", displayName: "Target (% achieved)" }
     });
     lowThreshold = new formattingSettings.NumUpDown({
-        name: "lowThreshold", displayName: "Lower threshold (%)", value: 90,
-        options: { minValue: { type: powerbi.visuals.ValidatorType.Min, value: 0 }, maxValue: { type: powerbi.visuals.ValidatorType.Max, value: 1000 } }
+        name: "lowThreshold", displayName: "Lower threshold", value: 90,
+        description: "In % for Target and Prior period; in the value's own units for Value itself.",
+        options: { minValue: { type: powerbi.visuals.ValidatorType.Min, value: -1e15 }, maxValue: { type: powerbi.visuals.ValidatorType.Max, value: 1e15 } }
     });
     highThreshold = new formattingSettings.NumUpDown({
-        name: "highThreshold", displayName: "Upper threshold (%)", value: 100,
-        options: { minValue: { type: powerbi.visuals.ValidatorType.Min, value: 0 }, maxValue: { type: powerbi.visuals.ValidatorType.Max, value: 1000 } }
+        name: "highThreshold", displayName: "Upper threshold", value: 100,
+        description: "In % for Target and Prior period; in the value's own units for Value itself.",
+        options: { minValue: { type: powerbi.visuals.ValidatorType.Min, value: -1e15 }, maxValue: { type: powerbi.visuals.ValidatorType.Max, value: 1e15 } }
     });
     lowerIsBetter = new formattingSettings.ToggleSwitch({
         name: "lowerIsBetter", displayName: "Lower is better", value: false
@@ -424,7 +427,9 @@ class StatusSettings extends FormattingSettingsCard {
         items: [
             { value: "both",   displayName: "Value and accent bar" },
             { value: "value",  displayName: "Value" },
-            { value: "accent", displayName: "Accent bar" }
+            { value: "accent", displayName: "Accent bar" },
+            { value: "background", displayName: "Card background" },
+            { value: "border", displayName: "Card border" }
         ],
         value: { value: "both", displayName: "Value and accent bar" }
     });
@@ -432,7 +437,7 @@ class StatusSettings extends FormattingSettingsCard {
         name: "showText", displayName: "Show status text", value: true
     });
     name = "status";
-    displayName = "Status (Pro)";
+    displayName = "Color rules (Pro)";
     slices = [this.show, this.basis, this.lowThreshold, this.highThreshold, this.lowerIsBetter,
               this.goodColor, this.warnColor, this.badColor, this.applyTo, this.showText];
 }

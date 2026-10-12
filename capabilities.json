@@ -501,9 +501,9 @@
       }
     },
     "status": {
-      "displayName": "Status (Pro)",
+      "displayName": "Color rules (Pro)",
       "displayNameKey": "Object_Status",
-      "description": "Colours the card by how the value compares with the target or the prior period: on track, warning or off track.",
+      "description": "Colours the card by rules on the value, the target achieved or the prior period: on track, warning or off track.",
       "descriptionKey": "Object_Status_Desc",
       "properties": {
         "show": { "displayName": "Show", "displayNameKey": "Prop_Status_Show", "type": { "bool": true } },
@@ -511,11 +511,12 @@
           "displayName": "Compare value with", "displayNameKey": "Prop_Status_Basis",
           "type": { "enumeration": [
             { "value": "target", "displayName": "Target (% achieved)", "displayNameKey": "Enum_Status_Target" },
-            { "value": "prior", "displayName": "Prior period (% of prior)", "displayNameKey": "Enum_Status_Prior" }
+            { "value": "prior", "displayName": "Prior period (% of prior)", "displayNameKey": "Enum_Status_Prior" },
+            { "value": "value", "displayName": "Value itself", "displayNameKey": "Enum_Status_ValueItself" }
           ] }
         },
-        "lowThreshold": { "displayName": "Lower threshold (%)", "displayNameKey": "Prop_Status_Low", "type": { "numeric": true } },
-        "highThreshold": { "displayName": "Upper threshold (%)", "displayNameKey": "Prop_Status_High", "type": { "numeric": true } },
+        "lowThreshold": { "displayName": "Lower threshold", "displayNameKey": "Prop_Status_Low", "type": { "numeric": true } },
+        "highThreshold": { "displayName": "Upper threshold", "displayNameKey": "Prop_Status_High", "type": { "numeric": true } },
         "lowerIsBetter": { "displayName": "Lower is better", "displayNameKey": "Prop_Status_LowerBetter", "type": { "bool": true } },
         "goodColor": { "displayName": "On track color", "displayNameKey": "Prop_Status_Good", "type": { "fill": { "solid": { "color": true } } } },
         "warnColor": { "displayName": "Warning color", "displayNameKey": "Prop_Status_Warn", "type": { "fill": { "solid": { "color": true } } } },
@@ -525,7 +526,9 @@
           "type": { "enumeration": [
             { "value": "both", "displayName": "Value and accent bar", "displayNameKey": "Enum_Status_Both" },
             { "value": "value", "displayName": "Value", "displayNameKey": "Enum_Status_Value" },
-            { "value": "accent", "displayName": "Accent bar", "displayNameKey": "Enum_Status_Accent" }
+            { "value": "accent", "displayName": "Accent bar", "displayNameKey": "Enum_Status_Accent" },
+            { "value": "background", "displayName": "Card background", "displayNameKey": "Enum_Status_Background" },
+            { "value": "border", "displayName": "Card border", "displayNameKey": "Enum_Status_Border" }
           ] }
         },
         "showText": { "displayName": "Show status text", "displayNameKey": "Prop_Status_ShowText", "type": { "bool": true } }

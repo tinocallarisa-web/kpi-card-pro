@@ -1557,13 +1557,39 @@ export class Visual implements IVisual {
      * anterior). Umbrales T1 <= T2. Mayor es mejor: >= T2 en linea, >= T1 aviso, si no
      * desviado. Menor es mejor: <= T1 en linea, <= T2 aviso, si no desviado.
      */
+    /**
+     * Fondo y borde de la tarjeta según las reglas de color, cuando se aplican a la tarjeta
+     * entera. El fondo es un tinte del 12 % sobre el fondo elegido, para que el texto siga
+     * leyéndose; en alto contraste no se toca nada (el estado se dice con texto).
+     */
+    private ruleFrame(metric: MetricData, hc: boolean, bg: string, border: string, bw: number):
+            { bg: string; border: string; bw: number } {
+        const out = { bg, border, bw };
+        if (hc) return out;
+        const st = this.statusOf(metric, metric.highlightValue !== null ? metric.highlightValue : metric.value);
+        if (!st) return out;
+        const a = String((this.formattingSettings.status.applyTo.value as any)?.value ?? "both");
+        if (a === "background") {
+            const tinte = /^#[0-9a-f]{6}$/i.test(st.color) ? st.color + "1F" : st.color;
+            out.bg = `linear-gradient(${tinte}, ${tinte}), ${bg}`;
+        } else if (a === "border") {
+            out.border = st.color;
+            out.bw = Math.max(2, bw);
+        }
+        return out;
+    }
+
     private statusOf(metric: MetricData, value: number | null): { color: string; text: string; word: string } | null {
         const s = this.formattingSettings.status;
         if (!s.show.value || !this.previewOf("status") || value === null) return null;
         const basis = String((s.basis.value as any)?.value ?? s.basis.value ?? "target");
-        const ref = basis === "prior" ? metric.priorPeriod : metric.target;
-        if (ref === null || ref === 0) return null;
-        const pct = (value / Math.abs(ref)) * 100;
+        // "value": umbrales en las unidades del propio valor (2.2.0.0), sin referencia.
+        let pct = value;
+        if (basis !== "value") {
+            const ref = basis === "prior" ? metric.priorPeriod : metric.target;
+            if (ref === null || ref === 0) return null;
+            pct = (value / Math.abs(ref)) * 100;
+        }
         let t1 = s.lowThreshold.value ?? 90, t2 = s.highThreshold.value ?? 100;
         if (t1 > t2) { const x = t1; t1 = t2; t2 = x; }
         let level: "good" | "warn" | "bad";
@@ -1575,6 +1601,7 @@ export class Visual implements IVisual {
         const word = level === "good" ? this.t("Status_Good", "On track")
                    : level === "warn" ? this.t("Status_Warn", "Warning")
                    : this.t("Status_Bad", "Off track");
+        if (basis === "value") { return { color, text: "", word }; }
         const pctTxt = this.pctFormatter().format(pct / 100);
         const text = basis === "prior"
             ? this.t("Status_OfPrior", "{0} of prior").replace("{0}", pctTxt)
@@ -1656,6 +1683,10 @@ export class Visual implements IVisual {
         if (metrics.length === 0) {
             this.renderEmpty(root, hc);
         } else if (metrics.length === 1) {
+            const marco = this.ruleFrame(metrics[0], hc, cardBg, cardBorder, bw);
+            root.style.background = marco.bg;
+            root.style.borderColor = marco.border;
+            root.style.borderWidth = `${marco.bw}px`;
             const cell = this.buildMetricCell(metrics[0], hc, true, themeFg, themeMuted, 0);
             // Tarjeta unica: el ancho minimo solo cuenta si hay sparkline, que es lo
             // que de verdad necesita anchura. Sin ella el valor ocupa lo que ocupa y
@@ -1755,10 +1786,11 @@ export class Visual implements IVisual {
             const cardBorder = hc ? "#FFFFFF"  : (s2.card.borderColor.value?.value ?? "#E0E0E0");
             const cellBr     = this.previewOf("card styling") ? (s2.card.borderRadius.value ?? 8) : 8;
 
+            const marco = this.ruleFrame(metric, hc, cardBg, cardBorder, 1);
             const wrapper = document.createElement("div");
             wrapper.style.cssText = `
-                background: ${cardBg};
-                border: 1px solid ${cardBorder};
+                background: ${marco.bg};
+                border: ${marco.bw}px solid ${marco.border};
                 border-radius: ${cellBr}px;
                 padding: 12px;
                 box-sizing: border-box;
@@ -1958,7 +1990,7 @@ export class Visual implements IVisual {
         const st = this.statusOf(metric, displayValue);
         const stApply = String((s.status.applyTo.value as any)?.value ?? s.status.applyTo.value ?? "both");
         const valueColor = hc ? "#FFFFFF"
-            : (st && stApply !== "accent" ? st.color : (s.mainValue.color.value?.value ?? themeFg));
+            : (st && (stApply === "both" || stApply === "value") ? st.color : (s.mainValue.color.value?.value ?? themeFg));
         valueEl.style.cssText = `
             font-family: ${s.mainValue.fontFamily.value ?? "Segoe UI, sans-serif"};
             font-size: ${fontSize}px;
@@ -1967,17 +1999,17 @@ export class Visual implements IVisual {
             line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         `;
         cell.appendChild(valueEl);
-        if (st && !hc && stApply !== "value") {
+        if (st && !hc && (stApply === "both" || stApply === "accent")) {
             cell.style.borderLeft = `4px solid ${st.color}`;
             cell.style.paddingLeft = "8px";
         }
         if (st) {
-            valueEl.setAttribute("aria-label", `${metric.name}: ${formatted}. ${st.word}, ${st.text}`);
+            valueEl.setAttribute("aria-label", `${metric.name}: ${formatted}. ${st.word}${st.text ? ", " + st.text : ""}`);
             if (s.status.showText.value) {
                 const stEl = document.createElement("div");
                 stEl.className = "kpi-status";
-                stEl.textContent = `● ${st.word} · ${st.text}`;
-                stEl.style.cssText = `font-size:${large ? 11 : 10}px; font-weight:600;`
+                stEl.textContent = st.text ? `● ${st.word} · ${st.text}` : `● ${st.word}`;
+                stEl.style.cssText = `font-family:${s.label.fontFamily.value || "'Segoe UI', sans-serif"};font-size:${large ? 11 : 10}px; font-weight:600;`
                     + `color:${hc ? "#FFFFFF" : st.color};`
                     + " white-space:nowrap; overflow:hidden; text-overflow:ellipsis;";
                 cell.appendChild(stEl);
