@@ -282,6 +282,20 @@ export class Visual implements IVisual {
             if (this.selKeys.size === 0) return;
             this.selectionManager.clear().then(() => this.repaint());
         });
+
+        // Flechas, Inicio y Fin entre tarjetas (2.2.0.0); el tabulador sigue funcionando.
+        this.container.addEventListener("keydown", (e: KeyboardEvent) => {
+            const t = e.target as HTMLElement;
+            if (!t.classList || !t.classList.contains("kpi-metric-cell")) return;
+            const todas = Array.from(this.container.querySelectorAll(".kpi-metric-cell")) as HTMLElement[];
+            const i = todas.indexOf(t);
+            let j = -1;
+            if (e.key === "ArrowRight" || e.key === "ArrowDown") j = Math.min(todas.length - 1, i + 1);
+            else if (e.key === "ArrowLeft" || e.key === "ArrowUp") j = Math.max(0, i - 1);
+            else if (e.key === "Home") j = 0;
+            else if (e.key === "End") j = todas.length - 1;
+            if (j >= 0 && j !== i) { e.preventDefault(); todas[j].focus(); }
+        });
     }
 
     private applyTemplate(objects: powerbi.DataViewObjects | undefined): void {
@@ -300,6 +314,27 @@ export class Visual implements IVisual {
     }
 
     // ─── Selección ──────────────────────────────────────────────────────────
+
+    /**
+     * Lo que oye un lector de pantalla al llegar a una tarjeta: nombre y valor, periodo,
+     * variación contra el anterior, objetivo y estado. Antes solo decía el nombre.
+     */
+    private ariaSummary(metric: MetricData): string {
+        const v = metric.highlightValue !== null ? metric.highlightValue : metric.value;
+        const partes = [`${metric.name}: ${this.formatMetricValue(v, metric.formats.value)}`];
+        if (metric.periodLabel) partes.push(metric.periodLabel);
+        if (v !== null && metric.priorPeriod !== null && metric.priorPeriod !== 0) {
+            const pct = (v - metric.priorPeriod) / Math.abs(metric.priorPeriod);
+            partes.push(`${pct >= 0 ? "+" : "-"}${this.pctFormatter().format(Math.abs(pct))} `
+                + `${this.t("Aria_VsPrior", "vs prior")} (${this.formatMetricValue(metric.priorPeriod, metric.formats.prior)})`);
+        }
+        if (metric.target !== null) {
+            partes.push(`${this.t("Label_Target", "Target")}: ${this.formatMetricValue(metric.target, metric.formats.target)}`);
+        }
+        const st = this.statusOf(metric, v);
+        if (st) partes.push(st.text ? `${st.word}, ${st.text}` : st.word);
+        return partes.join(". ");
+    }
 
     private keyOf(id: powerbi.extensibility.ISelectionId | null | undefined): string {
         if (!id) return "";
@@ -906,21 +941,63 @@ export class Visual implements IVisual {
         wrapper.appendChild(guia);
         wrapper.appendChild(etq);
         const fmtSerie = metric.formats.value;
+        const textoPunto = (i: number): string => {
+            const lab = metric.trendLabels[i] ?? "";
+            return `${lab ? lab + ": " : ""}${this.formatMetricValue(data[i], fmtSerie)}`;
+        };
+        const mostrar = (i: number) => {
+            const xPct = kind === "bar" ? ((i + 0.5) / data.length) * 100 : (i / (data.length - 1)) * 100;
+            guia.style.left = `${xPct}%`;
+            guia.style.display = "block";
+            etq.textContent = textoPunto(i);
+            etq.style.left = `${Math.max(12, Math.min(88, xPct))}%`;
+            etq.style.display = "block";
+        };
+        const ocultar = () => { guia.style.display = "none"; etq.style.display = "none"; };
         wrapper.addEventListener("mousemove", (e: MouseEvent) => {
             const r = wrapper.getBoundingClientRect();
             if (r.width <= 0) return;
             const fx = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
-            const i = kind === "bar" ? Math.min(data.length - 1, Math.floor(fx * data.length))
-                                     : Math.round(fx * (data.length - 1));
-            const xPct = kind === "bar" ? ((i + 0.5) / data.length) * 100 : (i / (data.length - 1)) * 100;
-            guia.style.left = `${xPct}%`;
-            guia.style.display = "block";
-            const lab = metric.trendLabels[i] ?? "";
-            etq.textContent = `${lab ? lab + ": " : ""}${this.formatMetricValue(data[i], fmtSerie)}`;
-            etq.style.left = `${Math.max(12, Math.min(88, xPct))}%`;
-            etq.style.display = "block";
+            mostrar(kind === "bar" ? Math.min(data.length - 1, Math.floor(fx * data.length))
+                                   : Math.round(fx * (data.length - 1)));
         });
-        wrapper.addEventListener("mouseleave", () => { guia.style.display = "none"; etq.style.display = "none"; });
+        wrapper.addEventListener("mouseleave", () => { if (document.activeElement !== wrapper) ocultar(); });
+
+        // TECLADO Y LECTOR DE PANTALLA (2.2.0.0). La tendencia es un control deslizante: las
+        // flechas recorren los puntos y se anuncian (aria-valuetext), Intro o Espacio filtran
+        // por el punto. stopPropagation para que las flechas no salten a otra tarjeta.
+        let actual = data.length - 1;
+        const anunciar = () => {
+            wrapper.setAttribute("aria-valuenow", String(actual + 1));
+            wrapper.setAttribute("aria-valuetext", textoPunto(actual));
+        };
+        wrapper.tabIndex = 0;
+        wrapper.setAttribute("role", "slider");
+        wrapper.setAttribute("aria-label", `${this.t("Aria_Trend", "Trend")} ${metric.name}`);
+        wrapper.setAttribute("aria-valuemin", "1");
+        wrapper.setAttribute("aria-valuemax", String(data.length));
+        anunciar();
+        wrapper.style.outline = "none";
+        wrapper.addEventListener("focus", () => {
+            wrapper.style.boxShadow = `0 0 0 2px ${hc ? "#FFFF00" : "#2B6CB0"}`;
+            mostrar(actual);
+        });
+        wrapper.addEventListener("blur", () => { wrapper.style.boxShadow = "none"; ocultar(); });
+        wrapper.addEventListener("keydown", (e: KeyboardEvent) => {
+            let i = actual;
+            if (e.key === "ArrowLeft" || e.key === "ArrowDown") i = Math.max(0, actual - 1);
+            else if (e.key === "ArrowRight" || e.key === "ArrowUp") i = Math.min(data.length - 1, actual + 1);
+            else if (e.key === "Home") i = 0;
+            else if (e.key === "End") i = data.length - 1;
+            else if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault(); e.stopPropagation();
+                if ((this.host as any).allowInteractions === false) return;
+                if (metric.trendIds[actual]) this.selectId(metric.trendIds[actual], e.ctrlKey || e.metaKey);
+                return;
+            } else { return; }
+            e.preventDefault(); e.stopPropagation();
+            actual = i; anunciar(); mostrar(i);
+        });
 
         // CLIC EN UN PUNTO (2.2.0.0): filtra el informe por ese periodo. El mismo cálculo de
         // índice que el valor al pasar el ratón, para que se filtre lo que se está viendo.
@@ -1927,15 +2004,16 @@ export class Visual implements IVisual {
         // card showed the first card's figures. Click and keyboard were unaffected:
         // they capture the metric in the closure instead of looking it up.
         cell.dataset.selectionIndex = String(index);
-        cell.setAttribute("role", "button");
-        cell.setAttribute("aria-label", metric.name);
+        // Botón solo si hay algo que seleccionar; si no, un grupo con su resumen.
+        cell.setAttribute("role", metric.selectionId ? "button" : "group");
+        cell.setAttribute("aria-label", this.ariaSummary(metric));
         if (metric.selectionId) { cell.setAttribute("aria-pressed", String(this.cardSelected(metric))); }
         cell.setAttribute("tabindex", "0");                   // Keyboard Navigation
         cell.style.cssText = "display: flex; flex-direction: column; flex: 1; min-width: 0; gap: 2px; cursor: default; outline: none;";
 
         // ── Keyboard: focus ring ───────────────────────────────────────────
         cell.addEventListener("focus", () => {
-            cell.style.outline = "2px solid #C96442";
+            cell.style.outline = `2px solid ${hc ? "#FFFF00" : "#2B6CB0"}`;
             cell.style.outlineOffset = "2px";
         });
         cell.addEventListener("blur", () => {
