@@ -51,6 +51,51 @@ type DisplayUnit = "auto" | "none" | "thousands" | "millions" | "billions";
 
 const CONTEXT_MENU_DEBOUNCE = 200;
 
+/** Luminancia relativa (0 negro, 1 blanco) de un color #RRGGBB; null si no se puede leer. */
+function luminance(hex: string | undefined): number | null {
+    const m = /^#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(hex || "");
+    if (!m) return null;
+    const c = [m[1], m[2], m[3]].map(h => {
+        const v = parseInt(h, 16) / 255;
+        return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+    });
+    return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+}
+
+/** Mezcla un #RRGGBB con blanco en la proporción t (0..1). */
+function towardWhite(hex: string, t: number): string {
+    const m = /^#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(hex);
+    if (!m) return hex;
+    return "#" + [m[1], m[2], m[3]].map(h => {
+        const v = parseInt(h, 16);
+        return Math.round(v + (255 - v) * t).toString(16).padStart(2, "0");
+    }).join("");
+}
+
+/**
+ * Plantillas de estilo (2.2.0.0): [tarjeta, propiedad, valor]. Solo se aplican a lo que el
+ * autor no ha tocado (lo que no está en metadata.objects), así que un ajuste a mano siempre
+ * gana. Solo propiedades gratuitas: una plantilla no puede regalar el estilo Pro de la tarjeta.
+ */
+const TEMPLATES: Record<string, [string, string, unknown][]> = {
+    classic: [],
+    clean: [["card", "borderColor", "#FFFFFF"], ["mainValue", "fontSize", 32], ["mainValue", "bold", true],
+            ["mainValue", "color", "#1F2937"], ["label", "color", "#6B7280"],
+            ["trend", "color", "#2B6CB0"], ["trend", "areaOpacity", 12]],
+    bold: [["mainValue", "fontSize", 40], ["mainValue", "bold", true], ["mainValue", "color", "#1F4E80"],
+           ["label", "fontSize", 13], ["label", "bold", true], ["label", "color", "#1F4E80"],
+           ["trend", "color", "#1F4E80"], ["trend", "areaOpacity", 30], ["trend", "lineWidth", 3]],
+    minimal: [["card", "borderColor", "#FFFFFF"], ["mainValue", "fontSize", 34], ["mainValue", "bold", false],
+              ["label", "fontSize", 11], ["label", "color", "#8A8886"],
+              ["trend", "type", "line"], ["trend", "lineWidth", 1], ["trend", "color", "#605E5C"]],
+    soft: [["card", "background", "#F3F7FC"], ["card", "borderColor", "#DCE7F5"], ["mainValue", "bold", true],
+           ["mainValue", "color", "#1F4E80"], ["label", "color", "#4A6A8F"], ["secondary", "color", "#4A6A8F"],
+           ["trend", "color", "#2B6CB0"], ["trend", "areaOpacity", 25]],
+    midnight: [["card", "background", "#1F2A37"], ["card", "borderColor", "#1F2A37"], ["mainValue", "bold", true],
+               ["mainValue", "color", "#FFFFFF"], ["label", "color", "#A7B4C2"], ["secondary", "color", "#C9D3DD"],
+               ["trend", "color", "#5FA8F5"], ["trend", "areaOpacity", 25], ["trend", "targetColor", "#7B8794"]]
+};
+
 const SERVICE_PLAN_ID = "kpi-card-pro-tcviz";
 
 /**
@@ -239,6 +284,21 @@ export class Visual implements IVisual {
         });
     }
 
+    private applyTemplate(objects: powerbi.DataViewObjects | undefined): void {
+        const name = (objects?.["style"]?.["template"] as string) || "classic";
+        const list = TEMPLATES[name] || [];
+        const cards: any[] = (this.formattingSettings as any).cards || [];
+        for (const [cardName, prop, val] of list) {
+            if (objects?.[cardName]?.[prop] !== undefined) { continue; }
+            const card = cards.find(c => c.name === cardName);
+            const slice = card?.slices?.find((s: any) => s.name === prop);
+            if (!slice) { continue; }
+            if (Array.isArray(slice.items)) { slice.value = slice.items.find((it: any) => it.value === val) || slice.value; }
+            else if (slice.value && typeof slice.value === "object" && "value" in slice.value) { slice.value = { value: val }; }
+            else { slice.value = val; }
+        }
+    }
+
     // ─── Selección ──────────────────────────────────────────────────────────
 
     private keyOf(id: powerbi.extensibility.ISelectionId | null | undefined): string {
@@ -321,6 +381,7 @@ export class Visual implements IVisual {
                 VisualFormattingSettingsModel,
                 dataView
             ) as VisualFormattingSettingsModel;
+            this.applyTemplate(dataView?.metadata?.objects);
 
             // lastDataView se asigna ANTES de parsear. attemptedProFeatures() lo lee, y
             // asignarlo despues hacia que durante el parseo mirase el dataView ANTERIOR:
@@ -2419,6 +2480,10 @@ export class Visual implements IVisual {
         } else {
             color = isNeutral ? "#605E5C" : (isPositive ? "#107C10" : "#D13438");
         }
+        // Sobre una tarjeta oscura (plantilla Midnight, o un fondo elegido) el verde y el rojo
+        // por defecto no se leen: se aclaran hacia el blanco, manteniendo el tono.
+        const fondo = luminance(this.formattingSettings.card.background.value?.value);
+        if (!hc && fondo !== null && fondo < 0.18) { color = towardWhite(color, 0.45); }
 
         const arrow   = s.showArrow.value ? (isNeutral ? "→" : (diff > 0 ? "▲" : "▼")) : "";
         // El porcentaje de variacion en el idioma del informe: 12,5 % en español, 12.5% en inglés.

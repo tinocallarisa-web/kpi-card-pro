@@ -169,6 +169,23 @@
     }
   ],
   "objects": {
+    "style": {
+      "displayName": "Style template",
+      "displayNameKey": "Object_Style",
+      "properties": {
+        "template": {
+          "displayName": "Template", "displayNameKey": "Prop_Style_Template",
+          "type": { "enumeration": [
+            { "value": "classic", "displayName": "Classic", "displayNameKey": "Enum_Style_Classic" },
+            { "value": "clean", "displayName": "Clean", "displayNameKey": "Enum_Style_Clean" },
+            { "value": "bold", "displayName": "Bold", "displayNameKey": "Enum_Style_Bold" },
+            { "value": "minimal", "displayName": "Minimal", "displayNameKey": "Enum_Style_Minimal" },
+            { "value": "soft", "displayName": "Soft", "displayNameKey": "Enum_Style_Soft" },
+            { "value": "midnight", "displayName": "Midnight", "displayNameKey": "Enum_Style_Midnight" }
+          ] }
+        }
+      }
+    },
     "card": {
       "displayName": "Card",
       "displayNameKey": "Object_Card",

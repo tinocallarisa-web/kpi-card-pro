@@ -442,6 +442,29 @@ class StatusSettings extends FormattingSettingsCard {
               this.goodColor, this.warnColor, this.badColor, this.applyTo, this.showText];
 }
 
+// ─── Card: Style template (2.2.0.0) ──────────────────────────────────────────
+
+/** Plantillas de estilo. Gratis, y por eso solo tocan ajustes gratuitos: colores, fuentes y
+ *  el tamaño del número; nunca el borde, el radio, el relleno o la sombra, que son Pro. */
+class StyleSettings extends FormattingSettingsCard {
+    template = new formattingSettings.ItemDropdown({
+        name: "template", displayName: "Template",
+        items: [
+            { value: "classic",  displayName: "Classic" },
+            { value: "clean",    displayName: "Clean" },
+            { value: "bold",     displayName: "Bold" },
+            { value: "minimal",  displayName: "Minimal" },
+            { value: "soft",     displayName: "Soft" },
+            { value: "midnight", displayName: "Midnight" }
+        ],
+        value: { value: "classic", displayName: "Classic" }
+    });
+    name = "style";
+    displayName = "Style template";
+    description = "Fills only what you have not set yourself: any setting you change wins.";
+    slices = [this.template];
+}
+
 // ─── Card: Accessibility ─────────────────────────────────────────────────────
 
 class AccessibilitySettings extends FormattingSettingsCard {
@@ -460,6 +483,7 @@ class AccessibilitySettings extends FormattingSettingsCard {
 // ─── Root Model ──────────────────────────────────────────────────────────────
 
 export class VisualFormattingSettingsModel extends FormattingSettingsModel {
+    style = new StyleSettings();
     card = new CardSettings();
     mainValue = new MainValueSettings();
     label = new LabelSettings();
@@ -472,5 +496,5 @@ export class VisualFormattingSettingsModel extends FormattingSettingsModel {
     trend = new TrendSettings();
     status = new StatusSettings();
     accessibility = new AccessibilitySettings();
-    cards = [this.card, this.mainValue, this.label, this.variance, this.status, this.secondary, this.period, this.secondaryKpis, this.image, this.trend, this.smallMultiples, this.accessibility];
+    cards = [this.style, this.card, this.mainValue, this.label, this.variance, this.status, this.secondary, this.period, this.secondaryKpis, this.image, this.trend, this.smallMultiples, this.accessibility];
 }
