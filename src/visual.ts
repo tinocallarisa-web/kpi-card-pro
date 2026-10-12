@@ -11,6 +11,11 @@ import powerbi from "powerbi-visuals-api";
 import { FormattingSettingsService } from "powerbi-visuals-utils-formattingmodel";
 import { valueFormatter } from "powerbi-visuals-utils-formattingutils";
 import { VisualFormattingSettingsModel } from "./settings";
+import { I18N } from "./i18n";
+import {
+    HtmlSubSelectableClass, HtmlSubSelectionHelper, SubSelectableDisplayNameAttribute,
+    SubSelectableObjectNameAttribute, SubSelectableTypeAttribute,
+} from "powerbi-visuals-utils-onobjectutils";
 
 import DataView = powerbi.DataView;
 import IVisual = powerbi.extensibility.visual.IVisual;
@@ -205,6 +210,10 @@ export class Visual implements IVisual {
     private watermarkWhy: HTMLDivElement | null = null;
     /** Solo para el overlay de diagnostico. */
     private dbgMeasureIdx = 0;
+    /** Formato sobre el lienzo (2.2.0.0): número, etiqueta, variación, tendencia y tarjeta. */
+    public visualOnObjectFormatting: powerbi.extensibility.visual.VisualOnObjectFormatting;
+    private subSelectionHelper: HtmlSubSelectionHelper;
+    private formatMode = false;
     /** Paso del asistente de configuración (2 = comparación, 3 = estilo). El 1 es la
      *  pantalla de inicio: mientras no hay medida no hay tarjeta sobre la que flotar. */
     private guideStep = 2;
@@ -242,6 +251,16 @@ export class Visual implements IVisual {
             });
         }
         this.formattingSettingsService = new FormattingSettingsService();
+        this.subSelectionHelper = HtmlSubSelectionHelper.createHtmlSubselectionHelper({
+            hostElement: options.element,
+            subSelectionService: (options.host as any).subSelectionService,
+            selectionIdCallback: () => undefined,
+        });
+        this.visualOnObjectFormatting = {
+            getSubSelectionStyles: (subs) => this.getSubSelectionStyles(subs),
+            getSubSelectionShortcuts: (subs) => this.getSubSelectionShortcuts(subs),
+            getSubSelectables: (filter) => this.subSelectionHelper.getAllSubSelectables(filter),
+        };
         this.events = options.host.eventService;
 
         // ── Container (assign BEFORE any async work touches it) ───────────
@@ -281,6 +300,7 @@ export class Visual implements IVisual {
         this.container.addEventListener("click", (e: MouseEvent) => {
             if ((this.host as any).allowInteractions === false) return;
             const t = e.target as HTMLElement;
+            if (this.formatMode) return;
             if (t.closest("[data-selection-index]") || t.closest(".kpi-sparkline")) return;
             if (this.selKeys.size === 0) return;
             this.selectionManager.clear().then(() => this.repaint());
@@ -299,6 +319,36 @@ export class Visual implements IVisual {
             else if (e.key === "End") j = todas.length - 1;
             if (j >= 0 && j !== i) { e.preventDefault(); todas[j].focus(); }
         });
+    }
+
+    /**
+     * PANEL DE FORMATO EN EL IDIOMA DE POWER BI (2.2.0.0). Hasta la 2.1 los ajustes no
+     * llevaban clave y el panel salía en inglés aunque existiera la traducción. Las claves
+     * viven en capabilities.json (src/i18n.ts las recoge); aquí se aplican a tarjetas,
+     * ajustes, descripciones y opciones de las listas. En inglés no se toca nada: el texto
+     * de settings.ts es el original.
+     */
+    private localizeModel(): void {
+        const loc = String((this.host as any).locale || "");
+        if (!this.localization || /^en/i.test(loc)) return;
+        for (const card of ((this.formattingSettings as any).cards || []) as any[]) {
+            const m = I18N[card.name];
+            if (!m) continue;
+            if (m.k) card.displayName = this.t(m.k, card.displayName);
+            if (m.d && card.description) card.description = this.t(m.d, card.description);
+            for (const sl of (card.slices || []) as any[]) {
+                const e = m.p[sl.name];
+                if (!e) continue;
+                if (e.k) sl.displayName = this.t(e.k, sl.displayName);
+                if (e.d && sl.description) sl.description = this.t(e.d, sl.description);
+                if (Array.isArray(sl.items)) {
+                    sl.items = sl.items.map((it: any) => e.e[it.value]
+                        ? { ...it, displayName: this.t(e.e[it.value], it.displayName) } : it);
+                    const elegido = sl.items.find((it: any) => it.value === sl.value?.value);
+                    if (elegido) sl.value = elegido;
+                }
+            }
+        }
     }
 
     private applyTemplate(objects: powerbi.DataViewObjects | undefined): void {
@@ -366,6 +416,7 @@ export class Visual implements IVisual {
      * renderizado, y repetirlos es motivo de rechazo.
      */
     private selectId(id: powerbi.extensibility.ISelectionId, multi: boolean): void {
+        if (this.formatMode) return;   // en formato sobre el lienzo, un clic formatea
         this.selectionManager.select(id, multi).then(() => this.repaint());
     }
 
@@ -387,6 +438,8 @@ export class Visual implements IVisual {
             // dejaria la vista previa visible en un informe publicado.
             const viewMode = (options as any).viewMode;
             if (typeof viewMode === "number") { this.editing = viewMode !== 0; }
+            this.formatMode = !!(options as any).formatMode;
+            this.subSelectionHelper.setFormatMode(this.formatMode);
 
             // Power BI's viewport is authoritative. Relying on the container being
             // sized (width/height 100%) fails on page return, where the element can
@@ -420,6 +473,7 @@ export class Visual implements IVisual {
                 dataView
             ) as VisualFormattingSettingsModel;
             this.applyTemplate(dataView?.metadata?.objects);
+            this.localizeModel();
 
             // lastDataView se asigna ANTES de parsear. attemptedProFeatures() lo lee, y
             // asignarlo despues hacia que durante el parseo mirase el dataView ANTERIOR:
@@ -446,6 +500,10 @@ export class Visual implements IVisual {
             if (metrics.length > 0) {
                 this.hasRenderedData = true;
                 this.requestLicenseDeferred();
+            }
+            if (this.formatMode) {
+                const subs = (options as any).subSelections as powerbi.visuals.CustomVisualSubSelection[] | undefined;
+                this.subSelectionHelper.updateOutlinesFromSubSelections(subs ?? [], true);
             }
 
             this.events.renderingFinished(options);
@@ -1043,11 +1101,15 @@ export class Visual implements IVisual {
         this.lastBlockedNotice = signature;
         this.licenseIconShown = true;
 
-        const list = wanted.length === 1
-            ? wanted[0]
-            : wanted.slice(0, -1).join(", ") + " and " + wanted[wanted.length - 1];
-        const msg = `KPI Card Pro: ${list} ${wanted.length === 1 ? "is" : "are"} part of the `
-                  + `Pro plan. Get a licence to enable ${wanted.length === 1 ? "it" : "them"}.`;
+        // En el idioma del informe (2.2.0.0): el aviso es lo que explica qué se compra.
+        const nombres = wanted.map(w => this.t("Pro_" + w.replace(/[^A-Za-z]+/g, "_"), w));
+        const list = nombres.length === 1
+            ? nombres[0]
+            : nombres.slice(0, -1).join(", ") + " " + this.t("Msg_And", "and") + " " + nombres[nombres.length - 1];
+        const msg = this.t(nombres.length === 1 ? "Msg_ProOne" : "Msg_ProMany",
+            nombres.length === 1
+                ? "KPI Card Pro: {0} is part of the Pro plan. Get a licence to enable it."
+                : "KPI Card Pro: {0} are part of the Pro plan. Get a licence to enable them.").replace("{0}", list);
 
         // Power BI shows ONE licence notification at a time and the last call replaces
         // the one before it. Until 1.2.1.0 notifyLicenseRequired ran first and
@@ -1084,6 +1146,91 @@ export class Visual implements IVisual {
         catch (_) { /* best-effort */ }
         if (cleared && typeof cleared.then === "function") { cleared.then(show, show); }
         else { show(); }
+    }
+
+    // ─── Formato sobre el lienzo (2.2.0.0) ───────────────────────────────────
+
+    private subSelectable(el: Element, objectName: string, displayName: string, type: powerbi.visuals.SubSelectionStylesType): void {
+        if (!this.formatMode) return;
+        el.classList.add(HtmlSubSelectableClass);
+        el.setAttribute(SubSelectableObjectNameAttribute, objectName);
+        el.setAttribute(SubSelectableDisplayNameAttribute, displayName);
+        el.setAttribute(SubSelectableTypeAttribute, String(type));
+    }
+
+    private getSubSelectionStyles(subs: powerbi.visuals.CustomVisualSubSelection[]): powerbi.visuals.SubSelectionStyles | undefined {
+        const name = subs[0]?.customVisualObjects[0]?.objectName;
+        const ref = (objectName: string, propertyName: string, label: string) => ({ reference: { objectName, propertyName }, label });
+        switch (name) {
+            case "mainValue":
+                return { type: powerbi.visuals.SubSelectionStylesType.Text,
+                    fontFamily: ref("mainValue", "fontFamily", this.t("OO_Font", "Font")),
+                    fontSize: ref("mainValue", "fontSize", this.t("OO_Size", "Size")),
+                    fontColor: ref("mainValue", "color", this.t("OO_Color", "Color")),
+                    bold: ref("mainValue", "bold", this.t("OO_Bold", "Bold")) } as any;
+            case "label":
+                return { type: powerbi.visuals.SubSelectionStylesType.Text,
+                    fontFamily: ref("label", "fontFamily", this.t("OO_Font", "Font")),
+                    fontSize: ref("label", "fontSize", this.t("OO_Size", "Size")),
+                    fontColor: ref("label", "color", this.t("OO_Color", "Color")),
+                    bold: ref("label", "bold", this.t("OO_Bold", "Bold")) } as any;
+            case "variance":
+                return { type: powerbi.visuals.SubSelectionStylesType.Text, fontSize: ref("variance", "fontSize", this.t("OO_Size", "Size")) } as any;
+            case "trend":
+                return { type: powerbi.visuals.SubSelectionStylesType.Shape, fill: ref("trend", "color", this.t("OO_Color", "Color")) } as any;
+            case "card":
+                return { type: powerbi.visuals.SubSelectionStylesType.Shape,
+                    fill: ref("card", "background", this.t("OO_Background", "Background")),
+                    outline: ref("card", "borderColor", this.t("OO_Border", "Border")) } as any;
+        }
+        return undefined;
+    }
+
+    private getSubSelectionShortcuts(subs: powerbi.visuals.CustomVisualSubSelection[]): powerbi.visuals.VisualSubSelectionShortcuts | undefined {
+        const name = subs[0]?.customVisualObjects[0]?.objectName;
+        const id = (objectName: string, propertyName: string) => ({ objectName, propertyName });
+        const nav = (card: string, label: string) => ({ type: powerbi.visuals.VisualShortcutType.Navigate, destinationInfo: { cardUid: "Visual-" + card + "-card" }, label });
+        const reset = (ids: { objectName: string; propertyName: string }[]) => ({ type: powerbi.visuals.VisualShortcutType.Reset, relatedResetFormattingIds: ids });
+        switch (name) {
+            case "mainValue":
+                return [
+                    { type: powerbi.visuals.VisualShortcutType.Picker, ...id("mainValue", "displayUnit"), label: this.t("OO_Units", "Display units") },
+                    { type: powerbi.visuals.VisualShortcutType.Picker, ...id("style", "template"), label: this.t("Prop_Style_Template", "Template") },
+                    { type: powerbi.visuals.VisualShortcutType.Divider },
+                    reset([id("mainValue", "fontFamily"), id("mainValue", "fontSize"), id("mainValue", "color"), id("mainValue", "bold")]),
+                    nav("mainValue", this.t("OO_More", "More options")),
+                ] as any;
+            case "label":
+                return [
+                    { type: powerbi.visuals.VisualShortcutType.Toggle, ...id("label", "show"), label: this.t("OO_ShowLabel", "Show label") },
+                    { type: powerbi.visuals.VisualShortcutType.Divider },
+                    reset([id("label", "fontFamily"), id("label", "fontSize"), id("label", "color"), id("label", "bold")]),
+                    nav("label", this.t("OO_More", "More options")),
+                ] as any;
+            case "variance":
+                return [
+                    { type: powerbi.visuals.VisualShortcutType.Toggle, ...id("variance", "showArrow"), label: this.t("OO_Arrow", "Show arrow") },
+                    { type: powerbi.visuals.VisualShortcutType.Toggle, ...id("variance", "invertColors"), label: this.t("OO_Invert", "Lower is better") },
+                    { type: powerbi.visuals.VisualShortcutType.Divider },
+                    nav("variance", this.t("OO_More", "More options")),
+                ] as any;
+            case "trend":
+                return [
+                    { type: powerbi.visuals.VisualShortcutType.Picker, ...id("trend", "type"), label: this.t("OO_ChartType", "Chart type") },
+                    { type: powerbi.visuals.VisualShortcutType.Toggle, ...id("trend", "showDot"), label: this.t("OO_LastPoint", "Highlight last point") },
+                    { type: powerbi.visuals.VisualShortcutType.Divider },
+                    reset([id("trend", "color"), id("trend", "type")]),
+                    nav("trend", this.t("OO_More", "More options")),
+                ] as any;
+            case "card":
+                return [
+                    { type: powerbi.visuals.VisualShortcutType.Picker, ...id("style", "template"), label: this.t("Prop_Style_Template", "Template") },
+                    { type: powerbi.visuals.VisualShortcutType.Divider },
+                    reset([id("card", "background"), id("card", "borderColor")]),
+                    nav("card", this.t("OO_More", "More options")),
+                ] as any;
+        }
+        return undefined;
     }
 
     // ─── Asistente de configuración (2.2.0.0) ────────────────────────────────
@@ -1284,7 +1431,7 @@ export class Visual implements IVisual {
         landing.appendChild(hint);
 
         const subHint = document.createElement("div");
-        subHint.textContent = "Prior Period for variance · Target for goal tracking · Small Multiples for multi-card layout (Pro)";
+        subHint.textContent = this.t("Msg_LandingHint", "Prior Period for variance · Target for goal tracking · Small Multiples for multi-card layout (Pro)");
         subHint.style.cssText = `font-size: 10px; color: ${muted}; max-width: 220px; line-height: 1.5; margin-top: 4px;`;
         landing.appendChild(subHint);
 
@@ -1933,6 +2080,7 @@ export class Visual implements IVisual {
 
         const root = document.createElement("div");
         root.className = "kpi-root" + (hc ? " high-contrast" : "");
+        this.subSelectable(root, "card", this.t("OO_Card", "Card"), powerbi.visuals.SubSelectionStylesType.Shape);
 
         const cardBg     = hc ? "#000000" : (s.card.background.value?.value ?? themeBg);
         const cardBorder = hc ? "#FFFFFF"  : (s.card.borderColor.value?.value ?? "#E0E0E0");
@@ -1984,7 +2132,7 @@ export class Visual implements IVisual {
         this.notifyProFeatureBlocked();
 
         // Asistente de configuración (2.2.0.0): solo editando y con datos.
-        if (metrics.length > 0 && this.editing && s.style.guide.value
+        if (metrics.length > 0 && this.editing && !this.formatMode && s.style.guide.value
             && (this.host as any).allowInteractions !== false) {
             root.appendChild(this.buildGuide(hc));
         }
@@ -2134,7 +2282,7 @@ export class Visual implements IVisual {
         empty.appendChild(emptyIcon);
 
         const emptySpan = document.createElement("span");
-        emptySpan.textContent = "Add a measure to the Value field well";
+        emptySpan.textContent = this.t("Msg_Empty", "Add a measure to the Value field well");
         empty.appendChild(emptySpan);
         root.appendChild(empty);
     }
@@ -2200,6 +2348,7 @@ export class Visual implements IVisual {
         if (showLabel) {
             const labelEl = document.createElement("div");
             labelEl.className = "kpi-label";
+            this.subSelectable(labelEl, "label", this.t("OO_Label", "Label"), powerbi.visuals.SubSelectionStylesType.Text);
             labelEl.textContent = metric.name;
             labelEl.title = metric.name;
             labelEl.setAttribute("aria-hidden", "true");
@@ -2274,6 +2423,7 @@ export class Visual implements IVisual {
         valueEl.textContent = formatted;
         valueEl.title = formatted;
         valueEl.setAttribute("aria-label", `${metric.name}: ${formatted}`);
+        this.subSelectable(valueEl, "mainValue", this.t("OO_Value", "Main value"), powerbi.visuals.SubSelectionStylesType.Text);
         const fontSize = large
             ? (s.mainValue.fontSize.value ?? 28)
             : Math.max(16, (s.mainValue.fontSize.value ?? 28) * 0.7);
@@ -2362,7 +2512,10 @@ export class Visual implements IVisual {
         // path explains why, so nothing disappears without a word.
         if (this.hasSparkline(metric)) {
             const spark = this.buildSparkline(metric, hc);
-            if (spark) cell.appendChild(spark);
+            if (spark) {
+                this.subSelectable(spark, "trend", this.t("OO_Trend", "Trend line"), powerbi.visuals.SubSelectionStylesType.Shape);
+                cell.appendChild(spark);
+            }
         }
 
         return cell;
@@ -2715,9 +2868,10 @@ export class Visual implements IVisual {
 
         const pill = document.createElement("div");
         pill.className = "kpi-variance-pill";
+        this.subSelectable(pill, "variance", this.t("OO_Variance", "Variance"), powerbi.visuals.SubSelectionStylesType.Text);
         pill.textContent = pctStr;
         pill.title = `Variance: ${pctStr} (${diff >= 0 ? "+" : ""}${this.formatMetricValue(diff, format)})`;
-        pill.setAttribute("aria-label", `Variance ${pctStr}`);
+        pill.setAttribute("aria-label", `${this.t("Aria_Variance", "Variance")} ${pctStr}`);
 
         pill.style.cssText = usePill
             ? `display: inline-flex; align-items: center; background: ${color}22; color: ${color};
