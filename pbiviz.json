@@ -4,7 +4,7 @@
     "displayName": "KPI Card Pro",
     "guid": "kpiCardProTCViz",
     "visualClassName": "Visual",
-    "version": "2.1.0.0",
+    "version": "2.2.0.0",
     "description": "Multi-metric KPI card with trend, target and variance for Power BI executive dashboards.",
     "supportUrl": "https://tinocallarisa-web.github.io/kpi-card-pro/support.html",
     "privacyTermsLink": "https://tinocallarisa-web.github.io/kpi-card-pro/privacy.html",
@@ -21,7 +21,17 @@
   },
   "stringResources": [
     "./stringResources/en-US/resources.resjson",
-    "./stringResources/es-ES/resources.resjson"
+    "./stringResources/es-ES/resources.resjson",
+    "./stringResources/fr-FR/resources.resjson",
+    "./stringResources/de-DE/resources.resjson",
+    "./stringResources/it-IT/resources.resjson",
+    "./stringResources/pt-BR/resources.resjson",
+    "./stringResources/nl-NL/resources.resjson",
+    "./stringResources/pl-PL/resources.resjson",
+    "./stringResources/ja-JP/resources.resjson",
+    "./stringResources/zh-CN/resources.resjson",
+    "./stringResources/ko-KR/resources.resjson",
+    "./stringResources/pt-PT/resources.resjson"
   ],
   "capabilities": "./capabilities.json",
   "licenseTerms": "https://tinocallarisa-web.github.io/kpi-card-pro/terms.html",

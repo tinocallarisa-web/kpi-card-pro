@@ -39,14 +39,42 @@
   <header>
     <a class="brand" href="https://tcviz.com">TCViz</a>
     <h1>Changelog</h1>
-    <p class="meta">KPI Card Pro &nbsp;·&nbsp; current version 2.1.0.0</p>
+    <p class="meta">KPI Card Pro &nbsp;·&nbsp; current version 2.2.0.0</p>
   </header>
 
   <main>
     <div class="rel">
       <div class="rel-head">
-        <span class="rel-ver">2.1.0.0</span>
+        <span class="rel-ver">2.2.0.0</span>
         <span class="tag tag-cur">Current</span>
+        <span class="rel-date">2026-10-12</span>
+      </div>
+      <h4><span class="tag tag-add">Added</span></h4>
+    <ul>
+      <li><strong>Click a trend point to filter the report by that period.</strong> In small multiples the selection carries the card too: March of Spain, not March of everyone. Ctrl+click adds points, clicking empty space clears, and the selected points are marked with a ring. In bar trends the other bars dim.</li>
+      <li><strong>Color rules (Pro)</strong> — the card's conditional formatting. *Compare value with* gains <strong>Value itself</strong>, with thresholds in the value's own units, and *Apply color to* gains <strong>Card background</strong> (a light tint) and <strong>Card border</strong>. Power BI's fx button is not available to visuals that read data as a matrix, which this one does to combine Small Multiples and Trend; Color rules is the answer to that, not a workaround. The card formerly called Status keeps every setting.</li>
+      <li><strong>Style templates (free):</strong> Classic, Clean, Bold, Minimal, Soft and Midnight. A template only fills settings you have not changed yourself, and only touches colours, fonts and the size of the number — never the Pro card styling. On dark cards the variance colours lighten automatically.</li>
+      <li><strong>Setup guide inside the visual (free).</strong> While you edit, a small panel lists the optional fields, ticks each as you add it, and offers the templates as one-click previews. ✕ or Finish closes it; *Format → Style template → Setup guide* brings it back. Never shown in reading view.</li>
+      <li><strong>Format on the canvas.</strong> In format mode, click the number, the label, the variance, the trend line or the card to format it there, with shortcuts to the template, display units and chart type.</li>
+      <li><strong>Twelve languages.</strong> English, Spanish, French, German, Italian, Portuguese (Brazil and Portugal), Dutch, Polish, Japanese, Simplified Chinese and Korean — the Format pane, the setup guide, the messages and the licence notice.</li>
+    </ul>
+      <h4><span class="tag tag-chg">Changed</span></h4>
+    <ul>
+      <li><strong>The layout adapts to the size of the visual.</strong> The main number shrinks to fit instead of being cut off with an ellipsis — measured exactly, since a number a fraction of a pixel too wide used to show "14…". In a grid every card takes the size of the one that needs it most. Small Multiples *Columns* becomes a maximum: below about 150 px per card fewer columns are used. A single card that is too short withdraws, in order, the trend, the prior/target line, the secondary KPIs, the status text, the variance and the label; the number always stays.</li>
+      <li><strong>Accessibility.</strong> Screen readers hear the whole card — value, period, variance against the prior, target and status — instead of only its name. Arrow keys, Home and End move between cards. The trend line is a slider: arrow keys step through the points, each one announced, and Enter filters by it. The focus ring uses the TCViz blue, and yellow in high contrast.</li>
+      <li><strong>A card is a button only when there is something to select;</strong> otherwise it is a group with its summary.</li>
+      <li><strong>New Nord-style icon.</strong></li>
+    </ul>
+      <h4><span class="tag tag-fix">Fixed</span></h4>
+    <ul>
+      <li><strong>Clicking a card filtered the report but nothing changed on the card</strong> (certification note 1180.2.2.3, *Filter out*). The selected card now stays sharp and the others dim to 30%, and the single card filters through its trend points.</li>
+      <li><strong>The Format pane was always in English,</strong> even with the Spanish translation installed: the settings carried no translation keys. They are now applied from <code>capabilities.json</code> to cards, settings, descriptions and list options.</li>
+      <li><strong>The status text was drawn in a serif font</strong> in some hosts; it now uses the label font.</li>
+      <li><strong>Two cards of the Format pane had no translation keys</strong> (*Value &amp; comparison* and *Secondary KPIs*).</li>
+    </ul>
+    <div class="rel">
+      <div class="rel-head">
+        <span class="rel-ver">2.1.0.0</span>
         <span class="rel-date">2026-10-02</span>
       </div>
       <h4><span class="tag tag-add">Added</span></h4>

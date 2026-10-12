@@ -1,342 +1,552 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Support — KPI Card Pro | TCViz</title>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --text: #1a1a1a;
-      --muted: #555;
-      --accent: #0078D4;
-      --border: #e8e8e8;
-      --bg: #ffffff;
-    }
-    body {
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-      font-size: 15px;
-      line-height: 1.7;
-      color: var(--text);
-      background: var(--bg);
-      max-width: 720px;
-      margin: 0 auto;
-      padding: 48px 24px 80px;
-    }
-    header {
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 24px;
-      margin-bottom: 40px;
-    }
-    .brand {
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--accent);
-      text-decoration: none;
-    }
-    h1 {
-      font-size: 28px;
-      font-weight: 700;
-      margin-top: 12px;
-      line-height: 1.2;
-    }
-    .meta {
-      font-size: 13px;
-      color: var(--muted);
-      margin-top: 6px;
-    }
-    h2 {
-      font-size: 17px;
-      font-weight: 600;
-      margin-top: 36px;
-      margin-bottom: 10px;
-    }
-    p { margin-bottom: 14px; }
-    ul {
-      margin: 0 0 14px 20px;
-      padding: 0;
-    }
-    li { margin-bottom: 6px; }
-    a { color: var(--accent); }
-    .contact-card {
-      background: #f5f9ff;
-      border: 1px solid #d0e4f7;
-      border-radius: 8px;
-      padding: 20px 24px;
-      margin-top: 24px;
-    }
-    .contact-card p { margin-bottom: 6px; }
-    footer {
-      margin-top: 64px;
-      padding-top: 24px;
-      border-top: 1px solid var(--border);
-      font-size: 13px;
-      color: var(--muted);
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KPI Card Pro – Support</title>
+<style>
+  :root {
+    --bg: #FAF9F5; --bg2: #EDE9DE; --bd: #F5F3ED; --line: #DAD9D4;
+    --t1: #3D3929; --t2: #535146; --t3: #83827D;
+    --acc: #2B6CB0; --accd: #1F4E80; --acc2: #3E9C5B;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--t1); line-height: 1.65; }
+
+  /* ── Header ── */
+  header { background: var(--t1); color: #fff; padding: 28px 48px; display: flex; align-items: center; gap: 20px; }
+  header svg { flex-shrink: 0; }
+  header .title { font-size: 22px; font-weight: 700; }
+  header .sub   { font-size: 13px; color: #b5b3aa; margin-top: 2px; }
+
+  /* ── Nav ── */
+  nav { background: var(--bg2); border-bottom: 1px solid var(--line); padding: 0 48px; display: flex; gap: 0; overflow-x: auto; }
+  nav a { display: block; padding: 14px 14px; white-space: nowrap; font-size: 13px; font-weight: 600; color: var(--t2);
+          text-decoration: none; border-bottom: 3px solid transparent; transition: color .2s, border-color .2s; }
+  nav a:hover, nav a.active { color: var(--acc); border-bottom-color: var(--acc); }
+
+  /* ── Layout ── */
+  .wrap { max-width: 900px; margin: 0 auto; padding: 48px 24px 80px; }
+  h1 { font-size: 26px; font-weight: 700; margin-bottom: 8px; }
+  h2 { font-size: 17px; font-weight: 700; color: var(--t1); margin: 40px 0 12px; padding-bottom: 8px;
+       border-bottom: 2px solid var(--acc); display: inline-block; }
+  h3 { font-size: 14px; font-weight: 700; color: var(--t1); margin: 18px 0 6px; }
+  p  { font-size: 14px; color: var(--t2); margin-bottom: 10px; }
+  ul { font-size: 14px; color: var(--t2); padding-left: 20px; margin-bottom: 10px; }
+  li { margin-bottom: 5px; }
+  code { font-family: monospace; background: var(--bg2); padding: 1px 6px; border-radius: 4px;
+         font-size: 12px; color: var(--acc); }
+
+  /* ── Cards ── */
+  .card { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 24px 28px; margin-bottom: 16px; }
+
+  /* ── Badges ── */
+  .badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px;
+           text-transform: uppercase; letter-spacing: .5px; vertical-align: middle; margin-left: 6px; }
+  .badge-pro  { background: var(--acc2); color: #fff; }
+  .badge-free { background: var(--acc);  color: #fff; }
+
+  /* ── Field wells table ── */
+  table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 16px; }
+  th { background: var(--bg2); color: var(--t1); font-weight: 700; padding: 10px 14px; text-align: left;
+       border-bottom: 2px solid var(--line); }
+  td { padding: 9px 14px; border-bottom: 1px solid var(--bd); color: var(--t2); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+
+  /* ── FAQ ── */
+  details { border: 1px solid var(--line); border-radius: 8px; margin-bottom: 10px; background: #fff; }
+  summary { padding: 14px 18px; font-size: 14px; font-weight: 600; cursor: pointer; list-style: none;
+            display: flex; align-items: center; justify-content: space-between; color: var(--t1); }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: '+'; font-size: 18px; font-weight: 300; color: var(--acc); transition: transform .2s; }
+  details[open] summary::after { content: '−'; }
+  details[open] summary { border-bottom: 1px solid var(--line); }
+  .faq-body { padding: 14px 18px; font-size: 14px; color: var(--t2); }
+  .faq-body p { margin-bottom: 6px; }
+  .faq-body ul { margin-top: 6px; }
+
+  /* ── Contact box ── */
+  .contact-box { background: var(--acc); color: #fff; border-radius: 10px; padding: 24px 28px;
+                  display: flex; align-items: center; gap: 20px; }
+  .contact-box .icon { font-size: 36px; flex-shrink: 0; }
+  .contact-box h3 { font-size: 16px; font-weight: 700; margin-bottom: 4px; color: #fff; }
+  .contact-box p  { font-size: 13px; color: rgba(255,255,255,.85); margin: 0; }
+  .contact-box a  { color: #fff; font-weight: 700; text-decoration: underline; }
+
+  /* ── Video embed ── */
+  .video-wrap { position: relative; padding-bottom: 56.25%; height: 0; border-radius: 10px; overflow: hidden;
+                border: 1px solid var(--line); margin-bottom: 20px; }
+  .video-wrap iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+
+  /* ── CTA strip ── */
+  .cta { display: flex; gap: 12px; flex-wrap: wrap; margin: 16px 0; }
+  .btn { display: inline-block; padding: 10px 22px; border-radius: 6px; font-size: 13px; font-weight: 700;
+          text-decoration: none; transition: background .2s; }
+  .btn-primary { background: var(--acc); color: #fff; }
+  .btn-primary:hover { background: var(--accd); }
+  .btn-outline { background: transparent; color: var(--acc); border: 2px solid var(--acc); }
+  .btn-outline:hover { background: var(--acc); color: #fff; }
+
+  /* ── Search ── */
+  .searchbar { background: var(--bg2); border-bottom: 1px solid var(--line); padding: 14px 48px 16px; }
+  .searchbox { position: relative; max-width: 900px; margin: 0 auto; display: flex; align-items: center;
+               gap: 10px; background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 0 12px; }
+  .searchbox:focus-within { border-color: var(--acc); box-shadow: 0 0 0 3px rgba(43,108,176,.16); }
+  .searchbox svg { color: var(--t3); flex-shrink: 0; }
+  .searchbox input { flex: 1; border: none; outline: none; background: transparent; font: inherit;
+                     font-size: 14px; color: var(--t1); padding: 11px 0; }
+  .searchbox input::placeholder { color: var(--t3); }
+  .searchbox button { border: none; background: transparent; color: var(--t3); font-size: 20px;
+                      line-height: 1; cursor: pointer; padding: 0 2px; }
+  .searchbox button:hover { color: var(--acc); }
+  .search-status { max-width: 900px; margin: 8px auto 0; font-size: 12px; color: var(--t3); min-height: 16px; }
+  mark { background: #FCE8A8; color: var(--t1); border-radius: 2px; padding: 0 2px; }
+  .is-hidden { display: none !important; }
+
+  /* ── Version pill ── */
+  .verpill { display: block; width: fit-content; font-size: 11px; font-weight: 700; letter-spacing: .4px;
+             background: var(--bg2); color: var(--t2); border: 1px solid var(--line);
+             padding: 3px 10px; border-radius: 20px; margin-bottom: 14px; }
+  .verpill a { color: var(--acc); text-decoration: none; }
+  .lead { font-size: 14px; line-height: 1.6; color: var(--t2); margin: 0 0 22px; }
+  .lead a { color: var(--acc); }
+
+  /* ── Footer ── */
+  footer { background: var(--t1); color: var(--t3); text-align: center; padding: 24px 48px; font-size: 12px; }
+  footer a { color: #b5b3aa; text-decoration: none; margin: 0 8px; }
+  footer a:hover { color: #fff; }
+</style>
 </head>
 <body>
-  <header>
-    <a class="brand" href="https://tcviz.com">TCViz</a>
-    <h1>Support</h1>
-    <p class="meta">KPI Card Pro &nbsp;·&nbsp; v2.1.0.0 &nbsp;·&nbsp; docs updated 2 October 2026 &nbsp;·&nbsp; tcviz.com</p>
-  </header>
 
-  <main>
-    <h2>Getting started</h2>
-    <p>
-      KPI Card Pro needs one measure in the <strong>Value</strong> field well. That alone renders a
-      single card with the value, in the format your model gives that measure. Everything else is
-      optional:
-    </p>
+<!-- Header -->
+<header>
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 828 362" width="90" height="40">
+    <defs><linearGradient id="g" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#1F4E80"/>
+      <stop offset=".55" stop-color="#2B6CB0"/>
+      <stop offset="1" stop-color="#3E9C5B"/>
+    </linearGradient></defs>
+    <g transform="translate(40,46)">
+      <rect x="22" y="20" width="150" height="150" rx="30" fill="none" stroke="url(#g)" stroke-width="11"/>
+      <g fill="url(#g)">
+        <rect x="42" y="110" width="20" height="58" rx="5"/>
+        <rect x="70" y="86" width="20" height="82" rx="5"/>
+        <rect x="98" y="62" width="20" height="106" rx="5"/>
+        <rect x="126" y="38" width="20" height="130" rx="5"/>
+      </g>
+    </g>
+    <text x="258" y="246" font-family="Poppins,sans-serif" font-weight="700" font-size="196" letter-spacing="-4">
+      <tspan fill="url(#g)">tc</tspan><tspan fill="#fff">viz</tspan>
+    </text>
+    <text x="264" y="306" font-family="Poppins,sans-serif" font-weight="500" font-size="31" letter-spacing="6.5" fill="#83827D">VISUALS TO POWER BI</text>
+  </svg>
+  <div>
+    <div class="title">KPI Card Pro</div>
+    <div class="sub">Support &amp; Documentation</div>
+  </div>
+</header>
+
+<!-- Nav -->
+<nav>
+  <a href="#quickstart" class="active">Quick Start</a>
+  <a href="#fields">Field Wells</a>
+  <a href="#formats">Number formats</a>
+  <a href="#rules">Color rules</a>
+  <a href="#periods">Periods</a>
+  <a href="#templates">Templates</a>
+  <a href="#interaction">Filtering</a>
+  <a href="#size">Size</a>
+  <a href="#format">Format Pane</a>
+  <a href="#accessibility">Accessibility</a>
+  <a href="#free-pro">Free vs Pro</a>
+  <a href="#faq">FAQ</a>
+  <a href="changelog.html">Changelog</a>
+  <a href="#contact">Contact</a>
+</nav>
+
+<!-- Search -->
+<div class="searchbar">
+  <div class="searchbox">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+         stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    <input id="docsearch" type="search" placeholder="Search the documentation — try &quot;percentage&quot;, &quot;trend&quot;, &quot;color rules&quot;…"
+           autocomplete="off" aria-label="Search the documentation">
+    <button id="searchclear" type="button" aria-label="Clear search" hidden>&times;</button>
+  </div>
+  <div id="searchstatus" class="search-status" role="status" aria-live="polite"></div>
+</div>
+
+<div class="wrap">
+
+  <div class="verpill">Visual v2.2.0.0 &nbsp;·&nbsp; docs updated 12 Oct 2026 &nbsp;·&nbsp; <a href="changelog.html">what's new</a></div>
+
+  <p class="lead"><strong>A KPI card that puts the answer on the card:</strong> the value, its variance, the target, a trend
+  line and a status that says on track, warning or off track. Add a category and the single card becomes a grid of up to
+  fifty. Supported Power BI features: cross-filtering by card and by <strong>trend point</strong>, Ctrl+click multi-select,
+  highlighting · bookmarks · tooltips and report tooltips · context menu · <strong>custom color rules</strong> ·
+  <strong>format on the canvas</strong> (on-object) · <strong>setup guide</strong> inside the visual · keyboard navigation and
+  screen-reader summaries · high contrast · <strong>number formats from the model</strong> and dynamic format strings ·
+  <strong>12 panel languages</strong> · 6 style templates · a layout that adapts to the size of the visual.</p>
+
+  <!-- Video -->
+  <div class="video-wrap">
+    <iframe src="https://www.youtube.com/embed/4fP7zYKnhWo" title="KPI Card Pro walkthrough"
+            allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+  </div>
+
+  <!-- Quick Start -->
+  <h2 id="quickstart">Quick Start</h2>
+  <div class="card">
+    <h3>1. Add the visual to your report</h3>
+    <p>In Power BI Desktop, go to the Visualizations pane → click the three dots → <strong>Get more visuals</strong> → search for <em>KPI Card Pro</em>.</p>
+    <h3>2. Add a measure to Value</h3>
+    <p>That alone renders a card with the number, in the format your model gives the measure.</p>
+    <h3>3. Follow the setup guide</h3>
+    <p>While you edit, a small panel inside the visual lists the optional fields — Prior period, Target, Trend, Small
+    multiples — ticks each one as you add it, and then lets you pick a style template with one click. Close it with
+    <strong>✕</strong> or <strong>Finish</strong>; reopen it from <em>Format → Style template → Setup guide</em>. It never appears in
+    reading view.</p>
+  </div>
+
+  <!-- Field wells -->
+  <h2 id="fields">Field Wells</h2>
+  <table>
+    <tr><th>Well</th><th>Accepts</th><th>What it does</th></tr>
+    <tr><td><strong>Value</strong></td><td>1 measure, required</td><td>The number on the card.</td></tr>
+    <tr><td><strong>Prior Period</strong></td><td>Measure</td><td>The comparison value: variance percentage, its arrow and the “Prior:” line.</td></tr>
+    <tr><td><strong>Target</strong></td><td>Measure</td><td>A goal shown on the card and drawn on the trend line period by period.</td></tr>
+    <tr><td><strong>Image</strong></td><td>Measure, aggregated as First</td><td>A Base64 data URI (<code>data:image/png;base64,…</code>) shown in the top-right corner. Web links are rejected: the visual makes no network requests.</td></tr>
+    <tr><td><strong>Small Multiples</strong> (Pro)</td><td>A category</td><td>One card per category, up to 50.</td></tr>
+    <tr><td><strong>Trend</strong> (Pro)</td><td>A date or ordered period</td><td>The trend line, and period comparisons without DAX. Use a real date column: a month stored as text sorts alphabetically.</td></tr>
+    <tr><td><strong>Tooltips</strong> (Pro)</td><td>Measures</td><td>Extra figures on hover.</td></tr>
+    <tr><td><strong>Secondary KPIs</strong> (Pro)</td><td>Up to 3 measures</td><td>Supporting figures beside or below the value, each with its own variance.</td></tr>
+    <tr><td><strong>Secondary KPIs prior</strong> (Pro)</td><td>Measures</td><td>The comparison value of each secondary KPI, paired by position.</td></tr>
+  </table>
+
+  <!-- Number formats -->
+  <h2 id="formats">Number formats</h2>
+  <div class="card">
+    <p>Every figure — value, prior, target, variance, secondary KPIs, tooltips — uses the format string of its own measure
+    and the language of the report: currency, percentage, thousands separator, decimal mark. A measure formatted as 0.00%
+    holding 0.3 is shown as 30.00%.</p>
     <ul>
-      <li>Add a measure to <strong>Prior Period</strong> to show the variance, as a percentage with a
-        direction arrow and the prior value underneath.</li>
-      <li>Add a measure to <strong>Target</strong> to track against a goal &mdash; and switch on
-        <strong>Status (Pro)</strong> to colour the card on track, warning or off track.</li>
-      <li>Add a date to <strong>Trend (Pro)</strong> to draw a trend line inside the card. With a
-        trend bound, the card can also compare periods by itself, with no date table and no DAX.</li>
-      <li>Add a category field to <strong>Small Multiples (Pro)</strong> to render one card per
-        category &mdash; each with its own number, variance and line.</li>
-      <li>Add up to three measures to <strong>Secondary KPIs (Pro)</strong> to show supporting figures
-        beside the main value.</li>
-      <li>Add a Base64 image column to <strong>Image</strong> to show a logo or flag per card.</li>
-      <li>Add measures to <strong>Tooltips (Pro)</strong> to show more figures on hover.</li>
+      <li><strong>Display units</strong> scale on top of that format: Auto picks K, M or bn, or force one. A percentage is never scaled.</li>
+      <li><strong>Decimal places</strong> applies only once you change it; until then the decimals come from the measure.</li>
+      <li>A measure with a <strong>dynamic format string</strong> is shown with the format Power BI sends for each value.</li>
+      <li><strong>Prefix and Suffix</strong> (Pro) add free text. Never add “%” to a raw ratio — format the measure as a percentage.</li>
     </ul>
+  </div>
 
-    <h2>Field wells</h2>
+  <!-- Color rules -->
+  <h2 id="rules">Color rules (Pro)</h2>
+  <div class="card">
+    <p>Color rules give each card one of three states — on track, warning, off track — with your own thresholds and colours.
+    They are the card's conditional formatting: Power BI's fx button is not available to visuals that read data as a matrix,
+    which this one does to combine Small Multiples and Trend.</p>
     <ul>
-      <li><strong>Value</strong> (measure, required) &mdash; the number on the card.</li>
-      <li><strong>Prior Period</strong> (measure) &mdash; the comparison value. Enables the variance
-        percentage, its arrow and the &ldquo;Prior:&rdquo; line.</li>
-      <li><strong>Target</strong> (measure) &mdash; a goal to compare against, shown on the card and
-        drawn on the trend line period by period.</li>
-      <li><strong>Image</strong> (measure, aggregated as <em>First</em>) &mdash; a column holding a
-        Base64 data URI (<code>data:image/png;base64,&hellip;</code>), shown in the top-right of each
-        card. External URLs are rejected: the visual makes no network requests of any kind.</li>
-      <li><strong>Small Multiples (Pro)</strong> (grouping) &mdash; one card per category, up to 50.</li>
-      <li><strong>Trend (Pro)</strong> (grouping) &mdash; a date or ordered period. Each distinct value
-        is a point on the line. Use a real date column: a month stored as text would be ordered
-        alphabetically. A numeric period is reordered by the visual so the line reads left to right.</li>
-      <li><strong>Tooltips (Pro)</strong> (measures) &mdash; additional figures shown on hover.</li>
-      <li><strong>Secondary KPIs (Pro)</strong> (measures, up to 3) &mdash; supporting figures beside
-        the main value, each with its own variance.</li>
-      <li><strong>Secondary KPIs prior (Pro)</strong> (measures) &mdash; the comparison value for each
-        secondary KPI, paired <strong>by position</strong>: the first prior goes with the first KPI.</li>
+      <li><strong>Compare value with</strong>: the <em>Target</em> (% achieved), the <em>Prior period</em> (% of prior), or the
+      <em>Value itself</em>, with thresholds in the value's own units.</li>
+      <li>With the default thresholds of 90 and 100: 100 or more is on track, 90 to 100 warning, below 90 off track.
+      <strong>Lower is better</strong> mirrors it for costs, defects or churn.</li>
+      <li><strong>Apply color to</strong>: the value, an accent bar, both, the <strong>card background</strong> (a light tint, so the text
+      stays readable) or the <strong>card border</strong>.</li>
+      <li><strong>Show status text</strong> writes the state under the value — “● On track · 103.1% of target” — so the meaning
+      never depends on colour alone. Screen readers announce it too.</li>
     </ul>
+  </div>
 
-    <h2>Number formats</h2>
-    <p>
-      Every figure on the card &mdash; value, prior, target, variance, secondary KPIs and tooltip
-      fields &mdash; uses the format string of its own measure in your model and the language of the
-      report: currency symbol, percentage, thousands separator and decimal mark. A measure formatted
-      as <code>0.00%</code> holding 0.3 is shown as 30.00%.
-    </p>
+  <!-- Periods -->
+  <h2 id="periods">Comparing periods without DAX</h2>
+  <div class="card">
+    <p>With a date in Trend, <em>Value &amp; comparison → Value shows</em> chooses what the big number is:</p>
     <ul>
-      <li><strong>Display Units</strong> scale on top of that format: Auto picks K, M or bn; you can
-        also force thousands, millions or billions, or none. A percentage is never scaled.</li>
-      <li><strong>Decimal Places</strong> applies only once you change it. Until then the decimals
-        come from the measure&rsquo;s format.</li>
-      <li>A measure with a <strong>dynamic format string</strong> (a format chosen by DAX row by row)
-        is shown with the format Power BI sends for each value, when it sends one.</li>
-      <li><strong>Prefix and Suffix (Pro)</strong> add free text around the value. With a proper
-        format in the model you rarely need them; never use the suffix &ldquo;%&rdquo; on a raw ratio
-        &mdash; format the measure as a percentage instead.</li>
+      <li><strong>Total of the period</strong> — the whole range (default).</li>
+      <li><strong>Latest point</strong> — the last point, compared with the one <em>Compare against (points back)</em> earlier:
+      1 for the previous month on a monthly series, 12 for the same month last year.</li>
+      <li><strong>Last N points</strong> — the sum of the last N points against the N before: N = 12 on a monthly series is the rolling year.</li>
     </ul>
+    <p><em>Show period label</em> prints what is compared, for example “Dec 2025 vs Nov 2025”. A Prior Period measure you bind yourself always wins.</p>
+  </div>
 
-    <h2>Status (Pro)</h2>
-    <p>
-      Status compares the value with the <strong>target</strong> or with the <strong>prior
-      period</strong>, as a percentage, and gives each card one of three states.
-    </p>
+  <!-- Secondary KPIs -->
+  <h2 id="secondary">Secondary KPIs (Pro)</h2>
+  <div class="card">
+    <p>Up to three supporting measures with their own variance. <strong>Right</strong> puts them in a column beside the value,
+    <strong>Bottom</strong> below it (in a row when they fit, otherwise a list), <strong>Auto</strong> chooses by width. In small
+    multiples every card uses the same layout, so they stay comparable.</p>
+  </div>
+
+  <!-- Templates -->
+  <h2 id="templates">Style templates</h2>
+  <div class="card">
+    <p><em>Format → Style template</em>: <strong>Classic</strong>, <strong>Clean</strong>, <strong>Bold</strong>, <strong>Minimal</strong>,
+    <strong>Soft</strong> and <strong>Midnight</strong>. A template only fills what you have not set yourself — any colour or size you
+    change wins. Templates are free and change colours, fonts and the size of the number; the Pro card styling (border width,
+    radius, padding, shadow) is not part of them. On dark cards the variance colours lighten automatically to stay readable.</p>
+  </div>
+
+  <!-- Interaction -->
+  <h2 id="interaction">Selecting and filtering</h2>
+  <div class="card">
     <ul>
-      <li>With the default thresholds of 90% and 100%: 100% or more is <em>on track</em>, from 90% to
-        100% is <em>warning</em>, and below 90% is <em>off track</em>.</li>
-      <li><strong>Lower is better</strong> mirrors it for costs, defects or churn: up to the lower
-        threshold is on track, up to the upper one is warning, above it is off track.</li>
-      <li><strong>Apply color to</strong> the value, to an accent bar on the left of the card, or to
-        both. The three colours are configurable.</li>
-      <li><strong>Show status text</strong> writes the state under the value &mdash; &ldquo;&#9679; On
-        track &middot; 103.1% of target&rdquo; &mdash; so the meaning never depends on colour alone. In
-        high contrast only the text is shown. The tooltip includes the status too.</li>
-      <li>A card with no target (or no prior period, depending on the comparison) shows no status.</li>
+      <li>With Small Multiples, <strong>click a card</strong> to filter the rest of the page by its category. The others dim.</li>
+      <li>With a Trend, <strong>click a point of the line</strong> to filter by that period — and by the card, in small multiples:
+      March of Spain, not March of everyone. Selected points are marked with a ring.</li>
+      <li><strong>Ctrl+click</strong> adds to the selection; click again to remove; click empty space to clear.</li>
+      <li><strong>Bookmarks</strong> restore the selection; <strong>Edit interactions</strong> is respected; right-click opens the Power BI context menu.</li>
+      <li>A single card with no Trend has nothing to filter by, like Power BI's own card.</li>
     </ul>
+  </div>
 
-    <h2>Comparing periods without DAX</h2>
-    <p>
-      With a date in <strong>Trend</strong>, <strong>Value &amp; comparison &rarr; Value shows</strong>
-      chooses what the big number is:
-    </p>
+  <!-- Size -->
+  <h2 id="size">Small and narrow visuals</h2>
+  <div class="card">
     <ul>
-      <li><strong>Total of the period</strong> &mdash; the whole range (default).</li>
-      <li><strong>Latest point</strong> &mdash; the last point of the series, compared with the one
-        <em>Compare against (points back)</em> earlier: 1 for the previous month on a monthly series,
-        12 for the same month last year.</li>
-      <li><strong>Last N points</strong> &mdash; the sum of the last N points against the N before
-        them: on a monthly series, N = 12 is the rolling year against the previous one.</li>
+      <li>The main number <strong>shrinks to fit</strong> instead of being cut off. In a grid, all cards share the size of the one that needs it most.</li>
+      <li>Small Multiples <em>Columns</em> is a maximum: when the cards would be narrower than about 150 px, fewer columns are used.</li>
+      <li>When a single card is too short, the extras are withdrawn in this order: trend, prior/target line, secondary KPIs,
+      status text, variance and label. The number always stays.</li>
     </ul>
-    <p>
-      <strong>Show period label</strong> prints what is compared, for example &ldquo;Dec 2025 vs Nov
-      2025&rdquo;. The visual steps back by positions in the series, so a step of 12 is a year only if
-      the series is monthly &mdash; the label is how you check it. A Prior Period measure you bind
-      yourself always takes precedence.
-    </p>
+  </div>
 
-    <h2>Secondary KPIs (Pro)</h2>
-    <p>
-      Up to three supporting measures with their own variance. <strong>Position</strong> decides
-      where they go:
-    </p>
+  <!-- Format pane -->
+  <h2 id="format">Format pane</h2>
+  <div class="card">
+    <p>Settings that need a licence carry (Pro) in their name. In <strong>format mode</strong> you can also click the number, the label,
+    the variance, the trend line or the card itself to format it right there.</p>
     <ul>
-      <li><strong>Right</strong> &mdash; a column beside the value, numbers right-aligned and every
-        variance pill at the same position. Below <em>Min width beside value</em> the column is
-        withdrawn, so the main value is never squeezed.</li>
-      <li><strong>Bottom</strong> &mdash; below the value: in a row when the figures fit, otherwise in
-        a list, one line per KPI, or name above number and pill on very narrow cards.</li>
-      <li><strong>Auto</strong> (default) &mdash; on the right when there is room, below when the card
-        is narrower than the minimum width.</li>
+      <li><strong>Style template</strong> — template, setup guide.</li>
+      <li><strong>Card</strong> — background, border colour; (Pro) border width, radius, padding, drop shadow.</li>
+      <li><strong>Main Value</strong> — font, size, bold, colour, display units, decimal places; (Pro) prefix and suffix.</li>
+      <li><strong>Label</strong> — show, font, size, bold, colour.</li>
+      <li><strong>Variance</strong> — show, invert (lower is better), arrow, size; (Pro) colours and pill.</li>
+      <li><strong>Color rules</strong> (Pro) — compare with, thresholds, lower is better, three colours, apply to, status text.</li>
+      <li><strong>Prior &amp; Target</strong>, <strong>Value &amp; comparison</strong>, <strong>Secondary KPIs</strong> (Pro), <strong>Image</strong>,
+      <strong>Trend</strong> (Pro), <strong>Small Multiples</strong> (Pro), <strong>Accessibility</strong>.</li>
     </ul>
-    <p>
-      In small multiples <strong>every card uses the same layout</strong>: if one card needs the list,
-      all of them show it. The grid never scrolls sideways; when the cards need more height it scrolls
-      vertically.
-    </p>
+    <p>The Format pane, the setup guide and the messages of the visual follow the language of Power BI: English, Spanish,
+    French, German, Italian, Portuguese (Brazil and Portugal), Dutch, Polish, Japanese, Simplified Chinese and Korean.</p>
+  </div>
 
-    <h2>Format pane</h2>
-    <p>Settings and cards that need a licence carry <strong>(Pro)</strong> in their name.</p>
+  <!-- Accessibility -->
+  <h2 id="accessibility">Accessibility</h2>
+  <div class="card">
     <ul>
-      <li><strong>Card</strong> &mdash; Background, Border Colour, and <strong>(Pro)</strong> Border
-        Width, Border Radius, Padding, Drop Shadow.</li>
-      <li><strong>Main Value</strong> &mdash; Font family, size, bold, colour, display units, decimal
-        places, and <strong>(Pro)</strong> Prefix and Suffix.</li>
-      <li><strong>Label (single card)</strong> &mdash; Show, font family, size, bold, colour. Governs
-        the text above the number when there is a single card; with Small Multiples that text is
-        governed by the Small Multiples card.</li>
-      <li><strong>Variance</strong> &mdash; Show, invert logic (lower is better), show arrow, font
-        size, and <strong>(Pro)</strong> positive / negative / neutral colours and Show as Pill.</li>
-      <li><strong>Status (Pro)</strong> &mdash; Show, compare value with (target or prior period),
-        lower and upper threshold, lower is better, the three colours, apply color to, show status
-        text.</li>
-      <li><strong>Prior &amp; Target</strong> &mdash; Show, font family, size and colour of the
-        &ldquo;Prior:&rdquo; and &ldquo;Target:&rdquo; line.</li>
-      <li><strong>Value &amp; comparison</strong> &mdash; Value shows, window size, compare against
-        (points back), show period label.</li>
-      <li><strong>Secondary KPIs (Pro)</strong> &mdash; Show, position, min width beside value, show
-        variance, value and label text size and colour.</li>
-      <li><strong>Image</strong> &mdash; Show, height, corner radius.</li>
-      <li><strong>Trend (Pro)</strong> &mdash; Show, chart type (area, line or bar), colour, line
-        width, area opacity, height, last-point marker, and the target line with its colour. Hover
-        the line to read the value of any period.</li>
-      <li><strong>Small Multiples (Pro)</strong> &mdash; Columns, gap, and the category title with its
-        font family, size, bold and colour.</li>
-      <li><strong>Accessibility</strong> &mdash; High contrast handling and the visual title announced
-        to screen readers.</li>
+      <li><strong>Screen readers</strong> hear each card in full: name and value, period, variance against the prior, target and status.</li>
+      <li><strong>Keyboard</strong>: Tab reaches the cards; arrow keys, Home and End move between them; Enter or Space selects.</li>
+      <li>The <strong>trend line</strong> is a slider: arrow keys move from point to point and each one is announced
+      (“Sep: 1.39K”); Enter filters by it.</li>
+      <li><strong>High contrast</strong>: system colours replace the palette and every state is also written as text.</li>
     </ul>
+  </div>
 
-    <h2>Free vs Pro</h2>
-    <p>The card is complete without a licence. A Pro subscription adds context around it.</p>
-    <ul>
-      <li><strong>Free</strong> &mdash; one KPI card with value, prior-period variance with its arrow
-        and invert logic, and target; your model&rsquo;s number formats, display units and decimals;
-        label styling; card background and border colour; images; native and modern tooltips;
-        cross-filtering, cross-highlighting and bookmarks; keyboard navigation, screen-reader labels
-        and high contrast.</li>
-      <li><strong>Pro</strong> &mdash; Status colours; the trend line, with its target and hover
-        values, and the period comparisons it enables; Small Multiples, up to 50 cards in one to six
-        columns; Secondary KPIs; prefix and suffix; the variance pill and custom variance colours;
-        extra measures in tooltips; and the card border width, radius, padding and shadow.</li>
-    </ul>
-    <p>
-      <strong>See it before you buy.</strong> While you edit a report without a licence, every Pro
-      feature you turn on is drawn working under a &ldquo;Pro preview&rdquo; watermark that names it,
-      and Power BI shows its own licence notification with the way to buy. Reading view shows the free
-      result with no watermark, so a published report never uses a feature that has not been paid for.
-    </p>
+  <!-- Free vs Pro -->
+  <h2 id="free-pro">Free vs Pro</h2>
+  <div class="card">
+    <p><strong>Free</strong> — a complete card: value, prior-period variance with arrow and invert, target; your model's formats,
+    display units and decimals; label and card colours; images; style templates; the setup guide; the size-adaptive layout;
+    tooltips; cross-highlighting, bookmarks, keyboard, screen-reader summaries and high contrast; format on the canvas.</p>
+    <p><strong>Pro</strong> — color rules; the trend line with its target, hover values, clickable points and period comparisons;
+    Small Multiples (up to 50 cards, 1 to 6 columns); Secondary KPIs; prefix and suffix; variance pill and colours; extra
+    tooltip measures; card border width, radius, padding and shadow.</p>
+    <p><strong>See it before you buy.</strong> While you edit without a licence, every Pro feature you turn on is drawn working under
+    a “Pro preview” watermark naming it. Reading view shows the free result. Pro comes with a 30-day free trial on AppSource.</p>
+  </div>
 
-    <h2>Accessibility</h2>
-    <ul>
-      <li>Each card is reachable with <strong>Tab</strong> and selected with
-        <strong>Enter</strong> or <strong>Space</strong>.</li>
-      <li>Right-click opens the standard Power BI context menu, on a card and on empty space.</li>
-      <li>High-contrast themes are honoured: colours follow the Power BI palette, and Status is shown
-        as text rather than colour.</li>
-      <li>Cards carry ARIA labels announcing the metric name, value, variance and status. The visual
-        title announced to screen readers is configurable under Accessibility.</li>
-    </ul>
+  <!-- FAQ -->
+  <h2 id="faq">FAQ</h2>
+  <details><summary>My percentage shows as 0.3.</summary><div class="faq-body"><p>The card uses the format of the measure in your model. Format the measure as a percentage (Measure tools → Format → Percentage) and the card shows 30%. Do not add a “%” suffix to a raw ratio: it would read 0.3%.</p></div></details>
+  <details><summary>The card shows a different number of decimals from my measure.</summary><div class="faq-body"><p>Check <em>Main Value → Decimal places</em>: once you change it, it overrides the measure's format. With display units (K, M) the decimals are chosen to fit the scaled number.</p></div></details>
+  <details><summary>Why is there no fx (conditional formatting) button?</summary><div class="faq-body"><p>Power BI does not offer its fx button to visuals that read data as a matrix, and this one needs the matrix to combine Small Multiples and Trend. <strong>Color rules</strong> (Pro) do the same job: thresholds on the target, the prior period or the value itself, applied to the number, an accent bar, the background or the border.</p></div></details>
+  <details><summary>The color rules do not appear.</summary><div class="faq-body"><p>They need <em>Show</em> on, a target (or a prior period, if you compare with it — not needed for <em>Value itself</em>) and a licence, or edit mode, where they are drawn under the Pro preview watermark.</p></div></details>
+  <details><summary>How do I filter the report by one month?</summary><div class="faq-body"><p>Bind a date to Trend and click that point of the line, or move to it with the arrow keys and press Enter. Ctrl+click adds more months; clicking empty space clears.</p></div></details>
+  <details><summary>Clicking a single card does nothing.</summary><div class="faq-body"><p>A single card has no category to filter by, like Power BI's own card. Add a field to Small Multiples to filter by card, or to Trend to filter by period.</p></div></details>
+  <details><summary>The setup guide is in the way. How do I hide it — or get it back?</summary><div class="faq-body"><p>Click ✕ or Finish. It only shows while you edit and never in reading view. To bring it back: <em>Format → Style template → Setup guide</em>.</p></div></details>
+  <details><summary>I chose a template and some of my colours did not change.</summary><div class="faq-body"><p>That is on purpose: a template only fills settings you have not changed yourself. Reset a setting (the circular arrow in the Format pane) and the template's value applies.</p></div></details>
+  <details><summary>The number got smaller, or the trend line disappeared.</summary><div class="faq-body"><p>The visual is smaller than the content. The number shrinks to stay whole, and on a short card the extras are withdrawn — trend first. Make the visual taller or lower <em>Trend → Height</em>.</p></div></details>
+  <details><summary>My secondary KPIs moved below the value, or disappeared.</summary><div class="faq-body"><p>With <em>Position: Auto</em> they move below when the card is narrower than <em>Min width beside value</em>, and switch to a list when the figures do not fit in a row. With <em>Right</em> they are withdrawn below that width. Lower the minimum width, use fewer columns, or choose Bottom.</p></div></details>
+  <details><summary>My image does not appear.</summary><div class="faq-body"><p>The Image well only accepts Base64 data URIs (<code>data:image/png;base64,…</code>). A link to an image on a web server is rejected on purpose: honouring it would make the visual fetch from the network, which it never does. Set the field's aggregation to <em>First</em>.</p></div></details>
+  <details><summary>I added a field to Small Multiples and still see one card.</summary><div class="faq-body"><p>Small Multiples is a Pro feature. Without a licence it is drawn working only in edit mode, under the Pro preview watermark; in reading view the first category renders and Power BI shows its licence notification.</p></div></details>
+  <details><summary>I bought Pro but the Pro features do not appear.</summary><div class="faq-body"><p>The licence is checked after the card first paints, so for a moment the free result shows; it re-renders a second later. If it persists, check you are signed in with the account that holds the licence and that it is assigned in the Microsoft 365 admin center.</p></div></details>
+  <details><summary>The variance shows the wrong direction.</summary><div class="faq-body"><p>For metrics where lower is better — cost, defects, churn — switch on <em>Variance → Invert</em> (free), and <em>Lower is better</em> in Color rules if you use them.</p></div></details>
+  <details><summary>The Format pane is in English.</summary><div class="faq-body"><p>It follows the language of Power BI Desktop (File → Options → Regional settings) or of the Service. Twelve languages are included; others fall back to English.</p></div></details>
+  <details><summary>Does the visual send my data anywhere?</summary><div class="faq-body"><p>No. Everything is calculated and drawn inside Power BI and the visual makes no network calls of any kind. The only host API it uses is Microsoft's licence check, which carries no report data. See the <a href="privacy.html">Privacy Policy</a>.</p></div></details>
+  <details><summary>Does it work in Power BI Service and mobile?</summary><div class="faq-body"><p>Yes: Desktop, Service, Embedded and the mobile apps.</p></div></details>
 
-    <h2>Video walkthrough</h2>
-    <p>
-      The tour of version 2.1: building the card from three fields, the status colours, one card per
-      country, comparing periods without DAX, the secondary KPIs, and what the Pro plan adds.
-    </p>
-    <p><a href="https://www.youtube.com/watch?v=4fP7zYKnhWo">Watch on YouTube</a></p>
-
-    <h2>Frequently asked questions</h2>
-
-    <p><strong>My percentage shows as 0.3.</strong><br />
-      The card uses the format of the measure in your model. Format the measure as a percentage
-      (Measure tools &rarr; Format &rarr; Percentage) and the card shows 30%. Do not add a &ldquo;%&rdquo;
-      suffix to a raw ratio: it would read 0.3%.</p>
-
-    <p><strong>The card shows a different number of decimals from my measure.</strong><br />
-      Check <em>Main Value &rarr; Decimal Places</em>: once you change it, it overrides the measure&rsquo;s
-      format. With display units (K, M) the decimals are chosen to fit the scaled number.</p>
-
-    <p><strong>The status does not appear.</strong><br />
-      Status needs <em>Show</em> on, a target (or a prior period, if you compare with it) and a
-      licence &mdash; or edit mode, where it is drawn under the Pro preview watermark.</p>
-
-    <p><strong>My secondary KPIs moved below the value, or disappeared.</strong><br />
-      With <em>Position: Auto</em> they move below when the card is narrower than <em>Min width beside
-      value</em>, and they switch to a list when the figures do not fit in a row. With <em>Position:
-      Right</em> they are withdrawn below that width instead. Lower the minimum width, use fewer
-      Small Multiples columns, or choose Bottom.</p>
-
-    <p><strong>My image does not appear.</strong><br />
-      The Image well only accepts Base64 data URIs (<code>data:image/png;base64,&hellip;</code>).
-      A link to an image on a web server is rejected on purpose: honouring it would make the visual
-      fetch from the network, which it never does. Convert the images in Power Query or with a small
-      script, and set the field&rsquo;s aggregation to <em>First</em>.</p>
-
-    <p><strong>I added a field to Small Multiples and still see one card.</strong><br />
-      Small Multiples is a Pro feature. Without a licence it is drawn working only in edit mode, under
-      the Pro preview watermark; in reading view the first category renders and Power BI shows its
-      licence notification.</p>
-
-    <p><strong>I bought Pro but the Pro features do not appear.</strong><br />
-      Licence validation runs asynchronously after the card first paints, so for a moment the free
-      result is shown. It re-renders with your settings a second later. If it persists, confirm you are
-      signed in with the account that holds the licence, and that it is active in the Microsoft 365
-      admin center.</p>
-
-    <p><strong>The variance shows the wrong direction.</strong><br />
-      For metrics where lower is better &mdash; cost, defects, churn &mdash; switch on <em>Invert</em>
-      under Variance, which is free. If you use Status (Pro), switch on <em>Lower is better</em> there
-      too.</p>
-
-    <p><strong>Does the visual send my data anywhere?</strong><br />
-      No. All calculation and rendering happens inside Power BI. The visual makes no network calls of
-      any kind. The only host API it uses is Microsoft&rsquo;s own licence check, which carries no
-      report data. See the <a href="privacy.html">Privacy Policy</a>.</p>
-
-    <p><strong>Does it work in Power BI Service?</strong><br />
-      Yes. Desktop, Service and the mobile apps are all supported.</p>
-
-    <h2>Contact support</h2>
-    <div class="contact-card">
-      <p><strong>Email:</strong> <a href="mailto:support@tcviz.com">support@tcviz.com</a> — we reply within 1&ndash;2 business days.</p>
-      <p><strong>Issues and feature requests:</strong> <a href="mailto:support@tcviz.com?subject=KPI%20Card%20Pro">support@tcviz.com</a></p>
-      <p><strong>What changed recently:</strong> <a href="changelog.html">Changelog</a></p>
-      <p><strong>Licensing:</strong> managed through Microsoft AppSource. Assign licences in the Microsoft 365 admin center.</p>
+  <!-- Contact -->
+  <h2 id="contact">Contact &amp; Support</h2>
+  <div class="contact-box">
+    <div class="icon">✉️</div>
+    <div>
+      <h3>support@tcviz.com</h3>
+      <p>Questions, ideas or a bug? Email <a href="mailto:support@tcviz.com">support@tcviz.com</a>, ask in
+      <a href="https://github.com/tinocallarisa-web/kpi-card-pro/discussions" target="_blank">GitHub Discussions</a> or
+      <a href="https://github.com/tinocallarisa-web/kpi-card-pro/issues/new" target="_blank">open an issue</a>.
+      Licensing questions: include your AppSource order reference.</p>
     </div>
-  </main>
+  </div>
+  <div class="cta">
+    <a class="btn btn-outline" href="changelog.html">Changelog</a>
+  </div>
 
-  <footer>
-    &copy; 2026 TCViz &nbsp;·&nbsp; <a href="https://tcviz.com">tcviz.com</a> &nbsp;·&nbsp;
-    <a href="privacy.html">Privacy Policy</a> &nbsp;·&nbsp;
-    <a href="terms.html">Terms of Use</a>
-  </footer>
+</div>
+
+<footer>
+  <div style="margin-bottom:10px;">
+    <a href="https://tinocallarisa-web.github.io/kpi-card-pro/privacy.html">Privacy Policy</a>
+    <a href="https://tinocallarisa-web.github.io/kpi-card-pro/terms.html">Terms of Service</a>
+    <a href="changelog.html">Changelog</a>
+    <a href="https://github.com/tinocallarisa-web/kpi-card-pro/discussions" target="_blank">Discussions</a>
+    <a href="https://github.com/tinocallarisa-web/kpi-card-pro" target="_blank">GitHub</a>
+    <a href="https://tcviz.com" target="_blank">tcviz.com</a>
+  </div>
+  <p>© 2026 TCViz · KPI Card Pro · <a href="mailto:support@tcviz.com">support@tcviz.com</a></p>
+</footer>
+
+<script>
+(function () {
+  'use strict';
+
+  // ── Nav highlight (in-page anchors only) ────────────────────────────────────
+  document.querySelectorAll('nav a[href^="#"]').forEach(function (a) {
+    a.addEventListener('click', function () {
+      document.querySelectorAll('nav a').forEach(function (x) { x.classList.remove('active'); });
+      a.classList.add('active');
+    });
+  });
+
+  // ── Documentation search ────────────────────────────────────────────────────
+  var input  = document.getElementById('docsearch');
+  var clear  = document.getElementById('searchclear');
+  var status = document.getElementById('searchstatus');
+  var wrap   = document.querySelector('.wrap');
+  if (!input || !wrap) { return; }
+
+  var HIDE = 'is-hidden';
+
+  // Atomic searchable units: one FAQ entry, one table row, one card.
+  var units = [];
+  function add(el) {
+    if (units.some(function (u) { return u.el === el; })) { return; }
+    units.push({ el: el, html: el.innerHTML, text: (el.textContent || '').toLowerCase() });
+  }
+  wrap.querySelectorAll('details').forEach(add);
+  wrap.querySelectorAll('table tr').forEach(function (tr) {
+    if (tr.querySelector('th')) { return; }   // header rows follow their table
+    add(tr);
+  });
+  wrap.querySelectorAll('.card, .contact-box').forEach(add);
+
+  // Sections: an <h2> plus every sibling up to the next <h2>.
+  var sections = [];
+  var current = null;
+  Array.prototype.forEach.call(wrap.children, function (el) {
+    if (el.tagName === 'H2') {
+      current = { head: el, body: [] };
+      sections.push(current);
+    } else if (current) {
+      current.body.push(el);
+    }
+  });
+  // Each body element remembers which units live inside it.
+  sections.forEach(function (sec) {
+    sec.body.forEach(function (b) {
+      b._units = units.filter(function (u) { return b === u.el || b.contains(u.el); });
+      if (!b._units.length) { b._html = b.innerHTML; }
+    });
+  });
+
+  function escapeRe(t) { return t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+  function escapeHtml(t) {
+    return t.replace(/[&<>]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]; });
+  }
+
+  function highlight(el, terms) {
+    var re = new RegExp('(' + terms.map(escapeRe).join('|') + ')', 'gi');
+    var walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null);
+    var nodes = [], n;
+    while ((n = walker.nextNode())) { nodes.push(n); }
+    nodes.forEach(function (node) {
+      var txt = node.nodeValue;
+      re.lastIndex = 0;
+      if (!re.test(txt)) { return; }
+      re.lastIndex = 0;
+      var span = document.createElement('span');
+      span.innerHTML = escapeHtml(txt).replace(re, '<mark>$1</mark>');
+      node.parentNode.replaceChild(span, node);
+    });
+  }
+
+  function showAll() {
+    units.forEach(function (u) { u.el.classList.remove(HIDE); u.el.innerHTML = u.html; });
+    sections.forEach(function (sec) {
+      sec.head.classList.remove(HIDE);
+      sec.body.forEach(function (b) {
+        b.classList.remove(HIDE);
+        if (b._html !== undefined) { b.innerHTML = b._html; }
+      });
+    });
+    status.textContent = '';
+    clear.hidden = true;
+  }
+
+  function run(q) {
+    q = (q || '').trim();
+    if (q.length < 2) { showAll(); return; }
+    clear.hidden = false;
+
+    var terms = q.toLowerCase().split(/\s+/).filter(Boolean);
+    var hits = 0;
+
+    units.forEach(function (u) {
+      u.el.innerHTML = u.html;
+      var match = terms.every(function (t) { return u.text.indexOf(t) !== -1; });
+      u.el.classList.toggle(HIDE, !match);
+      if (match) {
+        hits++;
+        highlight(u.el, terms);
+        if (u.el.tagName === 'DETAILS') { u.el.open = true; }
+      }
+    });
+
+    sections.forEach(function (sec) {
+      var anyVisible = false;
+      sec.body.forEach(function (b) {
+        var visible;
+        if (b._units.length) {
+          visible = b._units.some(function (u) { return !u.el.classList.contains(HIDE); });
+        } else {
+          b.innerHTML = b._html;
+          var txt = (b.textContent || '').toLowerCase();
+          visible = terms.every(function (t) { return txt.indexOf(t) !== -1; });
+          if (visible) { highlight(b, terms); }
+        }
+        b.classList.toggle(HIDE, !visible);
+        if (visible) { anyVisible = true; }
+      });
+      sec.head.classList.toggle(HIDE, !anyVisible);
+    });
+
+    status.textContent = hits
+      ? hits + ' result' + (hits === 1 ? '' : 's') + ' for “' + q + '”'
+      : 'No results for “' + q + '”. Try a Format pane setting name, or email support@tcviz.com.';
+  }
+
+  var timer;
+  input.addEventListener('input', function () {
+    clearTimeout(timer);
+    timer = setTimeout(function () { run(input.value); }, 120);
+  });
+  input.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') { input.value = ''; showAll(); }
+  });
+  clear.addEventListener('click', function () { input.value = ''; showAll(); input.focus(); });
+
+  // Deep link: support.html?q=license
+  var qp = new URLSearchParams(location.search).get('q');
+  if (qp) { input.value = qp; run(qp); }
+})();
+</script>
 </body>
 </html>

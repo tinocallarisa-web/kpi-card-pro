@@ -1,5 +1,27 @@
 # Changelog — KPI Card Pro
 
+## [2.2.0.0] — 2026-10-12
+
+### Added
+- **Click a trend point to filter the report by that period.** In small multiples the selection carries the card too: March of Spain, not March of everyone. Ctrl+click adds points, clicking empty space clears, and the selected points are marked with a ring. In bar trends the other bars dim.
+- **Color rules (Pro)** — the card's conditional formatting. *Compare value with* gains **Value itself**, with thresholds in the value's own units, and *Apply color to* gains **Card background** (a light tint) and **Card border**. Power BI's fx button is not available to visuals that read data as a matrix, which this one does to combine Small Multiples and Trend; Color rules is the answer to that, not a workaround. The card formerly called Status keeps every setting.
+- **Style templates (free):** Classic, Clean, Bold, Minimal, Soft and Midnight. A template only fills settings you have not changed yourself, and only touches colours, fonts and the size of the number — never the Pro card styling. On dark cards the variance colours lighten automatically.
+- **Setup guide inside the visual (free).** While you edit, a small panel lists the optional fields, ticks each as you add it, and offers the templates as one-click previews. ✕ or Finish closes it; *Format → Style template → Setup guide* brings it back. Never shown in reading view.
+- **Format on the canvas.** In format mode, click the number, the label, the variance, the trend line or the card to format it there, with shortcuts to the template, display units and chart type.
+- **Twelve languages.** English, Spanish, French, German, Italian, Portuguese (Brazil and Portugal), Dutch, Polish, Japanese, Simplified Chinese and Korean — the Format pane, the setup guide, the messages and the licence notice.
+
+### Changed
+- **The layout adapts to the size of the visual.** The main number shrinks to fit instead of being cut off with an ellipsis — measured exactly, since a number a fraction of a pixel too wide used to show "14…". In a grid every card takes the size of the one that needs it most. Small Multiples *Columns* becomes a maximum: below about 150 px per card fewer columns are used. A single card that is too short withdraws, in order, the trend, the prior/target line, the secondary KPIs, the status text, the variance and the label; the number always stays.
+- **Accessibility.** Screen readers hear the whole card — value, period, variance against the prior, target and status — instead of only its name. Arrow keys, Home and End move between cards. The trend line is a slider: arrow keys step through the points, each one announced, and Enter filters by it. The focus ring uses the TCViz blue, and yellow in high contrast.
+- **A card is a button only when there is something to select;** otherwise it is a group with its summary.
+- **New Nord-style icon.**
+
+### Fixed
+- **Clicking a card filtered the report but nothing changed on the card** (certification note 1180.2.2.3, *Filter out*). The selected card now stays sharp and the others dim to 30%, and the single card filters through its trend points.
+- **The Format pane was always in English,** even with the Spanish translation installed: the settings carried no translation keys. They are now applied from `capabilities.json` to cards, settings, descriptions and list options.
+- **The status text was drawn in a serif font** in some hosts; it now uses the label font.
+- **Two cards of the Format pane had no translation keys** (*Value & comparison* and *Secondary KPIs*).
+
 ## [2.1.0.0] — 2026-10-02
 
 ### Added
