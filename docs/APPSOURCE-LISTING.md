@@ -132,5 +132,5 @@ Editing this file changes nothing in the offer.
 - [ ] Offer logo: `assets/logo_300x300.png`
 - [ ] Video field unchanged: `https://www.youtube.com/watch?v=4fP7zYKnhWo` (canonical form only)
 - [ ] Certification notes from `docs/CERTIFICATION-NOTES-SHORT.txt` — the field is cleared on every resubmission
-- [ ] Version 2.2.0.0 is above the version currently published (2.1.0.0)
+- [ ] Version 2.2.0.0 is above the one currently published (check Partner Center)
 - [ ] Support, privacy and terms URLs checked with a real request
