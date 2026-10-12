@@ -41,6 +41,9 @@ interface MetricData {
     trendData: number[];                  // series for the sparkline, empty when unbound
     trendLabels: string[];                // etiqueta de cada punto, para el valor al pasar el raton
     targetData: number[];                 // target per period, aligned with trendData
+    /** Seleccion de cada punto de la tendencia, alineada con trendData: un clic en un
+     *  punto filtra el informe por ese periodo (y por la tarjeta, en small multiples). */
+    trendIds: powerbi.extensibility.ISelectionId[];
     image: string | null;                 // validated Base64 data URI, or null
 }
 
@@ -157,6 +160,8 @@ export class Visual implements IVisual {
     private watermarkWhy: HTMLDivElement | null = null;
     /** Solo para el overlay de diagnostico. */
     private dbgMeasureIdx = 0;
+    /** Claves de lo seleccionado al pintar: tarjetas y puntos de la tendencia. */
+    private selKeys: Set<string> = new Set();
 
     constructor(options: VisualConstructorOptions) {
         this.host = options.host;
@@ -222,6 +227,53 @@ export class Visual implements IVisual {
                 this.selectionManager.showContextMenu(null, { x: e.clientX, y: e.clientY });
             }
         });
+
+        // Un clic fuera de las tarjetas y de los puntos limpia la selección, como en los
+        // visuales nativos.
+        this.container.addEventListener("click", (e: MouseEvent) => {
+            if ((this.host as any).allowInteractions === false) return;
+            const t = e.target as HTMLElement;
+            if (t.closest("[data-selection-index]") || t.closest(".kpi-sparkline")) return;
+            if (this.selKeys.size === 0) return;
+            this.selectionManager.clear().then(() => this.repaint());
+        });
+    }
+
+    // ─── Selección ──────────────────────────────────────────────────────────
+
+    private keyOf(id: powerbi.extensibility.ISelectionId | null | undefined): string {
+        if (!id) return "";
+        const k = (id as any).getKey?.();
+        return typeof k === "string" ? k : JSON.stringify(id);
+    }
+
+    private selectedKeys(): Set<string> {
+        let ids: unknown[] = [];
+        try { ids = (this.selectionManager.getSelectionIds?.() as unknown[]) || []; } catch (_) { ids = []; }
+        return new Set(ids.map(i => this.keyOf(i as powerbi.extensibility.ISelectionId)).filter(k => k));
+    }
+
+    /** ¿Está seleccionada la tarjeta, o alguno de sus puntos? */
+    private cardSelected(metric: MetricData): boolean {
+        if (this.selKeys.size === 0) return false;
+        if (metric.selectionId && this.selKeys.has(this.keyOf(metric.selectionId))) return true;
+        return metric.trendIds.some(id => this.selKeys.has(this.keyOf(id)));
+    }
+
+    /**
+     * Selecciona y repinta. La selección propia no llega por registerOnSelectCallback (solo
+     * la externa: marcadores, borrar filtros), así que sin repintar aquí el clic filtraba
+     * el informe pero la tarjeta no cambiaba — que es justo lo que vio el revisor.
+     * Se pinta con render(), no con update(): fuera de update() no se emiten eventos de
+     * renderizado, y repetirlos es motivo de rechazo.
+     */
+    private selectId(id: powerbi.extensibility.ISelectionId, multi: boolean): void {
+        this.selectionManager.select(id, multi).then(() => this.repaint());
+    }
+
+    private repaint(): void {
+        if (!this.lastDataView || !this.formattingSettings) return;
+        try { this.render(this.parseDataView(this.lastDataView)); } catch (_) { /* se queda lo que hay */ }
     }
 
     // ─── Update ─────────────────────────────────────────────────────────────
@@ -708,6 +760,11 @@ export class Visual implements IVisual {
 
         const pathD = pts.map((p, i) => `${i === 0 ? "M" : "L"}${p[0]},${p[1]}`).join(" ");
 
+        // Puntos seleccionados (por clic aquí, o por un marcador): se marcan, y en barras el
+        // resto se atenúa. Sin esto el filtro salía hacia el informe sin rastro en la tarjeta.
+        const elegidos = new Set<number>();
+        metric.trendIds.forEach((id, i) => { if (this.selKeys.has(this.keyOf(id))) elegidos.add(i); });
+
         if (kind === "bar") {
             const barW = (100 / data.length) * 0.7;
             data.forEach((v, i) => {
@@ -718,7 +775,8 @@ export class Visual implements IVisual {
                 rect.setAttribute("width", String(barW));
                 rect.setAttribute("height", String(Math.max(0, h)));
                 rect.setAttribute("fill", color);
-                rect.setAttribute("fill-opacity", String(Math.min(1, opacity + 0.4)));
+                const fuerte = elegidos.size === 0 || elegidos.has(i);
+                rect.setAttribute("fill-opacity", String(fuerte ? Math.min(1, opacity + 0.4) : 0.15));
                 svg.appendChild(rect);
             });
         } else {
@@ -760,6 +818,21 @@ export class Visual implements IVisual {
 
         wrapper.appendChild(svg);
 
+        if (kind !== "bar") {
+            const r = lineW + 2.5;
+            elegidos.forEach(i => {
+                const p = pts[i];
+                const m = document.createElement("div");
+                m.className = "kpi-point-selected";
+                m.style.cssText =
+                    `position:absolute;left:${p[0]}%;top:${p[1]}px;` +
+                    `width:${r * 2}px;height:${r * 2}px;margin:${-r}px 0 0 ${-r}px;box-sizing:border-box;` +
+                    `border-radius:50%;background:${hc ? "#000000" : "#FFFFFF"};border:2px solid ${color};` +
+                    "pointer-events:none;z-index:2;";
+                wrapper.appendChild(m);
+            });
+        }
+
         // VALOR AL PASAR EL RATON (2.1.0.0): guia vertical, punto y etiqueta con el
         // periodo y su valor formateado. HTML encima del SVG, por la misma razon que el
         // punto final: el viewBox estirado deformaria la geometria.
@@ -787,6 +860,22 @@ export class Visual implements IVisual {
             etq.style.display = "block";
         });
         wrapper.addEventListener("mouseleave", () => { guia.style.display = "none"; etq.style.display = "none"; });
+
+        // CLIC EN UN PUNTO (2.2.0.0): filtra el informe por ese periodo. El mismo cálculo de
+        // índice que el valor al pasar el ratón, para que se filtre lo que se está viendo.
+        if (metric.trendIds.length === data.length) {
+            wrapper.style.cursor = "pointer";
+            wrapper.addEventListener("click", (e: MouseEvent) => {
+                if ((this.host as any).allowInteractions === false) return;
+                const r = wrapper.getBoundingClientRect();
+                if (r.width <= 0) return;
+                e.stopPropagation();
+                const fx = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
+                const i = kind === "bar" ? Math.min(data.length - 1, Math.floor(fx * data.length))
+                                         : Math.round(fx * (data.length - 1));
+                this.selectId(metric.trendIds[i], e.ctrlKey || e.metaKey);
+            });
+        }
         return wrapper;
     }
 
@@ -1040,9 +1129,9 @@ export class Visual implements IVisual {
      * delivered — sorting "Enero, Febrero, Marzo" alphabetically would break the
      * Sort-by-column the user set up precisely to avoid that.
      */
-    private seriesFrom(node: powerbi.DataViewMatrixNode | undefined, measureIdx: number): number[] {
+    /** Los puntos de la serie en orden: por fecha o número si todos lo son, si no tal cual llegan. */
+    private sortedKids(node: powerbi.DataViewMatrixNode | undefined): powerbi.DataViewMatrixNode[] {
         const kids = this.realChildren(node).slice();
-
         const key = (k: powerbi.DataViewMatrixNode): number | null => {
             const v = k.value as any;
             if (typeof v === "number") return v;
@@ -1052,8 +1141,24 @@ export class Visual implements IVisual {
         if (kids.length > 1 && kids.every(k => key(k) !== null)) {
             kids.sort((a, b) => (key(a) as number) - (key(b) as number));
         }
+        return kids;
+    }
 
-        return kids.map(k => this.getNodeValue(k.values ?? {}, measureIdx) ?? 0);
+    private seriesFrom(node: powerbi.DataViewMatrixNode | undefined, measureIdx: number): number[] {
+        return this.sortedKids(node).map(k => this.getNodeValue(k.values ?? {}, measureIdx) ?? 0);
+    }
+
+    /**
+     * Una selección por punto, en el mismo orden que seriesFrom(). En small multiples se
+     * encadena la tarjeta: un clic en marzo de España filtra España y marzo, no marzo de todos.
+     */
+    private seriesIdsFrom(node: powerbi.DataViewMatrixNode | undefined, levels: powerbi.DataViewHierarchyLevel[],
+                          card?: powerbi.DataViewMatrixNode): powerbi.extensibility.ISelectionId[] {
+        return this.sortedKids(node).map(k => {
+            let b = this.host.createSelectionIdBuilder();
+            if (card) { b = b.withMatrixNode(card, levels); }
+            return b.withMatrixNode(k, levels).createSelectionId();
+        });
     }
 
     /**
@@ -1065,17 +1170,7 @@ export class Visual implements IVisual {
      * fechas y la serie son años, la etiqueta lo dice y se ve al instante.
      */
     private seriesLabelsFrom(node: powerbi.DataViewMatrixNode | undefined): string[] {
-        const kids = this.realChildren(node).slice();
-        const key = (k: powerbi.DataViewMatrixNode): number | null => {
-            const v = k.value as any;
-            if (typeof v === "number") return v;
-            if (v instanceof Date) return v.getTime();
-            return null;
-        };
-        if (kids.length > 1 && kids.every(k => key(k) !== null)) {
-            kids.sort((a, b) => (key(a) as number) - (key(b) as number));
-        }
-        return kids.map(k => {
+        return this.sortedKids(node).map(k => {
             const v = k.value as any;
             if (v instanceof Date) {
                 try {
@@ -1302,6 +1397,7 @@ export class Visual implements IVisual {
                 trendData: trendBound ? this.seriesFrom(rows?.root, measureIdx) : [],
                 trendLabels: trendBound ? this.seriesLabelsFrom(rows?.root) : [],
                 targetData: trendBound && targetIdx >= 0 ? this.seriesFrom(rows?.root, targetIdx) : [],
+                trendIds: trendBound && rows ? this.seriesIdsFrom(rows.root, rows.levels) : [],
                 image: this.nodeOrChildrenText(valueNode, imageIdx)
             }];
             const modo = this.formattingSettings.period.valueMode.value;
@@ -1367,6 +1463,7 @@ export class Visual implements IVisual {
                 trendData: trendBound ? this.seriesFrom(child, measureIdx) : [],
                 trendLabels: trendBound ? this.seriesLabelsFrom(child) : [],
                 targetData: trendBound && targetIdx >= 0 ? this.seriesFrom(child, targetIdx) : [],
+                trendIds: trendBound ? this.seriesIdsFrom(child, rows.levels, child) : [],
                 image: this.nodeOrChildrenText(child, imageIdx)
             });
             const modo = this.formattingSettings.period.valueMode.value;
@@ -1520,6 +1617,7 @@ export class Visual implements IVisual {
 
         const s = this.formattingSettings;
         const palette = this.host.colorPalette;
+        this.selKeys = this.selectedKeys();
 
         // High contrast: auto-detect from host OR manual setting
         const hc = palette.isHighContrast || s.accessibility.highContrast.value;
@@ -1669,7 +1767,7 @@ export class Visual implements IVisual {
                 gap: 2px;
                 min-width: 0;
                 transition: opacity 0.15s ease;
-                opacity: ${metric.isHighlighted ? "1" : "0.3"};
+                opacity: ${!metric.isHighlighted || (this.selKeys.size > 0 && !this.cardSelected(metric)) ? "0.3" : "1"};
             `;
             wrapper.dataset.selectionIndex = String(idx);
 
@@ -1730,6 +1828,7 @@ export class Visual implements IVisual {
         cell.dataset.selectionIndex = String(index);
         cell.setAttribute("role", "button");
         cell.setAttribute("aria-label", metric.name);
+        if (metric.selectionId) { cell.setAttribute("aria-pressed", String(this.cardSelected(metric))); }
         cell.setAttribute("tabindex", "0");                   // Keyboard Navigation
         cell.style.cssText = "display: flex; flex-direction: column; flex: 1; min-width: 0; gap: 2px; cursor: default; outline: none;";
 
@@ -1748,7 +1847,7 @@ export class Visual implements IVisual {
             if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
                 if (metric.selectionId) {
-                    this.selectionManager.select(metric.selectionId, e.ctrlKey || e.metaKey);
+                    this.selectId(metric.selectionId, e.ctrlKey || e.metaKey);
                 }
             }
         });
@@ -1763,7 +1862,7 @@ export class Visual implements IVisual {
             if ((this.host as any).allowInteractions === false) return;         // Allow Interactions
             e.stopPropagation();
             if (metric.selectionId) {
-                this.selectionManager.select(metric.selectionId, e.ctrlKey || e.metaKey);
+                this.selectId(metric.selectionId, e.ctrlKey || e.metaKey);
             }
         });
 
