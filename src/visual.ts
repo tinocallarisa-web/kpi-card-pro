@@ -853,12 +853,15 @@ export class Visual implements IVisual {
         if (!box) {
             box = document.createElement("div");
             box.id = "dbg-lic";
-            box.style.cssText = "position:absolute;top:2px;left:2px;z-index:99999;max-width:96%;" +
-                "font:10px/1.35 monospace;color:#fff;background:#C96442;padding:3px 6px;" +
-                "border-radius:3px;white-space:pre;pointer-events:none;";
+            // Abajo, una línea, semitransparente y sin capturar clics: la tarjeta tiene que seguir viéndose.
+            box.style.cssText = "position:absolute;bottom:2px;left:2px;right:2px;z-index:99999;max-height:28%;overflow:hidden;" +
+                "font:9px/1.3 monospace;color:#fff;background:rgba(201,100,66,0.78);padding:2px 5px;" +
+                "border-radius:3px;white-space:normal;word-break:break-all;pointer-events:none;";
             this.container.appendChild(box);
         }
-        box.textContent = lines.join(String.fromCharCode(10));
+        // Solo la línea del fx (lo que se está probando); el resto del diagnóstico de licencia tapaba la tarjeta.
+        const fx = lines.filter(l => l.startsWith("fx meta="));
+        box.textContent = (fx.length ? fx : lines.slice(0, 2)).join(" · ");
     }
 
     /**
