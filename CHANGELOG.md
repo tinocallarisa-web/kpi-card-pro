@@ -1,5 +1,14 @@
 # Changelog — KPI Card Pro
 
+## [2.3.0.0] — 2026-10-20
+
+### Added
+- **Conditional formatting (fx) on the value colour and the card background (Pro).** *Main value → Color* and *Card → Background color* now have Power BI's fx button: rules, gradient or field value, evaluated card by card in Small Multiples. On a single card Power BI does not pass the result of a rule to the visual, so there the colour comes from **Color rules**, which compare with the target, the prior period or the value itself. The 2.2 notes said the fx button was not available to visuals that read data as a matrix; that was wrong, and this version uses it.
+
+### Changed
+- **A single card fills the visual.** Until a font size is chosen, the main number grows with the visual — like the native Card — while the label, variance and prior line grow far less, and the card is centred vertically. With a trend line the number stops at 40% of the height so the line keeps its room. A size you set under *Main value → Font size* is kept exactly. *Reports that never set a font size will show a larger number after the update.*
+- **Long card titles in a grid wrap onto two lines** before ending in "…"; the full title is still in the tooltip.
+
 ## [2.2.0.0] — 2026-10-12
 
 ### Added

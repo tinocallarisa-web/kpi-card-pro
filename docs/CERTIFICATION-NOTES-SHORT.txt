@@ -20,12 +20,11 @@ FILTER OUT (note 1180.2.2.3 on 2.1.0.0 - fixed)
 3. A single card with no Small Multiples and no Trend has nothing to filter by,
    like the native Card; with Trend it filters through its points.
 
-WHAT IS NEW IN 2.2
-Clickable trend points; selection drawn on the card; Color rules (Pro) on value,
-background or border (custom conditional formatting: fx is not offered to
-matrix-mapped visuals); 6 style templates; setup guide in edit mode only;
-on-object formatting; size-adaptive layout; screen-reader summaries, arrow-key
-navigation, trend as a keyboard slider; 12 languages for the Format pane.
+WHAT IS NEW IN 2.3
+Conditional formatting (fx, Pro) on Main value > Color and Card > Background
+color: ConstantOrRule with a wildcard selector, evaluated per card in Small
+Multiples (Power BI sends no rule result for a single card; Color rules cover it).
+A single card sizes its number to the visual until a font size is set.
 
 ALSO TEST
 - Edit mode: the setup guide lists the wells; pick a template; Finish hides it.

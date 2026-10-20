@@ -31,15 +31,11 @@ A number on a dashboard is only half an answer. 9.7M in revenue — is that good
 
 KPI Card Pro puts the answer on the card: the value, its variance, the target, a trend line and a color that says on track, warning or off track. Add a category and the single card becomes a grid — up to fifty cards, one per country, product or team, each with its own figures and line.
 
-WHAT IS NEW IN 2.2
+WHAT IS NEW IN 2.3
 
-• Click a point of the trend line to filter the whole report by that period — and by that card, in a grid
-• Color rules on the target, the prior period or the value itself, painted on the number, an accent bar, the card background or its border
-• Six style templates, from Clean to Midnight, applied in one click
-• A setup guide inside the visual: it ticks off each field as you add it and shows the templates with your own number
-• A layout that fits any size: the number shrinks instead of being cut off, and the grid picks how many columns fit
-• Format on the canvas, screen-reader summaries, keyboard navigation through cards and trend points
-• Format pane in twelve languages
+• Conditional formatting (fx) on the value colour and the card background, card by card in a grid
+• A single card that fills the visual: the number grows with it, like the native Card, until you set a size
+• Long card titles wrap onto two lines instead of being cut
 
 NO DATE TABLE, NO DAX
 
@@ -60,6 +56,7 @@ WHAT YOU GET
 • Variance against a prior period, with a direction arrow and invert logic for costs
 • A target, on the card and drawn on the trend line period by period
 • Color rules with three states, written under the value too, so meaning never depends on colour alone
+• Conditional formatting (fx) on the value colour and the card background, per card in a grid
 • A trend line: area, line or bars, over any date or ordered period
 • One card per category, in up to six columns that adapt to the width
 • A logo or flag on each card, from Base64 images already in your model
@@ -75,7 +72,7 @@ FREE AND PRO
 
 The card is complete without a licence: value, variance with its arrow and invert logic, target, your number formats, images, style templates, the setup guide, the size-adaptive layout, format on the canvas, cross-filtering, bookmarks, keyboard, screen readers and high contrast.
 
-Pro adds the context: color rules, the trend line with clickable points and its period comparisons, Small Multiples, Secondary KPIs, prefix and suffix, the variance pill and colours, extra tooltip measures, and the card border, radius, padding and shadow.
+Pro adds the context: color rules and conditional formatting (fx), the trend line with clickable points and its period comparisons, Small Multiples, Secondary KPIs, prefix and suffix, the variance pill and colours, extra tooltip measures, and the card border, radius, padding and shadow.
 
 SEE IT BEFORE YOU BUY
 

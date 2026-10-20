@@ -55,7 +55,7 @@ the single card had nothing selectable at all. In 2.2.0.0:
 ## What is new in 2.2.0.0
 
 - **Color rules (Pro)** replace Status with the same settings plus *Value itself* as basis and the card
-  background or border as targets. Power BI's conditional formatting (fx) is documented as not supported
+  background or border as targets. [2.3: superseded — fx works per card in Small Multiples] Power BI's conditional formatting (fx) is documented as not supported
   for matrix-based visuals, and this visual uses the matrix mapping to combine Small Multiples and Trend,
   so the rules are custom conditional formatting.
 - **Style templates** (free) apply only to properties absent from `metadata.objects`, and only to free
