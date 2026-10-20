@@ -2006,25 +2006,37 @@ export class Visual implements IVisual {
      * en el propio nodo o, con una sola tarjeta, en la raíz; se miran los tres (y los hijos, si la tarjeta agrupa
      * una tendencia). El color fijo NO llega aquí: está en metadata.objects y lo lee formattingSettings.
      */
+    /**
+     * Resultado de una regla fx (color del valor o fondo) para la tarjeta. Power BI la evalúa en cada nodo de la matriz:
+     * la tarjeta, su subtotal y, con tendencia, cada periodo. Lo que vale es el resultado sobre lo que ENSEÑA la tarjeta:
+     *  1. su propio nodo o su subtotal (el total de la tarjeta);
+     *  2. con tendencia en modo "último punto", el último periodo;
+     *  3. nada más: en modo total, un color de un mes sería falso (20-10: con meses de 300K, una regla "< 2,5M" pintaba
+     *     de azul tarjetas de 3,6M).
+     * El color fijo NO llega aquí: está en metadata.objects y lo lee formattingSettings.
+     */
     private fxColorOf(node: powerbi.DataViewMatrixNode | undefined, idx: number, obj: string, prop: string): string | null {
         const leer = (o: any): string | null => o?.[obj]?.[prop]?.solid?.color ?? null;
+        const de = (n: any): string | null => n ? (leer(n?.values?.[idx]?.objects) ?? leer(n?.objects)) : null;
+        const propio = de(node) ?? de((node?.children ?? []).find((k: any) => k.isSubtotal));
+        if (propio) { return propio; }
+        const hijos = this.realChildren(node);
+        if (hijos.length > 0) {
+            return this.formattingSettings?.period?.valueMode?.value === "latest" ? de(hijos[hijos.length - 1]) : null;
+        }
+        // Tarjeta sin agrupación de filas: el total puede llegar en la raíz o en la columna de la medida.
         const root = this.lastDataView?.matrix?.rows?.root as any;
-        const cand: any[] = [(node?.values as any)?.[idx]?.objects, (node as any)?.objects];
-        for (const k of this.realChildren(node)) { cand.push((k.values as any)?.[idx]?.objects, (k as any).objects); }
-        cand.push(root?.values?.[idx]?.objects, root?.objects);
-        // Sin agrupación de filas, el total puede llegar en la columna de la medida.
         const m: any = this.lastDataView?.matrix;
-        cand.push(m?.columns?.root?.children?.[idx]?.objects, m?.columns?.root?.objects, m?.valueSources?.[idx]?.objects);
-        for (const c of cand) { const v = leer(c); if (v) { return v; } }
-        return null;
+        return de(root) ?? leer(m?.columns?.root?.children?.[idx]?.objects) ?? leer(m?.valueSources?.[idx]?.objects);
     }
 
     /** Diagnóstico (--debug): dónde ha dejado Power BI un objeto mainValue dentro de la matriz. */
     private fxPaths(): string {
         const out: string[] = [];
         const walk = (o: any, p: string, d: number) => {
-            if (!o || typeof o !== "object" || d > 7 || out.length > 6) { return; }
-            if (o.objects?.mainValue) { out.push(p + "=" + JSON.stringify(o.objects.mainValue).slice(0, 40)); }
+            if (!o || typeof o !== "object" || d > 7 || out.length > 8) { return; }
+            const ob = o.objects?.mainValue ?? o.objects?.card;
+            if (ob) { out.push(p + (o.isSubtotal ? "[SUB]" : "") + "=" + JSON.stringify(ob).replace(/[{}"]|solid|color/g, "").slice(0, 16)); }
             for (const k of Object.keys(o)) {
                 if (k === "objects" || k === "identity" || k === "source" || k === "sources") { continue; }
                 walk(o[k], p + "." + k, d + 1);
@@ -2156,7 +2168,7 @@ export class Visual implements IVisual {
         this.subSelectable(root, "card", this.t("OO_Card", "Card"), powerbi.visuals.SubSelectionStylesType.Shape);
 
         const fxOn       = this.previewOf("conditional formatting (fx)");
-        const cardBg     = hc ? "#000000" : ((fxOn ? metrics[0]?.fxBg : null) ?? s.card.background.value?.value ?? themeBg);
+        const cardBg     = hc ? "#000000" : ((fxOn && metrics.length === 1 ? metrics[0]?.fxBg : null) ?? s.card.background.value?.value ?? themeBg);
         const cardBorder = hc ? "#FFFFFF"  : (s.card.borderColor.value?.value ?? "#E0E0E0");
         const bw  = this.previewOf("card styling") ? (s.card.borderWidth.value ?? 1) : 1;
         const br  = this.previewOf("card styling") ? (s.card.borderRadius.value ?? 8) : 8;
