@@ -44,6 +44,9 @@ KPI Card Pro — How to use this visual
 - **Color rules (Pro)** compare the value with the Target, the Prior Period or the value itself, with two
   thresholds: on track, warning, off track. Paint the number, an accent bar, the card background or its
   border. *Lower is better* mirrors the logic for costs and churn. The state is also written as text.
+- **Conditional formatting (fx, Pro)** on *Main value → Color* and *Card → Background color*, card by card in Small
+  Multiples. With a Trend field, set a gradient's Minimum and Maximum as **Number**: Lowest/Highest value are
+  worked out over the months, not the cards.
 - **Style templates** (free): Classic, Clean, Bold, Minimal, Soft, Midnight. A template only fills what
   you have not changed yourself.
 

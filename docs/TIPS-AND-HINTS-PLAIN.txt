@@ -55,6 +55,9 @@ COLOR RULES (PRO) AND STYLE TEMPLATES
   "Lower is better" mirrors the logic for costs and churn.
 - The state is also written under the value, so it never depends on
   colour alone.
+- Conditional formatting (fx, Pro) on Main value > Color and Card >
+  Background color, card by card in Small Multiples. With a Trend field,
+  set a gradient's Minimum and Maximum as Number.
 - Style templates (free): Classic, Clean, Bold, Minimal, Soft, Midnight.
   A template only fills what you have not changed yourself.
 
