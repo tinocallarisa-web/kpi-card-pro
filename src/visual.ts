@@ -2012,6 +2012,9 @@ export class Visual implements IVisual {
         const cand: any[] = [(node?.values as any)?.[idx]?.objects, (node as any)?.objects];
         for (const k of this.realChildren(node)) { cand.push((k.values as any)?.[idx]?.objects, (k as any).objects); }
         cand.push(root?.values?.[idx]?.objects, root?.objects);
+        // Sin agrupación de filas, el total puede llegar en la columna de la medida.
+        const m: any = this.lastDataView?.matrix;
+        cand.push(m?.columns?.root?.children?.[idx]?.objects, m?.columns?.root?.objects, m?.valueSources?.[idx]?.objects);
         for (const c of cand) { const v = leer(c); if (v) { return v; } }
         return null;
     }
@@ -2444,8 +2447,10 @@ export class Visual implements IVisual {
                 font-weight: ${labelBold ? 700 : 400};
                 font-size: ${labelFontSize}px;
                 color: ${labelColor};
-                white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-                line-height: 1.4;
+                line-height: 1.3;
+                ${isGridMode
+                    ? "white-space: normal; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; word-break: break-word;"
+                    : "white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"}
             `;
             cell.appendChild(labelEl);
         }
@@ -2814,6 +2819,7 @@ export class Visual implements IVisual {
      * lo que más espacio quita al número.
      */
     private fitToSize(root: HTMLElement): void {
+        this.autoCrecer(root);
         const valores = Array.from(root.querySelectorAll(".kpi-value")) as HTMLElement[];
         // Ancho real del texto con un Range: scrollWidth se redondea a entero y un número que
         // se pasa por décimas de píxel salía con elipsis aunque scrollWidth == clientWidth.
@@ -2844,6 +2850,48 @@ export class Visual implements IVisual {
             if (!desborda()) break;
             root.querySelectorAll(sel).forEach(e => (e as HTMLElement).style.display = "none");
         }
+    }
+
+    /**
+     * TAMAÑO AUTOMÁTICO (2.3). Con una sola tarjeta y sin tamaño de letra elegido por el usuario, el contenido crece
+     * hasta llenar el visual, como la tarjeta nativa: antes el número se quedaba en 28 px en una esquina de un visual
+     * de 1000×500. Todos los textos crecen en la misma proporción (búsqueda binaria del factor) y nada puede
+     * desbordar ni cortar el número. Idempotente: parte siempre del tamaño original guardado en data-fs0.
+     */
+    private autoCrecer(root: HTMLElement): void {
+        if (root.querySelector(".kpi-grid")) { return; }
+        const fijado = (this.lastDataView?.metadata?.objects as any)?.mainValue?.fontSize;
+        if (fijado !== undefined) { return; }
+        const valor = root.querySelector(".kpi-value") as HTMLElement | null;
+        if (!valor || root.clientHeight <= 0) { return; }
+        // El asistente y la marca de agua no son la tarjeta: no crecen con ella.
+        const els = (Array.from(root.querySelectorAll("*")) as HTMLElement[])
+            .filter(e => e.style && e.style.fontSize && !e.closest(".kpi-guide"));
+        for (const e of els) { if (!e.dataset.fs0) { e.dataset.fs0 = String(parseFloat(e.style.fontSize) || 0); } }
+        const base = parseFloat(valor.dataset.fs0 || "28") || 28;
+        // El número crece del todo; el resto (etiqueta, variación, prior) bastante menos, como en la tarjeta nativa.
+        const aplica = (f: number) => {
+            const g = 1 + (f - 1) * 0.3;
+            for (const e of els) { e.style.fontSize = `${(parseFloat(e.dataset.fs0 || "0") || 0) * (e === valor ? f : g)}px`; }
+        };
+        const anchoTexto = (el: HTMLElement): number => { const r = document.createRange(); r.selectNodeContents(el); return r.getBoundingClientRect().width; };
+        const cabe = () => root.scrollHeight <= root.clientHeight + 1 && root.scrollWidth <= root.clientWidth + 1
+            && anchoTexto(valor) <= valor.clientWidth - 0.5;
+        // Centrado vertical con una sola tarjeta (sin tendencia, que necesita el ancho y el alto).
+        // La celda ocupa todo el alto (flex: 1), así que el centrado va en ella, no en la raíz.
+        const celda = valor.closest(".kpi-metric-cell") as HTMLElement | null;
+        if (celda) { celda.style.justifyContent = "center"; }
+        // Con tendencia, el número no pasa del 40 % del alto: la línea necesita el suyo.
+        const tope = root.querySelector(".kpi-sparkline") ? (root.clientHeight * 0.4) / (base * 1.1) : 8;
+        let lo = 1, hi = Math.max(1, Math.min(8, 220 / base, tope));
+        aplica(1);
+        if (!cabe()) { return; }
+        for (let i = 0; i < 9; i++) {
+            const mid = (lo + hi) / 2;
+            aplica(mid);
+            if (cabe()) { lo = mid; } else { hi = mid; }
+        }
+        aplica(lo * 0.97);
     }
 
     private fitSecondaryColumns(root: HTMLElement): void {
