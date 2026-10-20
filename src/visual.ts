@@ -190,6 +190,11 @@ export class Visual implements IVisual {
     private licenseManager: IVisualLicenseManager;
     private localization: powerbi.extensibility.ILocalizationManager | undefined;
     private events: powerbi.extensibility.IVisualEventService;
+    /** Colores de alto contraste: los del tema de Windows (foreground, background, foregroundSelected). Con el
+     *  interruptor manual y sin tema del sistema, blanco sobre negro como siempre. Se recalculan en cada dibujo. */
+    private hcFg = "#FFFFFF";
+    private hcBg = "#000000";
+    private hcSel = "#FFFF00";
     private isPro: boolean = false; // set true locally to test Pro features
     private lastContextMenuTime: number = 0;
     private lastDataView: DataView | undefined = undefined;
@@ -229,6 +234,9 @@ export class Visual implements IVisual {
     private guideStep = 2;
     /** Claves de lo seleccionado al pintar: tarjetas y puntos de la tendencia. */
     private selKeys: Set<string> = new Set();
+    /** Selección tal como llega (propia o de un marcador), para comparar también con equals/includes. */
+    private selIds: powerbi.extensibility.ISelectionId[] = [];
+    private restoredIds: powerbi.extensibility.ISelectionId[] = [];
 
     constructor(options: VisualConstructorOptions) {
         this.host = options.host;
@@ -253,7 +261,9 @@ export class Visual implements IVisual {
         // from it, so there is nothing to reconcile by hand.
         const sm = this.selectionManager as any;
         if (typeof sm.registerOnSelectCallback === "function") {
-            sm.registerOnSelectCallback(() => {
+            sm.registerOnSelectCallback((ids: powerbi.extensibility.ISelectionId[]) => {
+                // Marcadores: getSelectionIds() puede no tenerlas todavía; se guardan para pintar con ellas.
+                this.restoredIds = ids || [];
                 if (!this.lastDataView || !this.formattingSettings) return;
                 try {
                     this.render(this.parseDataView(this.lastDataView));
@@ -313,7 +323,7 @@ export class Visual implements IVisual {
             if (this.formatMode) return;
             if (t.closest("[data-selection-index]") || t.closest(".kpi-sparkline")) return;
             if (this.selKeys.size === 0) return;
-            this.selectionManager.clear().then(() => this.repaint());
+            this.restoredIds = []; this.selectionManager.clear().then(() => this.repaint());
         });
 
         // Flechas, Inicio y Fin entre tarjetas (2.2.0.0); el tabulador sigue funcionando.
@@ -408,14 +418,25 @@ export class Visual implements IVisual {
     private selectedKeys(): Set<string> {
         let ids: unknown[] = [];
         try { ids = (this.selectionManager.getSelectionIds?.() as unknown[]) || []; } catch (_) { ids = []; }
+        if (!ids.length) { ids = this.restoredIds; }
+        this.selIds = ids as powerbi.extensibility.ISelectionId[];
         return new Set(ids.map(i => this.keyOf(i as powerbi.extensibility.ISelectionId)).filter(k => k));
+    }
+
+    /** ¿Está seleccionado este id? Por clave y, si no, con equals/includes: los ids que devuelve un marcador no
+     *  siempre tienen la misma clave (visto en Calendar, 13-10-2026). */
+    private estaSel(id: powerbi.extensibility.ISelectionId | null | undefined): boolean {
+        if (!id) return false;
+        if (this.selKeys.has(this.keyOf(id))) return true;
+        const a: any = id;
+        return this.selIds.some((b: any) => !!(a?.equals?.(b) || b?.equals?.(a) || b?.includes?.(a, true) || a?.includes?.(b, true)));
     }
 
     /** ¿Está seleccionada la tarjeta, o alguno de sus puntos? */
     private cardSelected(metric: MetricData): boolean {
-        if (this.selKeys.size === 0) return false;
-        if (metric.selectionId && this.selKeys.has(this.keyOf(metric.selectionId))) return true;
-        return metric.trendIds.some(id => this.selKeys.has(this.keyOf(id)));
+        if (this.selKeys.size === 0 && this.selIds.length === 0) return false;
+        if (this.estaSel(metric.selectionId)) return true;
+        return metric.trendIds.some(id => this.estaSel(id));
     }
 
     /**
@@ -427,6 +448,7 @@ export class Visual implements IVisual {
      */
     private selectId(id: powerbi.extensibility.ISelectionId, multi: boolean): void {
         if (this.formatMode) return;   // en formato sobre el lienzo, un clic formatea
+        this.restoredIds = [];
         this.selectionManager.select(id, multi).then(() => this.repaint());
     }
 
@@ -675,8 +697,12 @@ export class Visual implements IVisual {
 
         // Formato condicional (fx) en el color del valor o el fondo: Power BI deja el resultado en los nodos de la
         // matriz, no en metadata.objects, así que se busca ahí. Una regla aplicada es la intención.
-        const conRegla = [smRows?.root, ...smKids].some((n: any) => n?.objects?.mainValue?.color || n?.objects?.card?.background
-            || Object.values(n?.values ?? {}).some((v: any) => v?.objects?.mainValue?.color || v?.objects?.card?.background));
+        const tieneRegla = (o: any) => !!(o?.mainValue?.color || o?.card?.background);
+        const mtx: any = this.lastDataView?.matrix;
+        const conRegla = [smRows?.root, ...smKids, ...smKids.flatMap((k: any) => k?.children ?? [])].some((n: any) => tieneRegla(n?.objects)
+            || Object.values(n?.values ?? {}).some((v: any) => tieneRegla(v?.objects)))
+            || (mtx?.columns?.root?.children ?? []).some((c: any) => tieneRegla(c?.objects))
+            || (mtx?.valueSources ?? []).some((v: any) => tieneRegla(v?.objects));
         if (conRegla) {
             labels.push("conditional formatting (fx)");
             parts.push("fx=1");
@@ -899,7 +925,7 @@ export class Visual implements IVisual {
         svg.setAttribute("preserveAspectRatio", "none");
         svg.setAttribute("aria-hidden", "true");
 
-        const color   = hc ? "#FFFFFF" : (t.color.value?.value ?? "#0078D4");
+        const color   = hc ? this.hcFg : (t.color.value?.value ?? "#0078D4");
         const kind    = String(t.type.value?.["value"] ?? t.type.value ?? "area");
         const lineW   = t.lineWidth.value ?? 2;
         const opacity = (t.areaOpacity.value ?? 20) / 100;
@@ -931,7 +957,7 @@ export class Visual implements IVisual {
             const line = document.createElementNS(svgNS, "path");
             line.setAttribute("d", dTgt);
             line.setAttribute("fill", "none");
-            line.setAttribute("stroke", hc ? "#FFFF00" : (t.targetColor.value?.value ?? "#A19F9D"));
+            line.setAttribute("stroke", hc ? this.hcSel : (t.targetColor.value?.value ?? "#A19F9D"));
             line.setAttribute("stroke-width", "1");
             line.setAttribute("stroke-dasharray", "4 2");
             line.setAttribute("vector-effect", "non-scaling-stroke");
@@ -943,7 +969,7 @@ export class Visual implements IVisual {
         // Puntos seleccionados (por clic aquí, o por un marcador): se marcan, y en barras el
         // resto se atenúa. Sin esto el filtro salía hacia el informe sin rastro en la tarjeta.
         const elegidos = new Set<number>();
-        metric.trendIds.forEach((id, i) => { if (this.selKeys.has(this.keyOf(id))) elegidos.add(i); });
+        metric.trendIds.forEach((id, i) => { if (this.estaSel(id)) elegidos.add(i); });
 
         if (kind === "bar") {
             const barW = (100 / data.length) * 0.7;
@@ -1007,7 +1033,7 @@ export class Visual implements IVisual {
                 m.style.cssText =
                     `position:absolute;left:${p[0]}%;top:${p[1]}px;` +
                     `width:${r * 2}px;height:${r * 2}px;margin:${-r}px 0 0 ${-r}px;box-sizing:border-box;` +
-                    `border-radius:50%;background:${hc ? "#000000" : "#FFFFFF"};border:2px solid ${color};` +
+                    `border-radius:50%;background:${hc ? this.hcBg : "#FFFFFF"};border:2px solid ${color};` +
                     "pointer-events:none;z-index:2;";
                 wrapper.appendChild(m);
             });
@@ -1063,7 +1089,7 @@ export class Visual implements IVisual {
         anunciar();
         wrapper.style.outline = "none";
         wrapper.addEventListener("focus", () => {
-            wrapper.style.boxShadow = `0 0 0 2px ${hc ? "#FFFF00" : "#2B6CB0"}`;
+            wrapper.style.boxShadow = `0 0 0 2px ${hc ? this.hcSel : "#2B6CB0"}`;
             mostrar(actual);
         });
         wrapper.addEventListener("blur", () => { wrapper.style.boxShadow = "none"; ocultar(); });
@@ -1266,15 +1292,15 @@ export class Visual implements IVisual {
      * persistProperties sale de un clic del usuario, nunca del callback de selección.
      */
     private buildGuide(hc: boolean, muestra: string): HTMLElement {
-        const azul = hc ? "#FFFF00" : "#2B6CB0";
-        const fg = hc ? "#FFFFFF" : "#252423";
-        const muted = hc ? "#FFFFFF" : "#605E5C";
+        const azul = hc ? this.hcSel : "#2B6CB0";
+        const fg = hc ? this.hcFg : "#252423";
+        const muted = hc ? this.hcFg : "#605E5C";
         const g = document.createElement("div");
         g.className = "kpi-guide";
         g.setAttribute("role", "dialog");
         g.setAttribute("aria-label", this.t("Guide_Title", "Setup guide"));
         g.style.cssText = "position:absolute;left:8px;right:8px;bottom:8px;max-height:calc(100% - 16px);overflow:auto;"
-            + `background:${hc ? "#000000" : "#FFFFFF"};border:1px solid ${azul};border-radius:8px;`
+            + `background:${hc ? this.hcBg : "#FFFFFF"};border:1px solid ${azul};border-radius:8px;`
             + "box-shadow:0 4px 16px rgba(0,0,0,0.18);padding:10px 12px;box-sizing:border-box;z-index:20;"
             + `font:12px/1.4 'Segoe UI',sans-serif;color:${fg};text-align:left;cursor:default;`;
         // Los clics dentro del asistente no seleccionan tarjetas ni limpian la selección.
@@ -1290,7 +1316,7 @@ export class Visual implements IVisual {
             b.type = "button";
             b.textContent = texto;
             b.style.cssText = "font:600 12px 'Segoe UI',sans-serif;border-radius:4px;padding:3px 12px;cursor:pointer;"
-                + (principal ? `background:${azul};color:${hc ? "#000000" : "#FFFFFF"};border:1px solid ${azul};`
+                + (principal ? `background:${azul};color:${hc ? this.hcBg : "#FFFFFF"};border:1px solid ${azul};`
                              : `background:transparent;color:${azul};border:1px solid ${azul};`);
             b.addEventListener("click", accion);
             return b;
@@ -1337,7 +1363,7 @@ export class Visual implements IVisual {
                 const marca = document.createElement("span");
                 marca.textContent = hecho ? "✓" : "○";
                 marca.setAttribute("aria-label", hecho ? this.t("Guide_Done", "added") : this.t("Guide_Todo", "not added"));
-                marca.style.cssText = `font-weight:700;color:${hecho ? (hc ? "#00FF00" : "#107C10") : muted};width:12px;flex-shrink:0;`;
+                marca.style.cssText = `font-weight:700;color:${hecho ? (hc ? this.hcFg : "#107C10") : muted};width:12px;flex-shrink:0;`;
                 const txt = document.createElement("span");
                 const b = document.createElement("b");
                 b.textContent = nombre;
@@ -1392,6 +1418,7 @@ export class Visual implements IVisual {
     private renderLandingPage(): void {
         // Never replace already-painted data with the landing page.
         if (this.hasRenderedData) return;
+        this.coloresContraste();
 
         // 2.3: la pantalla de la serie (renderEmpty), dentro de un contenedor del tamaño del visual.
         const palette = this.host.colorPalette;
@@ -1402,7 +1429,7 @@ export class Visual implements IVisual {
         const lvW = this.viewport.width  > 0 ? `${this.viewport.width}px`  : "100%";
         const lvH = this.viewport.height > 0 ? `${this.viewport.height}px` : "100%";
         landing.style.cssText = `display: flex; flex-direction: column; width: ${lvW}; height: ${lvH};
-            background: ${isHC ? "#000000" : (palette.background?.value ?? "#FFFFFF")}; box-sizing: border-box; padding: 12px;`;
+            background: ${isHC ? this.hcBg : (palette.background?.value ?? "#FFFFFF")}; box-sizing: border-box; padding: 12px;`;
         this.renderEmpty(landing, isHC);
 
         // Atomic swap
@@ -2096,6 +2123,7 @@ export class Visual implements IVisual {
     }
 
     private render(metrics: MetricData[]): void {
+        this.coloresContraste();
         this.proPreview = this.computePreview();   // solo para el overlay de diagnostico
         // INVARIANT: once real data has been painted, never repaint an empty state.
         // Power BI emits partial updates (e.g. only the Prior Period role, with no
@@ -2121,8 +2149,8 @@ export class Visual implements IVisual {
         this.subSelectable(root, "card", this.t("OO_Card", "Card"), powerbi.visuals.SubSelectionStylesType.Shape);
 
         const fxOn       = this.previewOf("conditional formatting (fx)");
-        const cardBg     = hc ? "#000000" : ((fxOn && metrics.length === 1 ? metrics[0]?.fxBg : null) ?? s.card.background.value?.value ?? themeBg);
-        const cardBorder = hc ? "#FFFFFF"  : (s.card.borderColor.value?.value ?? "#E0E0E0");
+        const cardBg     = hc ? this.hcBg : ((fxOn && metrics.length === 1 ? metrics[0]?.fxBg : null) ?? s.card.background.value?.value ?? themeBg);
+        const cardBorder = hc ? this.hcFg  : (s.card.borderColor.value?.value ?? "#E0E0E0");
         const bw  = this.previewOf("card styling") ? (s.card.borderWidth.value ?? 1) : 1;
         const br  = this.previewOf("card styling") ? (s.card.borderRadius.value ?? 8) : 8;
         const pad = this.previewOf("card styling") ? (s.card.padding.value ?? 16) : 16;
@@ -2261,9 +2289,9 @@ export class Visual implements IVisual {
         metrics.forEach((metric, idx) => {
             const s2 = this.formattingSettings;
             const palette = this.host.colorPalette;
-            const cardBg     = hc ? "#000000" : ((this.previewOf("conditional formatting (fx)") ? metric.fxBg : null)
+            const cardBg     = hc ? this.hcBg : ((this.previewOf("conditional formatting (fx)") ? metric.fxBg : null)
                 ?? s2.card.background.value?.value ?? (palette.background?.value ?? "#FFFFFF"));
-            const cardBorder = hc ? "#FFFFFF"  : (s2.card.borderColor.value?.value ?? "#E0E0E0");
+            const cardBorder = hc ? this.hcFg  : (s2.card.borderColor.value?.value ?? "#E0E0E0");
             const cellBr     = this.previewOf("card styling") ? (s2.card.borderRadius.value ?? 8) : 8;
 
             const marco = this.ruleFrame(metric, hc, cardBg, cardBorder, 1);
@@ -2291,6 +2319,14 @@ export class Visual implements IVisual {
         root.appendChild(grid);
     }
 
+    private coloresContraste(): void {
+        const pal: any = this.host?.colorPalette;
+        const sistema = !!pal?.isHighContrast;
+        this.hcFg  = sistema ? (pal.foreground?.value || "#FFFFFF") : "#FFFFFF";
+        this.hcBg  = sistema ? (pal.background?.value || "#000000") : "#000000";
+        this.hcSel = sistema ? (pal.foregroundSelected?.value || this.hcFg) : "#FFFF00";
+    }
+
     /** allowInteractions vive en hostCapabilities desde la API 5.x; host.allowInteractions era el sitio antiguo. */
     private allowInter(): boolean | undefined {
         const h: any = this.host;
@@ -2305,8 +2341,8 @@ export class Visual implements IVisual {
         const w = this.viewport.width || 0, h = this.viewport.height || 0;
         const size = (w >= 600 && h >= 340) ? "l" : (w >= 360 && h >= 220) ? "m" : "s";
         const pal: any = this.host.colorPalette;
-        const fg = hc ? (pal.foreground?.value || "#FFFFFF") : "";
-        const bgHc = hc ? (pal.background?.value || "#000000") : "";
+        const fg = hc ? this.hcFg : "";
+        const bgHc = hc ? this.hcBg : "";
         const el = document.createElement("div");
         el.className = "kpi-landing kpi-landing-" + size;
         el.title = "KPI Card Pro — " + this.t("Msg_Empty", "Add a measure to the Value field well");
@@ -2335,7 +2371,7 @@ export class Visual implements IVisual {
             const a = mk("a", cls) as HTMLAnchorElement;
             a.href = url; a.tabIndex = 0; a.textContent = txt;
             if (hc) { a.style.background = "transparent"; a.style.borderColor = fg; }
-            const open = (e: Event) => { e.preventDefault(); e.stopPropagation(); this.host.launchUrl(url); };
+            const open = (e: Event) => { e.preventDefault(); e.stopPropagation(); if (this.allowInter() !== false) { this.host.launchUrl(url); } };
             a.addEventListener("click", open);
             a.addEventListener("keydown", (e: KeyboardEvent) => { if (e.key === "Enter" || e.key === " ") { open(e); } });
             return a;
@@ -2424,7 +2460,7 @@ export class Visual implements IVisual {
 
         // ── Keyboard: focus ring ───────────────────────────────────────────
         cell.addEventListener("focus", () => {
-            cell.style.outline = `2px solid ${hc ? "#FFFF00" : "#2B6CB0"}`;
+            cell.style.outline = `2px solid ${hc ? this.hcSel : "#2B6CB0"}`;
             cell.style.outlineOffset = "2px";
         });
         cell.addEventListener("blur", () => {
@@ -2474,8 +2510,8 @@ export class Visual implements IVisual {
                 ? (s.smallMultiples.titleFontSize.value ?? 11)
                 : (s.label.fontSize.value ?? 12);
             const labelColor = isGridMode && this.previewOf("small multiples layout")
-                ? (hc ? "#FFFFFF" : (s.smallMultiples.titleColor.value?.value ?? themeMuted))
-                : (hc ? "#FFFFFF" : (s.label.color.value?.value ?? themeMuted));
+                ? (hc ? this.hcFg : (s.smallMultiples.titleColor.value?.value ?? themeMuted))
+                : (hc ? this.hcFg : (s.label.color.value?.value ?? themeMuted));
             // La fuente sigue la misma regla que el tamano y el color: en rejilla
             // manda Small Multiples, en tarjeta unica manda Label.
             const labelFont = isGridMode && this.previewOf("small multiples layout")
@@ -2551,7 +2587,7 @@ export class Visual implements IVisual {
         // color del tema y el estado se dice con texto, que es lo que no depende del color.
         const st = this.statusOf(metric, displayValue);
         const stApply = String((s.status.applyTo.value as any)?.value ?? s.status.applyTo.value ?? "both");
-        const valueColor = hc ? "#FFFFFF"
+        const valueColor = hc ? this.hcFg
             : (st && (stApply === "both" || stApply === "value") ? st.color
                 : ((this.previewOf("conditional formatting (fx)") ? metric.fxColor : null) ?? s.mainValue.color.value?.value ?? themeFg));
         valueEl.style.cssText = `
@@ -2573,7 +2609,7 @@ export class Visual implements IVisual {
                 stEl.className = "kpi-status";
                 stEl.textContent = st.text ? `● ${st.word} · ${st.text}` : `● ${st.word}`;
                 stEl.style.cssText = `font-family:${s.label.fontFamily.value || "'Segoe UI', sans-serif"};font-size:${large ? 11 : 10}px; font-weight:600;`
-                    + `color:${hc ? "#FFFFFF" : st.color};`
+                    + `color:${hc ? this.hcFg : st.color};`
                     + " white-space:nowrap; overflow:hidden; text-overflow:ellipsis;";
                 cell.appendChild(stEl);
             }
@@ -2590,7 +2626,7 @@ export class Visual implements IVisual {
                 ? `${metric.periodLabel} ${this.t("Label_Vs", "vs")} ${metric.comparePeriodLabel}`
                 : metric.periodLabel;
             per.style.cssText = `font-size:${large ? 11 : 10}px;`
-                + `color:${hc ? "#FFFFFF" : (s.secondary.color.value?.value ?? "#605E5C")};`
+                + `color:${hc ? this.hcFg : (s.secondary.color.value?.value ?? "#605E5C")};`
                 + " white-space:nowrap; overflow:hidden; text-overflow:ellipsis;";
             cell.appendChild(per);
         }
@@ -2610,7 +2646,7 @@ export class Visual implements IVisual {
                 display: flex; flex-wrap: wrap; gap: 8px;
                 font-family: ${sec.fontFamily.value || "Segoe UI, sans-serif"};
                 font-size: ${sec.fontSize.value ?? 11}px;
-                color: ${hc ? "#FFFFFF" : (sec.color.value?.value ?? "#605E5C")};
+                color: ${hc ? this.hcFg : (sec.color.value?.value ?? "#605E5C")};
             `;
             if (metric.priorPeriod !== null) {
                 const ppSpan = document.createElement("span");
@@ -2675,7 +2711,7 @@ export class Visual implements IVisual {
         const minimo = s.minWidth.value ?? 320;
         if (anchoTarjeta > 0 && anchoTarjeta < minimo) return null;
 
-        const linea = hc ? "#FFFFFF" : "#EDEBE9";
+        const linea = hc ? this.hcFg : "#EDEBE9";
         const col = document.createElement("div");
         col.className = orient === "right" ? "kpi-secondary-col"
                       : orient === "bottom" ? "kpi-secondary-row"
@@ -2704,8 +2740,8 @@ export class Visual implements IVisual {
             : "display:grid; grid-template-columns:minmax(0,1fr) max-content; align-items:center;"
               + " column-gap:6px; row-gap:1px;" + pie;
 
-        const valColor   = hc ? "#FFFFFF" : (s.color.value?.value ?? "#323130");
-        const labColor   = hc ? "#FFFFFF" : (s.labelColor.value?.value ?? "#605E5C");
+        const valColor   = hc ? this.hcFg : (s.color.value?.value ?? "#323130");
+        const labColor   = hc ? this.hcFg : (s.labelColor.value?.value ?? "#605E5C");
         const valSize    = s.valueFontSize.value ?? 16;
         const labSize    = s.labelFontSize.value ?? 10;
         const enRejilla  = orient !== "bottom";

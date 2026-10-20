@@ -1,4 +1,4 @@
-KPI CARD PRO 2.2 — TIPS & HINTS (versión para pegar)
+KPI CARD PRO 2.3 — TIPS & HINTS (versión para pegar)
 ================================================================
 Los text boxes de Power BI no soportan tablas markdown: al pegar se pierde
 el formato. Esta versión usa listas con puntos guía, que sobreviven al
@@ -94,7 +94,8 @@ images, style templates, the setup guide, the layout that adapts to the
 size of the visual, format on the canvas, cross-filtering, bookmarks,
 keyboard, screen readers, high contrast, 12 languages.
 
-Pro: color rules, the trend line and its period comparisons, Small
+Pro: color rules, conditional formatting (fx) on the value colour and the
+card background, the trend line and its period comparisons, Small
 Multiples, Secondary KPIs, prefix and suffix, variance pill and colours,
 extra tooltip measures, card border, radius, padding and shadow.
 
@@ -114,6 +115,8 @@ TIPS & BEST PRACTICES
   alphabetically.
 - Small visual? The number shrinks to stay whole and the extras step
   aside — trend first. Make it taller to bring them back.
+- Big visual? A single card sizes its number to fill it, until you set
+  Main value > Font size.
 - In format mode, click the number, the label, the trend line or the card
   to format it right there.
 - Right-click a card for the Power BI context menu (drill-through, export).

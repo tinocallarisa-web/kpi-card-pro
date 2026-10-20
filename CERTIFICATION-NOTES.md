@@ -1,4 +1,6 @@
-# KPI Card Pro — Certification Notes — v2.2.0.0
+# KPI Card Pro — Certification Notes — v2.3.0.0
+
+> 2.3.0.0 adds conditional formatting (fx) on the value colour and card background, evaluated per card in Small Multiples, a single card that sizes its number to the visual, and a new start screen. Everything else below is unchanged from 2.2. Full list: CHANGELOG.md.
 
 > The text pasted into Partner Center is `docs/CERTIFICATION-NOTES-SHORT.txt` (the field caps at
 > 2,500 characters and is cleared on every resubmission). This file is the complete reference the
@@ -126,7 +128,7 @@ the model's number formats, display units and decimals; label styling; card back
 colour; images; native and modern tooltips; cross-filtering, cross-highlighting, bookmarks
 (`registerOnSelectCallback`); keyboard navigation, ARIA labels, high contrast; context menu.
 
-**Pro:** Status; the trend line with its target and hover values, and the value modes it enables;
+**Pro:** Color rules and conditional formatting (fx); the trend line with its target and hover values, and the value modes it enables;
 Small Multiples (up to 50 cards, 1–6 columns); Secondary KPIs (up to 3); prefix and suffix; the
 variance pill and custom variance colours; extra tooltip measures; card border width, radius,
 padding and drop shadow.
@@ -136,11 +138,11 @@ padding and drop shadow.
 1. Import the `.pbiviz` (Insert → More visuals → Import from file) and open the sample `.pbix`,
    which includes a "Tips & Hints" page.
 2. **Free, no licence.** A measure in Value renders one card. Add Prior Period and Target: the
-   variance pill and the "Prior: / Target:" line appear. Click the card: the report cross-filters.
+   variance pill and the "Prior: / Target:" line appear. With Small Multiples, click a card: the report cross-filters. A single card has nothing to filter by, like the native Card; with Trend it filters through its points.
    Right-click: the Power BI context menu opens.
 3. Format the Value measure as a percentage in the model: the card shows it as a percentage, in
    the report's language.
-4. In **edit mode**, turn on Status, bind Small Multiples or Trend, or add Secondary KPIs: each
+4. In **edit mode**, turn on Color rules, bind Small Multiples or Trend, or add Secondary KPIs: each
    renders working under the "Pro preview" watermark, a banner names the feature, and after about
    10 seconds the Upgrade bar appears. Remove the feature and both go.
 5. Switch to **reading view**: the free result, no watermark, no notice.

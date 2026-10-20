@@ -1,4 +1,4 @@
-# KPI Card Pro 2.2 — Tips & Hints (Sample File)
+# KPI Card Pro 2.3 — Tips & Hints (Sample File)
 
 Copia estos textos como Text Boxes en Power BI Desktop dentro del archivo .pbix de muestra.
 Crea una página llamada "Tips & Hints" o "How to use" y añade un bloque por sección.
@@ -78,6 +78,7 @@ point** (against the previous point, or 12 back for the same month last year) or
 | Format on the canvas, 12 languages | ✅ | ✅ |
 | Cross-filtering, bookmarks, keyboard, screen readers, high contrast | ✅ | ✅ |
 | **Color rules** | ❌ | ✅ |
+| **Conditional formatting (fx)** on value colour and card background | ❌ | ✅ |
 | **Trend line** and period comparisons | ❌ | ✅ |
 | Small Multiples (up to 50) | ❌ | ✅ |
 | Secondary KPIs | ❌ | ✅ |
@@ -96,6 +97,7 @@ view shows the free result.
 - For costs or effort, switch on **Invert (lower is better)** in Variance.
 - In **Trend**, use a real date column: a month stored as text sorts alphabetically.
 - Small visual? The number shrinks to stay whole and the extras step aside — trend first.
+- Big visual? A single card sizes its number to fill it, until you set *Main value → Font size*.
 - In format mode, click the number, the label, the trend line or the card to format it right there.
 - Right-click a card for the Power BI context menu (drill-through, export data).
 

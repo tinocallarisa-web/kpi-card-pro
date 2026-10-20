@@ -6,7 +6,7 @@
 
 [![AppSource](https://img.shields.io/badge/AppSource-Published-0078D4?logo=microsoft)](https://marketplace.microsoft.com/en-us/product/tino_callarisa.kpicard-pro?tab=Overview)
 [![Power BI API](https://img.shields.io/badge/API-5.11.0-yellow)](https://github.com/microsoft/powerbi-visuals-api)
-[![Version](https://img.shields.io/badge/version-2.2.0.0-brightgreen)](pbiviz.json)
+[![Version](https://img.shields.io/badge/version-2.3.0.0-brightgreen)](pbiviz.json)
 [![License](https://img.shields.io/badge/License-Proprietary-red)](https://tinocallarisa-web.github.io/kpi-card-pro/terms.html)
 
 📖 **[Documentation & Support](https://tinocallarisa-web.github.io/kpi-card-pro/support.html)** ·

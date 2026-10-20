@@ -1,4 +1,4 @@
-KPI Card Pro 2.2.0.0 - GUID kpiCardProTCViz
+KPI Card Pro 2.3.0.0 - GUID kpiCardProTCViz
 
 SOURCE CODE
 github.com/tinocallarisa-web/kpi-card-pro, branch "certification".

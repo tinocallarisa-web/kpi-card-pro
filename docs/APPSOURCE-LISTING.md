@@ -1,4 +1,4 @@
-# AppSource listing copy — KPI Card Pro v2.2.0.0
+# AppSource listing copy — KPI Card Pro v2.3.0.0
 
 Copy ready to paste into Partner Center. **The marketplace description is the documentation most
 people read and the one that goes stale fastest** — update it on every release, not only when the
@@ -129,5 +129,5 @@ Editing this file changes nothing in the offer.
 - [ ] Offer logo: `assets/logo_300x300.png`
 - [ ] Video field unchanged: `https://www.youtube.com/watch?v=4fP7zYKnhWo` (canonical form only)
 - [ ] Certification notes from `docs/CERTIFICATION-NOTES-SHORT.txt` — the field is cleared on every resubmission
-- [ ] Version 2.2.0.0 is above the one currently published (check Partner Center)
+- [ ] Version 2.3.0.0 is above the one currently published (check Partner Center)
 - [ ] Support, privacy and terms URLs checked with a real request

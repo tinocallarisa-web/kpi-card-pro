@@ -1,6 +1,6 @@
 # KPI Card Pro — TCViz Web Product Page Content
 
-Content for the four tabs of the TCViz product page. Current version: **2.2.0.0**.
+Content for the four tabs of the TCViz product page. Current version: **2.3.0.0**.
 
 The live page is generated from `src/data.jsx` in the **tcviz-web** repository
 (https://tcviz.com/product/horizon-kpi/). This file is the draft: copy the changes there.
