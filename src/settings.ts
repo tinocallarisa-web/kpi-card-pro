@@ -59,9 +59,14 @@ class MainValueSettings extends FormattingSettingsCard {
     bold = new formattingSettings.ToggleSwitch({
         name: "bold", displayName: "Bold", value: true
     });
+    // fx (2.3): constante o regla. altConstantSelector null = el color fijo se guarda a nivel general, como antes;
+    // solo las reglas se evalúan por tarjeta (comodín con totales: la tarjeta única es un total).
     color = new formattingSettings.ColorPicker({
         name: "color", displayName: "Color",
-        value: { value: "#252423" }
+        value: { value: "#252423" },
+        instanceKind: powerbi.VisualEnumerationInstanceKinds.ConstantOrRule,
+        selector: { data: [{ dataViewWildcard: { matchingOption: 0 } }] } as any,
+        altConstantSelector: null as any
     });
     displayUnit = new formattingSettings.ItemDropdown({
         name: "displayUnit", displayName: "Display Units",

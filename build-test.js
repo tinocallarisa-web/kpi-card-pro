@@ -60,6 +60,16 @@ try {
         );
     }
     pbiviz.visual.guid = guid;
+    // Desktop guarda cada visual por guid + versión: con la misma versión sigue sirviendo el paquete anterior.
+    // Cada build de prueba lleva su propio último dígito (contador local en .tmp/).
+    const CONTADOR = path.join(ROOT, '.tmp', 'test-build-counter');
+    fs.mkdirSync(path.dirname(CONTADOR), { recursive: true });
+    const n = (parseInt(fs.existsSync(CONTADOR) ? fs.readFileSync(CONTADOR, 'utf8') : '0', 10) || 0) + 1;
+    fs.writeFileSync(CONTADOR, String(n), 'utf8');
+    const partes = pbiviz.visual.version.split('.');
+    partes[3] = String(Number(partes[3]) + n);
+    pbiviz.visual.version = partes.join('.');
+    console.log(`📝  versión →  ${pbiviz.visual.version}`);
     fs.writeFileSync(PBIVIZ_JSON, JSON.stringify(pbiviz, null, 2), 'utf8');
     console.log(`📝  GUID   →  ${guid}`);
 

@@ -51,6 +51,8 @@ interface MetricData {
      *  punto filtra el informe por ese periodo (y por la tarjeta, en small multiples). */
     trendIds: powerbi.extensibility.ISelectionId[];
     image: string | null;                 // validated Base64 data URI, or null
+    /** Color del valor que devuelve una regla fx para esta tarjeta; null si no hay regla. */
+    fxColor: string | null;
 }
 
 type DisplayUnit = "auto" | "none" | "thousands" | "millions" | "billions";
@@ -822,6 +824,7 @@ export class Visual implements IVisual {
         const card0  = rows?.root?.children?.[0];
         const serieNode = roles2.sm >= 0 ? card0 : rows?.root;
         const kids = serieNode?.children ?? [];
+        lines.push(this.fxPaths());
         lines.push(`serie de: ${roles2.sm >= 0 ? String(card0?.value) : "raiz"}  n=${kids.length}`);
         const mIdx = this.dbgMeasureIdx;
         kids.slice(0, 8).forEach((k, i) => {
@@ -1822,6 +1825,7 @@ export class Visual implements IVisual {
                 target,
                 tooltipFields: [],
                 formats: formatsFor(valueNode),
+                fxColor: this.fxColorOf(valueNode, measureIdx),
                 periodLabel: "",
                 comparePeriodLabel: "",
                 secondary: secIdxs.map((si, k) => ({
@@ -1889,6 +1893,7 @@ export class Visual implements IVisual {
                 target,
                 tooltipFields,
                 formats: formatsFor(child),
+                fxColor: this.fxColorOf(child, measureIdx),
                 periodLabel: "",
                 comparePeriodLabel: "",
                 secondary: secIdxs.map((si, k) => ({
@@ -1981,6 +1986,37 @@ export class Visual implements IVisual {
      * si el nodo no lo trae, de su primer hijo con dato. La documentacion de Microsoft lo
      * describe en el mapping categorical; en matrix se lee igual, de forma defensiva.
      */
+    /**
+     * Resultado de una regla fx del color del valor. En una matriz Power BI puede dejarlo en la celda del valor,
+     * en el propio nodo o, con una sola tarjeta, en la raíz; se miran los tres (y los hijos, si la tarjeta agrupa
+     * una tendencia). El color fijo NO llega aquí: está en metadata.objects y lo lee formattingSettings.
+     */
+    private fxColorOf(node: powerbi.DataViewMatrixNode | undefined, idx: number): string | null {
+        const leer = (o: any): string | null => o?.mainValue?.color?.solid?.color ?? null;
+        const root = this.lastDataView?.matrix?.rows?.root as any;
+        const cand: any[] = [(node?.values as any)?.[idx]?.objects, (node as any)?.objects];
+        for (const k of this.realChildren(node)) { cand.push((k.values as any)?.[idx]?.objects, (k as any).objects); }
+        cand.push(root?.values?.[idx]?.objects, root?.objects);
+        for (const c of cand) { const v = leer(c); if (v) { return v; } }
+        return null;
+    }
+
+    /** Diagnóstico (--debug): dónde ha dejado Power BI un objeto mainValue dentro de la matriz. */
+    private fxPaths(): string {
+        const out: string[] = [];
+        const walk = (o: any, p: string, d: number) => {
+            if (!o || typeof o !== "object" || d > 7 || out.length > 6) { return; }
+            if (o.objects?.mainValue) { out.push(p + "=" + JSON.stringify(o.objects.mainValue).slice(0, 40)); }
+            for (const k of Object.keys(o)) {
+                if (k === "objects" || k === "identity" || k === "source" || k === "sources") { continue; }
+                walk(o[k], p + "." + k, d + 1);
+            }
+        };
+        walk(this.lastDataView?.matrix, "matrix", 0);
+        const meta = (this.lastDataView?.metadata?.objects as any)?.mainValue;
+        return "fx meta=" + (meta ? JSON.stringify(meta).slice(0, 50) : "-") + " | " + (out.join(" ; ") || "ninguno");
+    }
+
     private dynFormat(node: powerbi.DataViewMatrixNode | undefined, idx: number): string | undefined {
         const read = (vals: any): string | undefined => {
             const f = vals?.[idx]?.objects?.general?.formatString;
@@ -2452,7 +2488,7 @@ export class Visual implements IVisual {
         const st = this.statusOf(metric, displayValue);
         const stApply = String((s.status.applyTo.value as any)?.value ?? s.status.applyTo.value ?? "both");
         const valueColor = hc ? "#FFFFFF"
-            : (st && (stApply === "both" || stApply === "value") ? st.color : (s.mainValue.color.value?.value ?? themeFg));
+            : (st && (stApply === "both" || stApply === "value") ? st.color : (metric.fxColor ?? s.mainValue.color.value?.value ?? themeFg));
         valueEl.style.cssText = `
             font-family: ${s.mainValue.fontFamily.value ?? "Segoe UI, sans-serif"};
             font-size: ${fontSize}px;
