@@ -191,5 +191,22 @@
   "Status_OfPrior": "{0} poprzedniego",
   "Status_OfTarget": "{0} celu",
   "Status_Warn": "Ostrzeżenie",
-  "Pro_conditional_formatting_fx_": "formatowanie warunkowe (fx)"
+  "Pro_conditional_formatting_fx_": "formatowanie warunkowe (fx)",
+  "Landing_Tagline": "Liczba, jej zmiana, cel i trend na jednej karcie.",
+  "Landing_TaglineShort": "Liczba i jej kontekst.",
+  "Landing_Guide": "Przewodnik",
+  "Landing_GuideSub": "strona pomocy",
+  "Landing_Product": "Strona produktu",
+  "Landing_Video": "Wideo",
+  "Landing_Small": "Dodaj {value}; {prior} dla zmiany.",
+  "Landing_Step1": "miara: sprzedaż, marża, zamówienia",
+  "Landing_Step1Short": "miara",
+  "Landing_Step2": "pojawia się zmiana ze strzałką, bez DAX",
+  "Landing_Step2Short": "zmiana",
+  "Landing_Step3": "pole daty rysuje linię trendu",
+  "Landing_Step3Short": "linia trendu",
+  "Landing_Start": "Zacznij w 3 krokach",
+  "Landing_Help": "Pomoc",
+  "Landing_Pro": "Linia trendu, Small Multiples, reguły kolorów i formatowanie warunkowe, dodatkowe KPI.",
+  "Landing_ProShort": "Trend, Small Multiples, reguły kolorów."
 }

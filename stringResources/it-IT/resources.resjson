@@ -191,5 +191,22 @@
   "Status_OfPrior": "{0} del precedente",
   "Status_OfTarget": "{0} dell'obiettivo",
   "Status_Warn": "Attenzione",
-  "Pro_conditional_formatting_fx_": "la formattazione condizionale (fx)"
+  "Pro_conditional_formatting_fx_": "la formattazione condizionale (fx)",
+  "Landing_Tagline": "Il numero, la sua variazione, l’obiettivo e la tendenza, in una scheda.",
+  "Landing_TaglineShort": "Il numero e il suo contesto.",
+  "Landing_Guide": "Guida",
+  "Landing_GuideSub": "pagina di supporto",
+  "Landing_Product": "Pagina del prodotto",
+  "Landing_Video": "Video",
+  "Landing_Small": "Aggiungi {value}; {prior} per la variazione.",
+  "Landing_Step1": "la misura: vendite, margine, ordini",
+  "Landing_Step1Short": "la misura",
+  "Landing_Step2": "compare la variazione, con la freccia, senza DAX",
+  "Landing_Step2Short": "la variazione",
+  "Landing_Step3": "un campo data disegna la linea di tendenza",
+  "Landing_Step3Short": "la linea di tendenza",
+  "Landing_Start": "Inizia in 3 passi",
+  "Landing_Help": "Aiuto",
+  "Landing_Pro": "Linea di tendenza, Small Multiples, regole di colore e formattazione condizionale, KPI secondari.",
+  "Landing_ProShort": "Tendenza, Small Multiples, regole di colore."
 }

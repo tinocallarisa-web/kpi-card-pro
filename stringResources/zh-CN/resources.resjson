@@ -191,5 +191,22 @@
   "Status_OfPrior": "上期的 {0}",
   "Status_OfTarget": "目标的 {0}",
   "Status_Warn": "警告",
-  "Pro_conditional_formatting_fx_": "条件格式 (fx)"
+  "Pro_conditional_formatting_fx_": "条件格式 (fx)",
+  "Landing_Tagline": "数值、变化、目标和趋势，尽在一张卡片。",
+  "Landing_TaglineShort": "数值及其背景。",
+  "Landing_Guide": "指南",
+  "Landing_GuideSub": "支持页面",
+  "Landing_Product": "产品页面",
+  "Landing_Video": "视频",
+  "Landing_Small": "添加 {value}；{prior} 用于变化。",
+  "Landing_Step1": "度量值：销售额、利润率、订单",
+  "Landing_Step1Short": "度量值",
+  "Landing_Step2": "显示变化及箭头，无需 DAX",
+  "Landing_Step2Short": "变化",
+  "Landing_Step3": "日期字段绘制趋势线",
+  "Landing_Step3Short": "趋势线",
+  "Landing_Start": "3 步开始",
+  "Landing_Help": "帮助",
+  "Landing_Pro": "趋势线、小型序列图、颜色规则和条件格式、次要 KPI。",
+  "Landing_ProShort": "趋势、小型序列图、颜色规则。"
 }

@@ -1,0 +1,41 @@
+// Estilos que SÍ entran en el paquete (importados en src/visual.ts). visual.less no se ha importado nunca: sus
+// reglas (animaciones, hover, alto contraste con !important) no han llegado a Power BI en ninguna versión publicada;
+// activarlas es un cambio visual que hay que probar aparte.
+// Pantalla de inicio (2.3): la de la serie, en tres tamaños
+.kpi-landing {
+    display: flex; flex-direction: column; justify-content: center; gap: 18px; flex: 1; min-height: 0;
+    padding: 8px 16px; overflow: hidden; color: #605E5C; font-family: "Segoe UI", sans-serif;
+    .kpi-l-head { display: flex; gap: 12px; align-items: center; }
+    .kpi-l-icon { width: 44px; height: 44px; border-radius: 9px; flex-shrink: 0; }
+    .kpi-l-title { font-size: 20px; font-weight: 600; color: #252423; }
+    .kpi-l-tag { font-size: 14px; margin-top: 2px; }
+    .kpi-l-cols { display: grid; grid-template-columns: 1.15fr 1fr; gap: 28px; }
+    .kpi-l-lbl { font-size: 10.5px; font-weight: 600; letter-spacing: 1.3px; text-transform: uppercase; color: #8A8886; margin-bottom: 7px; }
+    .kpi-l-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 7px; font-size: 13.5px; }
+    .kpi-l-steps li { display: grid; grid-template-columns: 22px 1fr; gap: 8px; align-items: start; }
+    .kpi-l-n { display: flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 50%; background: #2B6CB0; color: #FFFFFF; font-size: 10.5px; }
+    .kpi-l-well { color: #252423; }
+    .kpi-l-links { display: grid; gap: 7px; }
+    .kpi-l-card { display: flex; align-items: center; gap: 9px; padding: 7px 10px; border: 1px solid #E1DFDD; border-radius: 6px; background: #F7F6F3; color: #252423; text-decoration: none; font-size: 13.5px; cursor: pointer; }
+    .kpi-l-card:hover, .kpi-l-card:focus-visible { border-color: #2B6CB0; outline: none; }
+    .kpi-l-sub { margin-left: auto; color: #8A8886; font-size: 11px; }
+    .kpi-l-inline { display: flex; gap: 14px; flex-wrap: wrap; }
+    .kpi-l-a { color: #2B6CB0; font-weight: 600; text-decoration: none; cursor: pointer; }
+    .kpi-l-a:hover, .kpi-l-a:focus-visible { text-decoration: underline; outline: none; }
+    .kpi-l-pro { display: flex; gap: 9px; align-items: center; flex-wrap: wrap; border-top: 1px solid #EDEBE9; padding-top: 12px; font-size: 13px; }
+    .kpi-l-chip { font-size: 10px; font-weight: 600; letter-spacing: .6px; text-transform: uppercase; padding: 3px 8px; border-radius: 999px; background: #E3F2E8; color: #2F7A47; }
+    .kpi-l-do { margin: 0; font-size: 12px; line-height: 1.45; }
+}
+.kpi-landing-m {
+    gap: 11px; padding: 4px 8px;
+    .kpi-l-icon { width: 34px; height: 34px; }
+    .kpi-l-title { font-size: 16px; }
+    .kpi-l-tag, .kpi-l-steps, .kpi-l-inline { font-size: 12.5px; }
+    .kpi-l-pro { font-size: 12px; padding-top: 9px; }
+}
+.kpi-landing-s {
+    gap: 8px; padding: 2px 4px;
+    .kpi-l-icon { width: 26px; height: 26px; border-radius: 6px; }
+    .kpi-l-title { font-size: 14px; }
+    .kpi-l-inline { font-size: 12px; }
+}

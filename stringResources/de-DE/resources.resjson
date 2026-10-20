@@ -191,5 +191,22 @@
   "Status_OfPrior": "{0} der Vorperiode",
   "Status_OfTarget": "{0} des Ziels",
   "Status_Warn": "Warnung",
-  "Pro_conditional_formatting_fx_": "bedingte Formatierung (fx)"
+  "Pro_conditional_formatting_fx_": "bedingte Formatierung (fx)",
+  "Landing_Tagline": "Die Kennzahl, ihre Abweichung, das Ziel und der Trend auf einer Karte.",
+  "Landing_TaglineShort": "Die Kennzahl und ihr Kontext.",
+  "Landing_Guide": "Anleitung",
+  "Landing_GuideSub": "Supportseite",
+  "Landing_Product": "Produktseite",
+  "Landing_Video": "Video",
+  "Landing_Small": "Fügen Sie {value} hinzu; {prior} für die Abweichung.",
+  "Landing_Step1": "das Measure: Umsatz, Marge, Aufträge",
+  "Landing_Step1Short": "das Measure",
+  "Landing_Step2": "die Abweichung erscheint mit Pfeil, ohne DAX",
+  "Landing_Step2Short": "die Abweichung",
+  "Landing_Step3": "ein Datumsfeld zeichnet die Trendlinie",
+  "Landing_Step3Short": "die Trendlinie",
+  "Landing_Start": "In 3 Schritten starten",
+  "Landing_Help": "Hilfe",
+  "Landing_Pro": "Trendlinie, Small Multiples, Farbregeln und bedingte Formatierung, sekundäre KPIs.",
+  "Landing_ProShort": "Trend, Small Multiples, Farbregeln."
 }

@@ -191,5 +191,22 @@
   "Status_OfPrior": "{0} de la précédente",
   "Status_OfTarget": "{0} de l'objectif",
   "Status_Warn": "Attention",
-  "Pro_conditional_formatting_fx_": "la mise en forme conditionnelle (fx)"
+  "Pro_conditional_formatting_fx_": "la mise en forme conditionnelle (fx)",
+  "Landing_Tagline": "Le chiffre, son écart, l’objectif et la tendance, sur une carte.",
+  "Landing_TaglineShort": "Le chiffre et son contexte.",
+  "Landing_Guide": "Guide",
+  "Landing_GuideSub": "page d’assistance",
+  "Landing_Product": "Page du produit",
+  "Landing_Video": "Vidéo",
+  "Landing_Small": "Ajoutez {value} ; {prior} pour l’écart.",
+  "Landing_Step1": "la mesure : ventes, marge, commandes",
+  "Landing_Step1Short": "la mesure",
+  "Landing_Step2": "l’écart apparaît, avec sa flèche, sans DAX",
+  "Landing_Step2Short": "l’écart",
+  "Landing_Step3": "un champ date trace la ligne de tendance",
+  "Landing_Step3Short": "la ligne de tendance",
+  "Landing_Start": "Commencer en 3 étapes",
+  "Landing_Help": "Aide",
+  "Landing_Pro": "Ligne de tendance, Small Multiples, règles de couleur et mise en forme conditionnelle, KPI secondaires.",
+  "Landing_ProShort": "Tendance, Small Multiples, règles de couleur."
 }

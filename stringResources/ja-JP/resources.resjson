@@ -191,5 +191,22 @@
   "Status_OfPrior": "前期の {0}",
   "Status_OfTarget": "目標の {0}",
   "Status_Warn": "警告",
-  "Pro_conditional_formatting_fx_": "条件付き書式 (fx)"
+  "Pro_conditional_formatting_fx_": "条件付き書式 (fx)",
+  "Landing_Tagline": "数値、変化、目標、傾向を 1 枚のカードに。",
+  "Landing_TaglineShort": "数値とその背景。",
+  "Landing_Guide": "ガイド",
+  "Landing_GuideSub": "サポート ページ",
+  "Landing_Product": "製品ページ",
+  "Landing_Video": "ビデオ",
+  "Landing_Small": "{value} を追加。変化には {prior}。",
+  "Landing_Step1": "メジャー: 売上、利益率、注文",
+  "Landing_Step1Short": "メジャー",
+  "Landing_Step2": "矢印付きで変化を表示、DAX 不要",
+  "Landing_Step2Short": "変化",
+  "Landing_Step3": "日付フィールドで傾向線を描画",
+  "Landing_Step3Short": "傾向線",
+  "Landing_Start": "3 ステップで開始",
+  "Landing_Help": "ヘルプ",
+  "Landing_Pro": "傾向線、スモール マルチプル、色ルールと条件付き書式、補助 KPI。",
+  "Landing_ProShort": "傾向、スモール マルチプル、色ルール。"
 }

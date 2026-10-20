@@ -21,9 +21,11 @@
     "powerbi-visuals-utils-onobjectutils": "^6.0.3"
   },
   "devDependencies": {
+    "@types/node": "^22.20.4",
     "@typescript-eslint/eslint-plugin": "^8.8.0",
     "eslint": "^9.11.1",
     "eslint-plugin-powerbi-visuals": "^1.0.0",
+    "powerbi-visuals-tools": "^7.2.1",
     "typescript": "5.5.4"
   }
 }

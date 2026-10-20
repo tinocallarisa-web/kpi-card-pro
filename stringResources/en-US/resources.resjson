@@ -191,5 +191,22 @@
   "Status_OfPrior": "{0} of prior",
   "Status_OfTarget": "{0} of target",
   "Status_Warn": "Warning",
-  "Pro_conditional_formatting_fx_": "conditional formatting (fx)"
+  "Pro_conditional_formatting_fx_": "conditional formatting (fx)",
+  "Landing_Tagline": "The number, its variance, target and trend, on one card.",
+  "Landing_TaglineShort": "The number and its context.",
+  "Landing_Guide": "Guide",
+  "Landing_GuideSub": "support page",
+  "Landing_Product": "Product page",
+  "Landing_Video": "Video",
+  "Landing_Small": "Add {value}; {prior} for the variance.",
+  "Landing_Step1": "the measure: sales, margin, orders",
+  "Landing_Step1Short": "the measure",
+  "Landing_Step2": "the variance appears, with its arrow, no DAX",
+  "Landing_Step2Short": "the variance",
+  "Landing_Step3": "a date field draws the trend line",
+  "Landing_Step3Short": "the trend line",
+  "Landing_Start": "Start in 3 steps",
+  "Landing_Help": "Help",
+  "Landing_Pro": "Trend line, Small Multiples, color rules and conditional formatting, secondary KPIs.",
+  "Landing_ProShort": "Trend, Small Multiples, color rules."
 }

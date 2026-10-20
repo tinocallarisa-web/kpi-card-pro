@@ -191,5 +191,22 @@
   "Status_OfPrior": "이전의 {0}",
   "Status_OfTarget": "목표의 {0}",
   "Status_Warn": "경고",
-  "Pro_conditional_formatting_fx_": "조건부 서식(fx)"
+  "Pro_conditional_formatting_fx_": "조건부 서식(fx)",
+  "Landing_Tagline": "숫자, 변화, 목표, 추세를 카드 하나에.",
+  "Landing_TaglineShort": "숫자와 그 맥락.",
+  "Landing_Guide": "가이드",
+  "Landing_GuideSub": "지원 페이지",
+  "Landing_Product": "제품 페이지",
+  "Landing_Video": "동영상",
+  "Landing_Small": "{value}를 추가하세요. 변화는 {prior}.",
+  "Landing_Step1": "측정값: 매출, 마진, 주문",
+  "Landing_Step1Short": "측정값",
+  "Landing_Step2": "화살표와 함께 변화 표시, DAX 불필요",
+  "Landing_Step2Short": "변화",
+  "Landing_Step3": "날짜 필드로 추세선 그리기",
+  "Landing_Step3Short": "추세선",
+  "Landing_Start": "3단계로 시작",
+  "Landing_Help": "도움말",
+  "Landing_Pro": "추세선, 작은 배수, 색 규칙과 조건부 서식, 보조 KPI.",
+  "Landing_ProShort": "추세, 작은 배수, 색 규칙."
 }

@@ -191,5 +191,22 @@
   "Status_OfPrior": "{0} van vorige",
   "Status_OfTarget": "{0} van doel",
   "Status_Warn": "Waarschuwing",
-  "Pro_conditional_formatting_fx_": "voorwaardelijke opmaak (fx)"
+  "Pro_conditional_formatting_fx_": "voorwaardelijke opmaak (fx)",
+  "Landing_Tagline": "Het getal, de afwijking, het doel en de trend op één kaart.",
+  "Landing_TaglineShort": "Het getal en de context.",
+  "Landing_Guide": "Handleiding",
+  "Landing_GuideSub": "ondersteuningspagina",
+  "Landing_Product": "Productpagina",
+  "Landing_Video": "Video",
+  "Landing_Small": "Voeg {value} toe; {prior} voor de afwijking.",
+  "Landing_Step1": "de meting: omzet, marge, orders",
+  "Landing_Step1Short": "de meting",
+  "Landing_Step2": "de afwijking verschijnt, met pijl, zonder DAX",
+  "Landing_Step2Short": "de afwijking",
+  "Landing_Step3": "een datumveld tekent de trendlijn",
+  "Landing_Step3Short": "de trendlijn",
+  "Landing_Start": "Begin in 3 stappen",
+  "Landing_Help": "Help",
+  "Landing_Pro": "Trendlijn, Small Multiples, kleurregels en voorwaardelijke opmaak, secundaire KPI’s.",
+  "Landing_ProShort": "Trend, Small Multiples, kleurregels."
 }

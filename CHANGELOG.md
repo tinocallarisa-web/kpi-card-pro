@@ -8,6 +8,10 @@
 ### Changed
 - **A single card fills the visual.** Until a font size is chosen, the main number grows with the visual — like the native Card — while the label, variance and prior line grow far less, and the card is centred vertically. With a trend line the number stops at 40% of the height so the line keeps its room. A size you set under *Main value → Font size* is kept exactly. *Reports that never set a font size will show a larger number after the update.*
 - **Long card titles in a grid wrap onto two lines** before ending in "…"; the full title is still in the tooltip.
+- **New start screen,** the same as the other TCViz visuals: what the card does, the three wells to fill (Value, Prior Period, Trend), links to the guide, the product page and the video — opened only when you click them — and what Pro adds, in three sizes.
+
+### Fixed
+- **Turning interactions off for the visual now stops its clicks from filtering the page.** The visual read the setting from where older versions of the Power BI API kept it; it now reads it from `hostCapabilities`.
 
 ## [2.2.0.0] — 2026-10-12
 

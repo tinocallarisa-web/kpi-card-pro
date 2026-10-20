@@ -9,6 +9,8 @@
 
 import powerbi from "powerbi-visuals-api";
 import { FormattingSettingsService } from "powerbi-visuals-utils-formattingmodel";
+import { LANDING_ICON } from "./landingIcon";
+import "./../style/landing.less";
 import { valueFormatter } from "powerbi-visuals-utils-formattingutils";
 import { VisualFormattingSettingsModel } from "./settings";
 import { I18N } from "./i18n";
@@ -131,6 +133,10 @@ let licenseEnvSupported = true;
 let licenseInfoAvailable = true;
 /** Diagnostic overlay. Patched to true by `node build-test.js --debug`. */
 let DBG_LICENSE = false; // DBG_LICENSE_MARKER
+// Enlaces de la pantalla de inicio: solo se abren con un clic, a través de host.launchUrl.
+const URL_GUIDE = "https://tinocallarisa-web.github.io/kpi-card-pro/support.html";
+const URL_PRODUCT = "https://tcviz.com/product/horizon-kpi/?ref=visual-kpi";
+const URL_VIDEO = "https://www.youtube.com/watch?v=4fP7zYKnhWo";
 
 
 function resolveLicense(licenseManager: IVisualLicenseManager): Promise<boolean> {
@@ -286,7 +292,7 @@ export class Visual implements IVisual {
 
         // ── Context menu on empty space ────────────────────────────────────
         this.container.addEventListener("contextmenu", (e: MouseEvent) => {
-            if ((this.host as any).allowInteractions === false) return;
+            if (this.allowInter() === false) return;
             const now = Date.now();
             if (now - this.lastContextMenuTime < CONTEXT_MENU_DEBOUNCE) return;
             this.lastContextMenuTime = now;
@@ -302,7 +308,7 @@ export class Visual implements IVisual {
         // Un clic fuera de las tarjetas y de los puntos limpia la selección, como en los
         // visuales nativos.
         this.container.addEventListener("click", (e: MouseEvent) => {
-            if ((this.host as any).allowInteractions === false) return;
+            if (this.allowInter() === false) return;
             const t = e.target as HTMLElement;
             if (this.formatMode) return;
             if (t.closest("[data-selection-index]") || t.closest(".kpi-sparkline")) return;
@@ -1069,7 +1075,7 @@ export class Visual implements IVisual {
             else if (e.key === "End") i = data.length - 1;
             else if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault(); e.stopPropagation();
-                if ((this.host as any).allowInteractions === false) return;
+                if (this.allowInter() === false) return;
                 if (metric.trendIds[actual]) this.selectId(metric.trendIds[actual], e.ctrlKey || e.metaKey);
                 return;
             } else { return; }
@@ -1082,7 +1088,7 @@ export class Visual implements IVisual {
         if (metric.trendIds.length === data.length) {
             wrapper.style.cursor = "pointer";
             wrapper.addEventListener("click", (e: MouseEvent) => {
-                if ((this.host as any).allowInteractions === false) return;
+                if (this.allowInter() === false) return;
                 const r = wrapper.getBoundingClientRect();
                 if (r.width <= 0) return;
                 e.stopPropagation();
@@ -1387,70 +1393,17 @@ export class Visual implements IVisual {
         // Never replace already-painted data with the landing page.
         if (this.hasRenderedData) return;
 
+        // 2.3: la pantalla de la serie (renderEmpty), dentro de un contenedor del tamaño del visual.
         const palette = this.host.colorPalette;
-        const isHC = palette.isHighContrast;
-        const fg = isHC ? "#FFFFFF" : (palette.foreground?.value ?? "#3D3929");
-        const bg = isHC ? "#000000" : (palette.background?.value ?? "#FAF9F5");
-        const muted = isHC ? "#CCCCCC" : "#83827D";
-        const accent = "#C96442";
-
+        const isHC = !!palette.isHighContrast;
         const landing = document.createElement("div");
         landing.setAttribute("role", "region");
-        landing.setAttribute("aria-label", "KPI Card Pro — Add data to get started");
+        landing.setAttribute("aria-label", "KPI Card Pro — " + this.t("Msg_Landing", "Add a measure to the Value field well to get started."));
         const lvW = this.viewport.width  > 0 ? `${this.viewport.width}px`  : "100%";
         const lvH = this.viewport.height > 0 ? `${this.viewport.height}px` : "100%";
-
-        landing.style.cssText = `
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            width: ${lvW}; height: ${lvH};
-            background: ${bg};
-            font-family: 'Segoe UI', sans-serif;
-            text-align: center;
-            padding: 20px; box-sizing: border-box; gap: 8px;
-        `;
-
-        // Icon
-        const svgNS = "http://www.w3.org/2000/svg";
-        const icon = document.createElementNS(svgNS, "svg");
-        icon.setAttribute("width", "40"); icon.setAttribute("height", "40");
-        icon.setAttribute("viewBox", "0 0 40 40"); icon.setAttribute("fill", "none");
-        icon.setAttribute("aria-hidden", "true");
-        const iconRect = document.createElementNS(svgNS, "rect");
-        iconRect.setAttribute("x", "4"); iconRect.setAttribute("y", "4");
-        iconRect.setAttribute("width", "32"); iconRect.setAttribute("height", "32");
-        iconRect.setAttribute("rx", "6"); iconRect.setAttribute("stroke", accent);
-        iconRect.setAttribute("stroke-width", "1.5"); iconRect.setAttribute("fill", "none");
-        icon.appendChild(iconRect);
-        const bars = [[10, 26, 6], [16, 20, 12], [22, 14, 18], [28, 8, 24]];
-        bars.forEach(([x, y, h]) => {
-            const r = document.createElementNS(svgNS, "rect");
-            r.setAttribute("x", String(x)); r.setAttribute("y", String(y));
-            r.setAttribute("width", "4"); r.setAttribute("height", String(h));
-            r.setAttribute("rx", "1"); r.setAttribute("fill", accent);
-            icon.appendChild(r);
-        });
-        landing.appendChild(icon);
-
-        const title = document.createElement("div");
-        title.textContent = "KPI Card Pro";
-        title.style.cssText = `font-size: 15px; font-weight: 700; color: ${fg};`;
-        landing.appendChild(title);
-
-        const paso = document.createElement("div");
-        paso.textContent = this.t("Guide_Step", "Setup · step {0} of 3").replace("{0}", "1");
-        paso.style.cssText = `font-size: 11px; font-weight: 700; letter-spacing: .3px; color: ${isHC ? fg : "#2B6CB0"};`;
-        landing.appendChild(paso);
-
-        const hint = document.createElement("div");
-        hint.textContent = this.t("Msg_Landing", "Add a measure to the Value field well to get started.");
-        hint.style.cssText = `font-size: 12px; color: ${muted}; max-width: 200px; line-height: 1.5;`;
-        landing.appendChild(hint);
-
-        const subHint = document.createElement("div");
-        subHint.textContent = this.t("Msg_LandingHint", "Prior Period for variance · Target for goal tracking · Small Multiples for multi-card layout (Pro)");
-        subHint.style.cssText = `font-size: 10px; color: ${muted}; max-width: 220px; line-height: 1.5; margin-top: 4px;`;
-        landing.appendChild(subHint);
+        landing.style.cssText = `display: flex; flex-direction: column; width: ${lvW}; height: ${lvH};
+            background: ${isHC ? "#000000" : (palette.background?.value ?? "#FFFFFF")}; box-sizing: border-box; padding: 12px;`;
+        this.renderEmpty(landing, isHC);
 
         // Atomic swap
         while (this.container.firstChild) {
@@ -2219,7 +2172,7 @@ export class Visual implements IVisual {
 
         // Asistente de configuración (2.2.0.0): solo editando y con datos.
         if (metrics.length > 0 && this.editing && !this.formatMode && s.style.guide.value
-            && (this.host as any).allowInteractions !== false) {
+            && this.allowInter() !== false) {
             const m0 = metrics[0];
             root.appendChild(this.buildGuide(hc, this.formatMetricValue(m0.highlightValue !== null ? m0.highlightValue : m0.value, m0.formats.value)));
         }
@@ -2338,41 +2291,118 @@ export class Visual implements IVisual {
         root.appendChild(grid);
     }
 
+    /** allowInteractions vive en hostCapabilities desde la API 5.x; host.allowInteractions era el sitio antiguo. */
+    private allowInter(): boolean | undefined {
+        const h: any = this.host;
+        return h?.hostCapabilities?.allowInteractions ?? h?.allowInteractions;
+    }
+
+    /**
+     * Pantalla de inicio (2.3), la de la serie: qué es, cómo empezar con los pozos reales, ayuda y qué añade el Pro.
+     * Tres tamaños. Los enlaces solo se abren al hacer clic (host.launchUrl); el Pro es texto, sin botón de compra.
+     */
     private renderEmpty(root: HTMLElement, hc: boolean): void {
-        const palette = this.host.colorPalette;
-        const empty = document.createElement("div");
-        empty.className = "kpi-empty";
-        empty.title = "KPI Card Pro — " + this.t("Msg_Empty", "Add a measure to the Value field well");
-        empty.style.cssText = `
-            display: flex; flex: 1; align-items: center; justify-content: center;
-            flex-direction: column; gap: 8px;
-            color: ${hc ? "#FFFFFF" : ((palette as any).foregroundNeutralSecondary?.value ?? "#A19F9D")};
-            font-family: 'Segoe UI', sans-serif;
-            font-size: 13px; text-align: center;
-        `;
-
-        const svgNS = "http://www.w3.org/2000/svg";
-        const emptyIcon = document.createElementNS(svgNS, "svg");
-        emptyIcon.setAttribute("width", "32"); emptyIcon.setAttribute("height", "32");
-        emptyIcon.setAttribute("viewBox", "0 0 32 32"); emptyIcon.setAttribute("fill", "none");
-        emptyIcon.setAttribute("aria-hidden", "true");
-        const iconRect = document.createElementNS(svgNS, "rect");
-        iconRect.setAttribute("x", "4"); iconRect.setAttribute("y", "4");
-        iconRect.setAttribute("width", "24"); iconRect.setAttribute("height", "24");
-        iconRect.setAttribute("rx", "4"); iconRect.setAttribute("stroke", "currentColor");
-        iconRect.setAttribute("stroke-width", "1.5"); iconRect.setAttribute("fill", "none");
-        emptyIcon.appendChild(iconRect);
-        const iconPath = document.createElementNS(svgNS, "path");
-        iconPath.setAttribute("d", "M10 20 L14 14 L18 17 L22 10");
-        iconPath.setAttribute("stroke", "currentColor"); iconPath.setAttribute("stroke-width", "1.5");
-        iconPath.setAttribute("stroke-linecap", "round"); iconPath.setAttribute("stroke-linejoin", "round");
-        emptyIcon.appendChild(iconPath);
-        empty.appendChild(emptyIcon);
-
-        const emptySpan = document.createElement("span");
-        emptySpan.textContent = this.t("Msg_Empty", "Add a measure to the Value field well");
-        empty.appendChild(emptySpan);
-        root.appendChild(empty);
+        const w = this.viewport.width || 0, h = this.viewport.height || 0;
+        const size = (w >= 600 && h >= 340) ? "l" : (w >= 360 && h >= 220) ? "m" : "s";
+        const pal: any = this.host.colorPalette;
+        const fg = hc ? (pal.foreground?.value || "#FFFFFF") : "";
+        const bgHc = hc ? (pal.background?.value || "#000000") : "";
+        const el = document.createElement("div");
+        el.className = "kpi-landing kpi-landing-" + size;
+        el.title = "KPI Card Pro — " + this.t("Msg_Empty", "Add a measure to the Value field well");
+        const mk = (tag: string, cls?: string, text?: string): HTMLElement => {
+            const n = document.createElement(tag);
+            if (cls) { n.className = cls; }
+            if (text !== undefined) { n.textContent = text; }
+            if (fg) { n.style.color = fg; }
+            return n;
+        };
+        const val = this.t("Role_Value", "Value"), prior = this.t("Role_PriorPeriod", "Prior Period"), trend = this.t("Role_Trend", "Trend (Pro)");
+        const head = mk("div", "kpi-l-head");
+        const img = document.createElement("img");
+        img.src = LANDING_ICON; img.alt = ""; img.className = "kpi-l-icon";
+        head.appendChild(img);
+        const titles = mk("div");
+        titles.appendChild(mk("div", "kpi-l-title", "KPI Card Pro"));
+        if (size !== "s") {
+            titles.appendChild(mk("div", "kpi-l-tag", size === "l"
+                ? this.t("Landing_Tagline", "The number, its variance, target and trend, on one card.")
+                : this.t("Landing_TaglineShort", "The number and its context.")));
+        }
+        head.appendChild(titles);
+        el.appendChild(head);
+        const link = (txt: string, url: string, cls: string): HTMLElement => {
+            const a = mk("a", cls) as HTMLAnchorElement;
+            a.href = url; a.tabIndex = 0; a.textContent = txt;
+            if (hc) { a.style.background = "transparent"; a.style.borderColor = fg; }
+            const open = (e: Event) => { e.preventDefault(); e.stopPropagation(); this.host.launchUrl(url); };
+            a.addEventListener("click", open);
+            a.addEventListener("keydown", (e: KeyboardEvent) => { if (e.key === "Enter" || e.key === " ") { open(e); } });
+            return a;
+        };
+        const links: [string, string, string][] = [
+            [this.t("Landing_Guide", "Guide"), this.t("Landing_GuideSub", "support page"), URL_GUIDE],
+            [this.t("Landing_Product", "Product page"), "tcviz.com", URL_PRODUCT],
+            [this.t("Landing_Video", "Video"), "YouTube", URL_VIDEO],
+        ];
+        if (size === "s") {
+            el.appendChild(mk("p", "kpi-l-do", this.t("Landing_Small", "Add {value}; {prior} for the variance.")
+                .replace("{value}", val).replace("{prior}", prior)));
+            const row = mk("div", "kpi-l-inline");
+            row.appendChild(link(links[0][0], links[0][2], "kpi-l-a"));
+            el.appendChild(row);
+            root.appendChild(el);
+            return;
+        }
+        const L = size === "l";
+        const steps = mk("ol", "kpi-l-steps");
+        const step = (n: number, well: string, txt: string) => {
+            const li = mk("li");
+            const num = mk("b", "kpi-l-n", String(n));
+            if (hc) { num.style.background = fg; num.style.color = bgHc; }
+            li.appendChild(num);
+            const sp = mk("span");
+            sp.appendChild(mk("strong", "kpi-l-well", well));
+            sp.appendChild(document.createTextNode(" · " + txt));
+            li.appendChild(sp);
+            steps.appendChild(li);
+        };
+        step(1, val, L ? this.t("Landing_Step1", "the measure: sales, margin, orders") : this.t("Landing_Step1Short", "the measure"));
+        step(2, prior, L ? this.t("Landing_Step2", "the variance appears, with its arrow, no DAX") : this.t("Landing_Step2Short", "the variance"));
+        step(3, trend, L ? this.t("Landing_Step3", "a date field draws the trend line") : this.t("Landing_Step3Short", "the trend line"));
+        if (L) {
+            const cols = mk("div", "kpi-l-cols");
+            const c1 = mk("div");
+            c1.appendChild(mk("div", "kpi-l-lbl", this.t("Landing_Start", "Start in 3 steps")));
+            c1.appendChild(steps);
+            const c2 = mk("div");
+            c2.appendChild(mk("div", "kpi-l-lbl", this.t("Landing_Help", "Help")));
+            const list = mk("div", "kpi-l-links");
+            for (const [txt, sub, url] of links) {
+                const a = link(txt, url, "kpi-l-card");
+                a.appendChild(mk("small", "kpi-l-sub", sub));
+                list.appendChild(a);
+            }
+            c2.appendChild(list);
+            cols.appendChild(c1); cols.appendChild(c2);
+            el.appendChild(cols);
+        } else {
+            el.appendChild(steps);
+            const row = mk("div", "kpi-l-inline");
+            for (const l of links) { row.appendChild(link(l[1] === "tcviz.com" ? "tcviz.com" : l[0], l[2], "kpi-l-a")); }
+            el.appendChild(row);
+        }
+        if (!this.isPro) {
+            const pro = mk("div", "kpi-l-pro");
+            const chip = mk("span", "kpi-l-chip", "Pro");
+            if (hc) { chip.style.background = "transparent"; chip.style.border = "1px solid " + fg; }
+            pro.appendChild(chip);
+            pro.appendChild(mk("span", undefined, L
+                ? this.t("Landing_Pro", "Trend line, Small Multiples, color rules and conditional formatting, secondary KPIs.")
+                : this.t("Landing_ProShort", "Trend, Small Multiples, color rules.")));
+            el.appendChild(pro);
+        }
+        root.appendChild(el);
     }
 
     private buildMetricCell(metric: MetricData, hc: boolean, large: boolean, themeFg: string, themeMuted: string, index: number): HTMLElement {
@@ -2403,7 +2433,7 @@ export class Visual implements IVisual {
 
         // ── Keyboard: Enter/Space to select ───────────────────────────────
         cell.addEventListener("keydown", (e: KeyboardEvent) => {
-            if ((this.host as any).allowInteractions === false) return;
+            if (this.allowInter() === false) return;
             if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
                 if (metric.selectionId) {
@@ -2413,13 +2443,13 @@ export class Visual implements IVisual {
         });
 
         cell.addEventListener("contextmenu", (e: MouseEvent) => {
-            if ((this.host as any).allowInteractions === false) return;
+            if (this.allowInter() === false) return;
             e.preventDefault(); e.stopPropagation();
             this.selectionManager.showContextMenu(metric.selectionId, { x: e.clientX, y: e.clientY });
         });
 
         cell.addEventListener("click", (e: MouseEvent) => {
-            if ((this.host as any).allowInteractions === false) return;         // Allow Interactions
+            if (this.allowInter() === false) return;         // Allow Interactions
             e.stopPropagation();
             if (metric.selectionId) {
                 this.selectId(metric.selectionId, e.ctrlKey || e.metaKey);
