@@ -190,5 +190,6 @@
   "Status_Good": "No alvo",
   "Status_OfPrior": "{0} do anterior",
   "Status_OfTarget": "{0} da meta",
-  "Status_Warn": "Alerta"
+  "Status_Warn": "Alerta",
+  "Pro_conditional_formatting_fx_": "a formatação condicional (fx)"
 }

@@ -190,5 +190,6 @@
   "Status_Good": "順調",
   "Status_OfPrior": "前期の {0}",
   "Status_OfTarget": "目標の {0}",
-  "Status_Warn": "警告"
+  "Status_Warn": "警告",
+  "Pro_conditional_formatting_fx_": "条件付き書式 (fx)"
 }

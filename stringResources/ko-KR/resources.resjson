@@ -190,5 +190,6 @@
   "Status_Good": "정상",
   "Status_OfPrior": "이전의 {0}",
   "Status_OfTarget": "목표의 {0}",
-  "Status_Warn": "경고"
+  "Status_Warn": "경고",
+  "Pro_conditional_formatting_fx_": "조건부 서식(fx)"
 }

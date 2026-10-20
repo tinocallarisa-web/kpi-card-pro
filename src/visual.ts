@@ -51,8 +51,9 @@ interface MetricData {
      *  punto filtra el informe por ese periodo (y por la tarjeta, en small multiples). */
     trendIds: powerbi.extensibility.ISelectionId[];
     image: string | null;                 // validated Base64 data URI, or null
-    /** Color del valor que devuelve una regla fx para esta tarjeta; null si no hay regla. */
+    /** Colores que devuelven las reglas fx para esta tarjeta (valor y fondo); null si no hay regla. */
     fxColor: string | null;
+    fxBg: string | null;
 }
 
 type DisplayUnit = "auto" | "none" | "thousands" | "millions" | "billions";
@@ -664,6 +665,15 @@ export class Visual implements IVisual {
         if (anyGrouping && roles.trend >= 0) {
             labels.push("trend line");
             parts.push("role.trend=1");
+        }
+
+        // Formato condicional (fx) en el color del valor o el fondo: Power BI deja el resultado en los nodos de la
+        // matriz, no en metadata.objects, así que se busca ahí. Una regla aplicada es la intención.
+        const conRegla = [smRows?.root, ...smKids].some((n: any) => n?.objects?.mainValue?.color || n?.objects?.card?.background
+            || Object.values(n?.values ?? {}).some((v: any) => v?.objects?.mainValue?.color || v?.objects?.card?.background));
+        if (conRegla) {
+            labels.push("conditional formatting (fx)");
+            parts.push("fx=1");
         }
 
         if (smHasGrouping) {
@@ -1825,7 +1835,8 @@ export class Visual implements IVisual {
                 target,
                 tooltipFields: [],
                 formats: formatsFor(valueNode),
-                fxColor: this.fxColorOf(valueNode, measureIdx),
+                fxColor: this.fxColorOf(valueNode, measureIdx, "mainValue", "color"),
+                fxBg: this.fxColorOf(valueNode, measureIdx, "card", "background"),
                 periodLabel: "",
                 comparePeriodLabel: "",
                 secondary: secIdxs.map((si, k) => ({
@@ -1893,7 +1904,8 @@ export class Visual implements IVisual {
                 target,
                 tooltipFields,
                 formats: formatsFor(child),
-                fxColor: this.fxColorOf(child, measureIdx),
+                fxColor: this.fxColorOf(child, measureIdx, "mainValue", "color"),
+                fxBg: this.fxColorOf(child, measureIdx, "card", "background"),
                 periodLabel: "",
                 comparePeriodLabel: "",
                 secondary: secIdxs.map((si, k) => ({
@@ -1991,8 +2003,8 @@ export class Visual implements IVisual {
      * en el propio nodo o, con una sola tarjeta, en la raíz; se miran los tres (y los hijos, si la tarjeta agrupa
      * una tendencia). El color fijo NO llega aquí: está en metadata.objects y lo lee formattingSettings.
      */
-    private fxColorOf(node: powerbi.DataViewMatrixNode | undefined, idx: number): string | null {
-        const leer = (o: any): string | null => o?.mainValue?.color?.solid?.color ?? null;
+    private fxColorOf(node: powerbi.DataViewMatrixNode | undefined, idx: number, obj: string, prop: string): string | null {
+        const leer = (o: any): string | null => o?.[obj]?.[prop]?.solid?.color ?? null;
         const root = this.lastDataView?.matrix?.rows?.root as any;
         const cand: any[] = [(node?.values as any)?.[idx]?.objects, (node as any)?.objects];
         for (const k of this.realChildren(node)) { cand.push((k.values as any)?.[idx]?.objects, (k as any).objects); }
@@ -2137,7 +2149,8 @@ export class Visual implements IVisual {
         root.className = "kpi-root" + (hc ? " high-contrast" : "");
         this.subSelectable(root, "card", this.t("OO_Card", "Card"), powerbi.visuals.SubSelectionStylesType.Shape);
 
-        const cardBg     = hc ? "#000000" : (s.card.background.value?.value ?? themeBg);
+        const fxOn       = this.previewOf("conditional formatting (fx)");
+        const cardBg     = hc ? "#000000" : ((fxOn ? metrics[0]?.fxBg : null) ?? s.card.background.value?.value ?? themeBg);
         const cardBorder = hc ? "#FFFFFF"  : (s.card.borderColor.value?.value ?? "#E0E0E0");
         const bw  = this.previewOf("card styling") ? (s.card.borderWidth.value ?? 1) : 1;
         const br  = this.previewOf("card styling") ? (s.card.borderRadius.value ?? 8) : 8;
@@ -2277,7 +2290,8 @@ export class Visual implements IVisual {
         metrics.forEach((metric, idx) => {
             const s2 = this.formattingSettings;
             const palette = this.host.colorPalette;
-            const cardBg     = hc ? "#000000" : (s2.card.background.value?.value ?? (palette.background?.value ?? "#FFFFFF"));
+            const cardBg     = hc ? "#000000" : ((this.previewOf("conditional formatting (fx)") ? metric.fxBg : null)
+                ?? s2.card.background.value?.value ?? (palette.background?.value ?? "#FFFFFF"));
             const cardBorder = hc ? "#FFFFFF"  : (s2.card.borderColor.value?.value ?? "#E0E0E0");
             const cellBr     = this.previewOf("card styling") ? (s2.card.borderRadius.value ?? 8) : 8;
 
@@ -2488,7 +2502,8 @@ export class Visual implements IVisual {
         const st = this.statusOf(metric, displayValue);
         const stApply = String((s.status.applyTo.value as any)?.value ?? s.status.applyTo.value ?? "both");
         const valueColor = hc ? "#FFFFFF"
-            : (st && (stApply === "both" || stApply === "value") ? st.color : (metric.fxColor ?? s.mainValue.color.value?.value ?? themeFg));
+            : (st && (stApply === "both" || stApply === "value") ? st.color
+                : ((this.previewOf("conditional formatting (fx)") ? metric.fxColor : null) ?? s.mainValue.color.value?.value ?? themeFg));
         valueEl.style.cssText = `
             font-family: ${s.mainValue.fontFamily.value ?? "Segoe UI, sans-serif"};
             font-size: ${fontSize}px;

@@ -16,9 +16,13 @@ import FormattingSettingsModel = formattingSettings.Model;
 // ─── Card: Card Container ────────────────────────────────────────────────────
 
 class CardSettings extends FormattingSettingsCard {
+    // fx (2.3, Pro): constante o regla por tarjeta, como el color del valor.
     background = new formattingSettings.ColorPicker({
         name: "background", displayName: "Background Color",
-        value: { value: "#FFFFFF" }
+        value: { value: "#FFFFFF" },
+        instanceKind: powerbi.VisualEnumerationInstanceKinds.ConstantOrRule,
+        selector: { data: [{ dataViewWildcard: { matchingOption: 0 } }] } as any,
+        altConstantSelector: null as any
     });
     borderColor = new formattingSettings.ColorPicker({
         name: "borderColor", displayName: "Border Color",

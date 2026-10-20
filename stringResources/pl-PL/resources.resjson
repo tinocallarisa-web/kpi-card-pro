@@ -190,5 +190,6 @@
   "Status_Good": "Zgodnie z planem",
   "Status_OfPrior": "{0} poprzedniego",
   "Status_OfTarget": "{0} celu",
-  "Status_Warn": "Ostrzeżenie"
+  "Status_Warn": "Ostrzeżenie",
+  "Pro_conditional_formatting_fx_": "formatowanie warunkowe (fx)"
 }

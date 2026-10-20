@@ -190,5 +190,6 @@
   "Status_Good": "On track",
   "Status_OfPrior": "{0} of prior",
   "Status_OfTarget": "{0} of target",
-  "Status_Warn": "Warning"
+  "Status_Warn": "Warning",
+  "Pro_conditional_formatting_fx_": "conditional formatting (fx)"
 }

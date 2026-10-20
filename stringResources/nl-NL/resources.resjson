@@ -190,5 +190,6 @@
   "Status_Good": "Op koers",
   "Status_OfPrior": "{0} van vorige",
   "Status_OfTarget": "{0} van doel",
-  "Status_Warn": "Waarschuwing"
+  "Status_Warn": "Waarschuwing",
+  "Pro_conditional_formatting_fx_": "voorwaardelijke opmaak (fx)"
 }

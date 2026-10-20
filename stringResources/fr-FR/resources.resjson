@@ -190,5 +190,6 @@
   "Status_Good": "Conforme",
   "Status_OfPrior": "{0} de la précédente",
   "Status_OfTarget": "{0} de l'objectif",
-  "Status_Warn": "Attention"
+  "Status_Warn": "Attention",
+  "Pro_conditional_formatting_fx_": "la mise en forme conditionnelle (fx)"
 }
