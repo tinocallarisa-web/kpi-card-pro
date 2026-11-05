@@ -1,13 +1,12 @@
-# AppSource listing copy — KPI Card Pro v2.3.0.0
+# AppSource listing copy — KPI Card Pro v2.4.0.0
 
 Copy ready to paste into Partner Center. **The marketplace description is the documentation most
 people read and the one that goes stale fastest** — update it on every release, not only when the
 code changes.
 
-**This version changes what the buyer sees** (color rules on the background or border, style
-templates, a setup guide inside the visual, clickable trend points, twelve languages): the
-description, the short description and the "What's new" block all change, the screenshots change,
-and the certification notes must be pasted again.
+**This version changes what the buyer sees** (the report's theme by default, six Pro styles, the trend
+on the right, variance in points): the description and the "What's new" block change, the styles
+infographic changes, and the certification notes must be pasted again. The short description does not.
 
 Rules for this listing: no comparisons with other marketplace visuals, not even implied; compare
 only with Power BI's own card. "Power BI" always with that capitalisation (rejection 100.7.1).
@@ -31,11 +30,14 @@ A number on a dashboard is only half an answer. 9.7M in revenue — is that good
 
 KPI Card Pro puts the answer on the card: the value, its variance, the target, a trend line and a color that says on track, warning or off track. Add a category and the single card becomes a grid — up to fifty cards, one per country, product or team, each with its own figures and line.
 
-WHAT IS NEW IN 2.3
+WHAT IS NEW IN 2.4
 
-• Conditional formatting (fx) on the value colour and the card background, card by card in a grid
-• A single card that fills the visual: the number grows with it, like the native Card, until you set a size
-• Long card titles wrap onto two lines instead of being cut
+• Follows your report's theme by default, like a native visual
+• Six Pro styles you can try on your own data: Boardroom, Ledger, Editorial, Signal, Aurora and Terrace
+• A style never moves your layout: the content stays in the same place
+• The trend line below the figures or beside them
+• A percentage varies in points: 25% to 27% is +2.0 pp, not +8%
+• Percentages stay right with a date in Trend: the card uses Power BI's total, it does not add up the months
 
 NO DATE TABLE, NO DAX
 
@@ -57,7 +59,7 @@ WHAT YOU GET
 • A target, on the card and drawn on the trend line period by period
 • Color rules with three states, written under the value too, so meaning never depends on colour alone
 • Conditional formatting (fx) on the value colour and the card background, per card in a grid
-• A trend line: area, line or bars, over any date or ordered period
+• A trend line: area, line or bars, below or beside the figures, over any date or ordered period
 • One card per category, in up to six columns that adapt to the width
 • A logo or flag on each card, from Base64 images already in your model
 • Your model's number formats, in the language of the report
@@ -70,9 +72,9 @@ No network calls of any kind: no telemetry, no analytics, no CDN. Everything hap
 
 FREE AND PRO
 
-The card is complete without a licence: value, variance with its arrow and invert logic, target, your number formats, images, style templates, the setup guide, the size-adaptive layout, format on the canvas, cross-filtering, bookmarks, keyboard, screen readers and high contrast.
+The card is complete without a licence: value, variance with its arrow and invert logic, target, your number formats, images, the report's theme, Classic and five more styles, the setup guide, the size-adaptive layout, format on the canvas, cross-filtering, bookmarks, keyboard, screen readers and high contrast.
 
-Pro adds the context: color rules and conditional formatting (fx), the trend line with clickable points and its period comparisons, Small Multiples, Secondary KPIs, prefix and suffix, the variance pill and colours, extra tooltip measures, and the card border, radius, padding and shadow.
+Pro adds the context: six more styles, color rules and conditional formatting (fx), the trend line with clickable points and its period comparisons, Small Multiples, Secondary KPIs, prefix and suffix, the variance pill and colours, extra tooltip measures, and the card border, radius, padding and shadow.
 
 SEE IT BEFORE YOU BUY
 
@@ -97,8 +99,8 @@ Support: support@tcviz.com
 | Repository (certification branch) | https://github.com/tinocallarisa-web/kpi-card-pro/tree/certification |
 | Demo video | https://www.youtube.com/watch?v=4fP7zYKnhWo |
 
-No new video for 2.2 (decision 12-10-2026): the existing one still shows features that work the
-same way. The novelties are told in the description and in the screenshots.
+No new video for 2.2 (decision 12-10-2026). For 2.4 the default look changes, so the existing video
+no longer matches the first thing a viewer sees: decide before submitting.
 
 **The certification notes field caps at 2,500 characters** (counting CRLF) and truncates without
 warning, mid-word. Paste `docs/CERTIFICATION-NOTES-SHORT.txt`. The full notes live in
@@ -113,8 +115,8 @@ from Partner Center, so correcting it in `pbiviz.json` alone changes nothing.
 
 | Asset | File | Notes |
 |---|---|---|
-| Offer screenshot 1 | `docs/infographic.png` (from `docs/infographic.html`) | 1366×768, general guide for 2.2 |
-| Offer screenshot 2 | `docs/infographic-styles.png` (from `docs/infographic-styles.html`) | 1366×768, templates and color rules |
+| Offer screenshot 1 | `docs/infographic.png` (from `docs/infographic.html`) | 1366×768, general guide |
+| Offer screenshot 2 | `docs/infographic-styles.png` (from `docs/infographic-styles.html`) | 1366×768, the two free styles shown and the six Pro styles |
 | Offer logo | `assets/logo_300x300.png` | New Nord icon. Uploaded by hand: it does not travel in the package |
 | Package icon | `assets/icon.png` | 36×36, embedded in the `.pbiviz` |
 
@@ -124,10 +126,9 @@ from Partner Center, so correcting it in `pbiviz.json` alone changes nothing.
 
 Editing this file changes nothing in the offer.
 
-- [ ] Long description and short description
-- [ ] Screenshots: the two infographics above, replacing the 2.1 one
-- [ ] Offer logo: `assets/logo_300x300.png`
+- [ ] Long description (the short description does not change)
+- [ ] Screenshots: the two infographics above, replacing the current ones
 - [ ] Video field unchanged: `https://www.youtube.com/watch?v=4fP7zYKnhWo` (canonical form only)
 - [ ] Certification notes from `docs/CERTIFICATION-NOTES-SHORT.txt` — the field is cleared on every resubmission
-- [ ] Version 2.3.0.0 is above the one currently published (check Partner Center)
+- [ ] Version 2.4.0.0 is above the one currently published (check Partner Center)
 - [ ] Support, privacy and terms URLs checked with a real request

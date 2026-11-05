@@ -1,6 +1,6 @@
 # KPI Card Pro — TCViz Web Product Page Content
 
-Content for the four tabs of the TCViz product page. Current version: **2.3.0.0**.
+Content for the four tabs of the TCViz product page. Current version: **2.4.0.0**.
 
 The live page is generated from `src/data.jsx` in the **tcviz-web** repository
 (https://tcviz.com/product/horizon-kpi/). This file is the draft: copy the changes there.
@@ -104,7 +104,7 @@ Everything below is free except the items marked **(Pro)**.
 
 ### Set up and style
 - A setup guide inside the visual, while you edit: it ticks off each field as you add it and offers the templates
-- Six style templates — Classic, Clean, Bold, Minimal, Soft, Midnight — that never override what you set
+- The report's theme by default, plus six free style templates — Classic, Clean, Bold, Minimal, Soft, Midnight — and six Pro ones — Boardroom, Ledger, Editorial, Signal, Aurora, Terrace — that never override what you set
 - Format on the canvas: click the number, label, trend line or card to format it
 - The number shrinks to fit any size; the grid picks how many columns fit
 

@@ -6,7 +6,7 @@
 
 [![AppSource](https://img.shields.io/badge/AppSource-Published-0078D4?logo=microsoft)](https://marketplace.microsoft.com/en-us/product/tino_callarisa.kpicard-pro?tab=Overview)
 [![Power BI API](https://img.shields.io/badge/API-5.11.0-yellow)](https://github.com/microsoft/powerbi-visuals-api)
-[![Version](https://img.shields.io/badge/version-2.3.0.0-brightgreen)](pbiviz.json)
+[![Version](https://img.shields.io/badge/version-2.4.0.0-brightgreen)](pbiviz.json)
 [![License](https://img.shields.io/badge/License-Proprietary-red)](https://tinocallarisa-web.github.io/kpi-card-pro/terms.html)
 
 📖 **[Documentation & Support](https://tinocallarisa-web.github.io/kpi-card-pro/support.html)** ·
@@ -24,7 +24,8 @@ grows a trend line — and can compare periods by itself, with no date table and
 category to **Small Multiples** and the single card becomes a grid, one card per category. Add up
 to three **Secondary KPIs** to show supporting figures beside the headline.
 
-New in 2.2: click a trend point to filter by that period; selection drawn on the card; six style
+New in 2.4: follows the report's theme by default; six Pro styles; the trend below or beside the figures; variance
+in points for percentages. New in 2.2: click a trend point to filter by that period; selection drawn on the card; six style
 templates; a setup guide inside the visual (edit mode only); format on the canvas; a layout that
 adapts to the size of the visual; screen-reader summaries and keyboard navigation through cards and
 trend points; the Format pane in twelve languages.
@@ -82,7 +83,7 @@ Power BI shows its licence notification. Reading view shows the free result.
 - **Label (single card)** — Show, font family, size, bold, colour
 - **Variance** — Show, invert, show arrow, font size · *(Pro)* positive / negative / neutral colours, Show as Pill
 - **Color rules (Pro)** — Show, compare with target, prior or the value itself, lower and upper threshold, lower is better, colours, apply to the value, an accent bar, the background or the border, show status text
-- **Style template** — Classic, Clean, Bold, Minimal, Soft, Midnight; setup guide on or off
+- **Style template** — Report theme (default), Classic, Clean, Bold, Minimal, Soft, Midnight; Pro: Boardroom, Ledger, Editorial, Signal, Aurora, Terrace; setup guide on or off
 - **Prior & Target** — Show, font family, size, colour
 - **Value & comparison** — Value shows (total, latest point, last N points), window size, compare against, show period label
 - **Secondary KPIs (Pro)** — Show, position (auto / right / bottom), min width beside value, show variance, text sizes and colours

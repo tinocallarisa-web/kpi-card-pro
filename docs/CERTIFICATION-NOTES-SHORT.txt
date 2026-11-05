@@ -1,4 +1,4 @@
-KPI Card Pro 2.3.0.0 - GUID kpiCardProTCViz
+KPI Card Pro 2.4.0.0 - GUID kpiCardProTCViz
 
 SOURCE CODE
 github.com/tinocallarisa-web/kpi-card-pro, branch "certification".
@@ -20,11 +20,11 @@ FILTER OUT (note 1180.2.2.3 on 2.1.0.0 - fixed)
 3. A single card with no Small Multiples and no Trend has nothing to filter by,
    like the native Card; with Trend it filters through its points.
 
-WHAT IS NEW IN 2.3
-Conditional formatting (fx, Pro) on Main value > Color and Card > Background
-color: ConstantOrRule with a wildcard selector, evaluated per card in Small
-Multiples (Power BI sends no rule result for a single card; Color rules cover it).
-A single card sizes its number to the visual until a font size is set.
+WHAT IS NEW IN 2.4
+The default look follows the report's theme (Classic remains). Six Pro styles in
+Format > Style template: without a licence one is drawn under the watermark and
+reading view shows the free look. Trend position: bottom, right or auto. A %
+measure varies in points. With Trend, values read Power BI's subtotal.
 
 ALSO TEST
 - Edit mode: the setup guide lists the wells; pick a template; Finish hides it.

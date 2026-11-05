@@ -1,5 +1,25 @@
 # Changelog — KPI Card Pro
 
+## [2.4.0.0] — 2026-11-05
+
+### Changed
+- **The default look now follows the report's theme.** A card with no style of its own takes its colours from the theme, as a native visual does. **This also applies to reports already built:** if yours relied on the old look, choose *Format → Style template → Classic*, which stays free.
+- **A percentage now varies in points.** A measure formatted as a percentage going from 25% to 27% shows +2.0 pp, not +8%. **Reports already built will show the new figure.** To go back, turn off *Variance → Percentage points for % measures*.
+- **A style changes how the card looks, never what fits in it.** The content sits in the same place with every style, framed or not, so changing style does not move a laid-out page. Clean, Bold and Minimal no longer set their own font size; only colours, weight and the serif of Ledger and Editorial change. A padding you chose under *Card* is kept. *Reports without a padding of their own use a tighter one: 8 px at the sides and 6 px above and below.*
+- **No frame inside the frame.** On *Report theme*, the card or grid draws no border, shadow or background of its own around it: the visual's container provides them, as with the native Card. Setting anything under *Card* brings the frame back. Each card in a grid keeps its own.
+- **A more compact card.** With no label, the image shares the row with the number. Without a trend, the content is centred vertically. The title is centred with the image and set slightly apart from the number.
+
+### Added
+- **Six Pro styles:** Boardroom, Ledger, Editorial, Signal, Aurora and Terrace. Choosing one without a licence draws it on your own data under the Pro preview watermark; reading view shows the free look.
+- **Trend position (Pro):** below the figures, to their right, or Auto, which chooses by the width of the card. With the trend on the right, the Secondary KPIs go below.
+- **Small Multiples title alignment:** left or centre, with the same names for these settings as in the rest of the collection.
+
+### Fixed
+- **Percentages and other non-additive measures were summed across the months when a Trend was bound.** A gross margin could read 455.9%. The card and its Secondary KPIs now use the total Power BI calculates. If Power BI sends no total for a percentage, the card leaves the figure out instead of showing a sum.
+- **Secondary KPIs could not be read on dark styles or dark themes:** they kept their dark default colour. They now follow the value and label colours of the style, unless you chose your own. Separator lines and the scroll bar also adapt.
+- **On a card short of height, the main number could be squeezed until it disappeared.** It now never shrinks that way: the extras are withdrawn first, starting with the trend.
+- **A Pro style drew dark text on its dark background** in the moments before the licence was known.
+
 ## [2.3.0.0] — 2026-10-20
 
 ### Added

@@ -1,4 +1,4 @@
-KPI CARD PRO 2.3 — TIPS & HINTS (versión para pegar)
+KPI CARD PRO 2.4 — TIPS & HINTS (versión para pegar)
 ================================================================
 Los text boxes de Power BI no soportan tablas markdown: al pegar se pierde
 el formato. Esta versión usa listas con puntos guía, que sobreviven al
@@ -58,7 +58,7 @@ COLOR RULES (PRO) AND STYLE TEMPLATES
 - Conditional formatting (fx, Pro) on Main value > Color and Card >
   Background color, card by card in Small Multiples. With a Trend field,
   set a gradient's Minimum and Maximum as Number.
-- Style templates (free): Classic, Clean, Bold, Minimal, Soft, Midnight.
+- Style templates: Report theme by default. Free: Classic, Clean, Bold, Minimal, Soft, Midnight. Pro: Boardroom, Ledger, Editorial, Signal, Aurora, Terrace.
   A template only fills what you have not changed yourself.
 
 

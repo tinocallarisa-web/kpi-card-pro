@@ -39,26 +39,56 @@
   <header>
     <a class="brand" href="https://tcviz.com">TCViz</a>
     <h1>Changelog</h1>
-    <p class="meta">KPI Card Pro &nbsp;·&nbsp; current version 2.2.0.0</p>
+    <p class="meta">KPI Card Pro &nbsp;·&nbsp; current version 2.4.0.0</p>
   </header>
 
   <main>
     <div class="rel">
       <div class="rel-head">
-        <span class="rel-ver">2.3.0.0</span>
+        <span class="rel-ver">2.4.0.0</span>
         <span class="tag tag-cur">Current</span>
+        <span class="rel-date">2026-11-05</span>
+      </div>
+      <h4><span class="tag tag-chg">Changed</span></h4>
+    <ul>
+      <li><strong>The default look now follows the report's theme.</strong> A card with no style of its own takes its colours from the theme, as a native visual does. <strong>This also applies to reports already built:</strong> if yours relied on the old look, choose *Format → Style template → Classic*, which stays free.</li>
+      <li><strong>A percentage now varies in points.</strong> A measure formatted as a percentage going from 25% to 27% shows +2.0 pp, not +8%. <strong>Reports already built will show the new figure.</strong> To go back, turn off *Variance → Percentage points for % measures*.</li>
+      <li><strong>A style changes how the card looks, never what fits in it.</strong> The content sits in the same place with every style, framed or not, so changing style does not move a laid-out page. Clean, Bold and Minimal no longer set their own font size; only colours, weight and the serif of Ledger and Editorial change. A padding you chose under *Card* is kept. *Reports without a padding of their own use a tighter one: 8 px at the sides and 6 px above and below.*</li>
+      <li><strong>No frame inside the frame.</strong> On *Report theme*, the card or grid draws no border, shadow or background of its own around it: the visual's container provides them, as with the native Card. Setting anything under *Card* brings the frame back. Each card in a grid keeps its own.</li>
+      <li><strong>A more compact card.</strong> With no label, the image shares the row with the number. Without a trend, the content is centred vertically. The title is centred with the image and set slightly apart from the number.</li>
+    </ul>
+      <h4><span class="tag tag-add">Added</span></h4>
+    <ul>
+      <li><strong>Six Pro styles:</strong> Boardroom, Ledger, Editorial, Signal, Aurora and Terrace. Choosing one without a licence draws it on your own data under the Pro preview watermark; reading view shows the free look.</li>
+      <li><strong>Trend position (Pro):</strong> below the figures, to their right, or Auto, which chooses by the width of the card. With the trend on the right, the Secondary KPIs go below.</li>
+      <li><strong>Small Multiples title alignment:</strong> left or centre, with the same names for these settings as in the rest of the collection.</li>
+    </ul>
+      <h4><span class="tag tag-fix">Fixed</span></h4>
+    <ul>
+      <li><strong>Percentages and other non-additive measures were summed across the months when a Trend was bound.</strong> A gross margin could read 455.9%. The card and its Secondary KPIs now use the total Power BI calculates. If Power BI sends no total for a percentage, the card leaves the figure out instead of showing a sum.</li>
+      <li><strong>Secondary KPIs could not be read on dark styles or dark themes:</strong> they kept their dark default colour. They now follow the value and label colours of the style, unless you chose your own. Separator lines and the scroll bar also adapt.</li>
+      <li><strong>On a card short of height, the main number could be squeezed until it disappeared.</strong> It now never shrinks that way: the extras are withdrawn first, starting with the trend.</li>
+      <li><strong>A Pro style drew dark text on its dark background</strong> in the moments before the licence was known.</li>
+    </ul>
+    <div class="rel">
+      <div class="rel-head">
+        <span class="rel-ver">2.3.0.0</span>
         <span class="rel-date">2026-10-20</span>
       </div>
       <h4><span class="tag tag-add">Added</span></h4>
     <ul>
-      <li><strong>Conditional formatting (fx) on the value colour and the card background (Pro).</strong> <em>Main value → Color</em> and <em>Card → Background color</em> now have Power BI's fx button: rules, gradient or field value, evaluated card by card in Small Multiples. On a single card Power BI does not pass the result of a rule to the visual, so there the colour comes from <strong>Color rules</strong>. The 2.2 notes said the fx button was not available to visuals that read data as a matrix; that was wrong, and this version uses it.</li>
+      <li><strong>Conditional formatting (fx) on the value colour and the card background (Pro).</strong> *Main value → Color* and *Card → Background color* now have Power BI's fx button: rules, gradient or field value, evaluated card by card in Small Multiples. On a single card Power BI does not pass the result of a rule to the visual, so there the colour comes from <strong>Color rules</strong>, which compare with the target, the prior period or the value itself. The 2.2 notes said the fx button was not available to visuals that read data as a matrix; that was wrong, and this version uses it.</li>
     </ul>
       <h4><span class="tag tag-chg">Changed</span></h4>
     <ul>
-      <li><strong>A single card fills the visual.</strong> Until a font size is chosen, the main number grows with the visual, like the native Card, and the card is centred vertically; with a trend line the number stops at 40% of the height. A size you set is kept exactly. <em>Reports that never set a font size will show a larger number after the update.</em></li>
-      <li><strong>Long card titles in a grid wrap onto two lines</strong> before ending in "…".</li>
+      <li><strong>A single card fills the visual.</strong> Until a font size is chosen, the main number grows with the visual — like the native Card — while the label, variance and prior line grow far less, and the card is centred vertically. With a trend line the number stops at 40% of the height so the line keeps its room. A size you set under *Main value → Font size* is kept exactly. *Reports that never set a font size will show a larger number after the update.*</li>
+      <li><strong>Long card titles in a grid wrap onto two lines</strong> before ending in "…"; the full title is still in the tooltip.</li>
+      <li><strong>New start screen,</strong> the same as the other TCViz visuals: what the card does, the three wells to fill (Value, Prior Period, Trend), links to the guide, the product page and the video — opened only when you click them — and what Pro adds, in three sizes.</li>
     </ul>
-    </div>
+      <h4><span class="tag tag-fix">Fixed</span></h4>
+    <ul>
+      <li><strong>Turning interactions off for the visual now stops its clicks from filtering the page.</strong> The visual read the setting from where older versions of the Power BI API kept it; it now reads it from <code>hostCapabilities</code>.</li>
+    </ul>
     <div class="rel">
       <div class="rel-head">
         <span class="rel-ver">2.2.0.0</span>

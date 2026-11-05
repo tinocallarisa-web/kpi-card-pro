@@ -1,6 +1,6 @@
-# KPI Card Pro — Certification Notes — v2.3.0.0
+# KPI Card Pro — Certification Notes — v2.4.0.0
 
-> 2.3.0.0 adds conditional formatting (fx) on the value colour and card background, evaluated per card in Small Multiples, a single card that sizes its number to the visual, and a new start screen. Everything else below is unchanged from 2.2. Full list: CHANGELOG.md.
+> 2.4.0.0 makes the report's theme the default look (Classic stays available), adds six Pro styles drawn under the preview watermark without a licence, a trend position (bottom, right, auto) and variance in points for percentage measures. With a Trend bound, values now read Power BI's subtotal (`rowSubtotalsPerLevel` is on by default) instead of summing the months. A style changes colours and weights only, never sizes or padding. Everything else below is unchanged from 2.3. Full list: CHANGELOG.md.
 
 > The text pasted into Partner Center is `docs/CERTIFICATION-NOTES-SHORT.txt` (the field caps at
 > 2,500 characters and is cleared on every resubmission). This file is the complete reference the
@@ -129,7 +129,7 @@ colour; images; native and modern tooltips; cross-filtering, cross-highlighting,
 (`registerOnSelectCallback`); keyboard navigation, ARIA labels, high contrast; context menu.
 
 **Pro:** Color rules and conditional formatting (fx); the trend line with its target and hover values, and the value modes it enables;
-Small Multiples (up to 50 cards, 1–6 columns); Secondary KPIs (up to 3); prefix and suffix; the
+six more styles (Boardroom, Ledger, Editorial, Signal, Aurora, Terrace); Small Multiples (up to 50 cards, 1–6 columns); Secondary KPIs (up to 3); prefix and suffix; the
 variance pill and custom variance colours; extra tooltip measures; card border width, radius,
 padding and drop shadow.
 

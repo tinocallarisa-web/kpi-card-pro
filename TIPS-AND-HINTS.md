@@ -1,4 +1,4 @@
-# KPI Card Pro 2.3 — Tips & Hints (Sample File)
+# KPI Card Pro 2.4 — Tips & Hints (Sample File)
 
 Copia estos textos como Text Boxes en Power BI Desktop dentro del archivo .pbix de muestra.
 Crea una página llamada "Tips & Hints" o "How to use" y añade un bloque por sección.
@@ -47,7 +47,8 @@ KPI Card Pro — How to use this visual
 - **Conditional formatting (fx, Pro)** on *Main value → Color* and *Card → Background color*, card by card in Small
   Multiples. With a Trend field, set a gradient's Minimum and Maximum as **Number**: Lowest/Highest value are
   worked out over the months, not the cards.
-- **Style templates** (free): Classic, Clean, Bold, Minimal, Soft, Midnight. A template only fills what
+- **Style templates:** Report theme by default. Free: Classic, Clean, Bold, Minimal, Soft, Midnight. Pro: Boardroom,
+  Ledger, Editorial, Signal, Aurora, Terrace. A template only fills what
   you have not changed yourself.
 
 ---
