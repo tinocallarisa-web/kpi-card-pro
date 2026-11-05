@@ -50,7 +50,6 @@ export const STRINGS: Record<string, Record<string, string>> = {
         "Msg_And": "und",
         "Msg_Empty": "Measure zum Feld „Wert“ hinzufügen",
         "Msg_Landing": "Zum Starten eine Measure zum Feld „Wert“ hinzufügen.",
-        "Msg_LandingHint": "Vorperiode für die Abweichung · Ziel für die Zielverfolgung · Kleine Vielfache für mehrere Karten (Pro)",
         "OO_Arrow": "Pfeil anzeigen",
         "OO_Background": "Hintergrund",
         "OO_Bold": "Fett",
@@ -84,7 +83,8 @@ export const STRINGS: Record<string, Record<string, string>> = {
         "Status_Good": "Im Plan",
         "Status_OfPrior": "{0} der Vorperiode",
         "Status_OfTarget": "{0} des Ziels",
-        "Status_Warn": "Warnung"
+        "Status_Warn": "Warnung",
+        "UI_Points": "PP"
     },
     "es-ES": {
         "Aria_Trend": "Tendencia",
@@ -133,7 +133,6 @@ export const STRINGS: Record<string, Record<string, string>> = {
         "Msg_And": "y",
         "Msg_Empty": "Añade una medida al campo Valor",
         "Msg_Landing": "Añade una medida al campo Valor para empezar.",
-        "Msg_LandingHint": "Periodo anterior para la variación · Objetivo para el seguimiento de metas · Múltiplos pequeños para varias tarjetas (Pro)",
         "OO_Arrow": "Mostrar flecha",
         "OO_Background": "Fondo",
         "OO_Bold": "Negrita",
@@ -166,7 +165,8 @@ export const STRINGS: Record<string, Record<string, string>> = {
         "Status_Good": "En objetivo",
         "Status_OfPrior": "{0} del anterior",
         "Status_OfTarget": "{0} del objetivo",
-        "Status_Warn": "Atención"
+        "Status_Warn": "Atención",
+        "UI_Points": "p.p."
     },
     "fr-FR": {
         "Aria_Trend": "Tendance",
@@ -214,7 +214,6 @@ export const STRINGS: Record<string, Record<string, string>> = {
         "Msg_And": "et",
         "Msg_Empty": "Ajoutez une mesure au champ Valeur",
         "Msg_Landing": "Ajoutez une mesure au champ Valeur pour commencer.",
-        "Msg_LandingHint": "Période précédente pour l'écart · Objectif pour le suivi des objectifs · Petits multiples pour plusieurs cartes (Pro)",
         "OO_Arrow": "Afficher la flèche",
         "OO_Background": "Arrière-plan",
         "OO_Bold": "Gras",
@@ -248,7 +247,8 @@ export const STRINGS: Record<string, Record<string, string>> = {
         "Status_Good": "Conforme",
         "Status_OfPrior": "{0} de la précédente",
         "Status_OfTarget": "{0} de l'objectif",
-        "Status_Warn": "Attention"
+        "Status_Warn": "Attention",
+        "UI_Points": "pts"
     },
     "it-IT": {
         "Aria_Trend": "Tendenza",
@@ -296,7 +296,6 @@ export const STRINGS: Record<string, Record<string, string>> = {
         "Msg_And": "e",
         "Msg_Empty": "Aggiungi una misura al campo Valore",
         "Msg_Landing": "Aggiungi una misura al campo Valore per iniziare.",
-        "Msg_LandingHint": "Periodo precedente per la varianza · Obiettivo per il monitoraggio degli obiettivi · Multipli piccoli per più schede (Pro)",
         "OO_Arrow": "Mostra freccia",
         "OO_Background": "Sfondo",
         "OO_Bold": "Grassetto",
@@ -330,7 +329,8 @@ export const STRINGS: Record<string, Record<string, string>> = {
         "Status_Good": "In linea",
         "Status_OfPrior": "{0} del precedente",
         "Status_OfTarget": "{0} dell'obiettivo",
-        "Status_Warn": "Attenzione"
+        "Status_Warn": "Attenzione",
+        "UI_Points": "p.p."
     },
     "ja-JP": {
         "Aria_Trend": "傾向",
@@ -379,7 +379,6 @@ export const STRINGS: Record<string, Record<string, string>> = {
         "Msg_And": "および",
         "Msg_Empty": "[値] フィールドにメジャーを追加してください",
         "Msg_Landing": "開始するには、[値] フィールドにメジャーを追加してください。",
-        "Msg_LandingHint": "差異には前期 · 目標管理には目標 · 複数カードにはスモール マルチプル (Pro)",
         "OO_Arrow": "矢印を表示",
         "OO_Background": "背景",
         "OO_Bold": "太字",
@@ -413,7 +412,8 @@ export const STRINGS: Record<string, Record<string, string>> = {
         "Status_Good": "順調",
         "Status_OfPrior": "前期の {0}",
         "Status_OfTarget": "目標の {0}",
-        "Status_Warn": "警告"
+        "Status_Warn": "警告",
+        "UI_Points": "pt"
     },
     "ko-KR": {
         "Aria_Trend": "추세",
@@ -462,7 +462,6 @@ export const STRINGS: Record<string, Record<string, string>> = {
         "Msg_And": "및",
         "Msg_Empty": "[값] 필드에 측정값을 추가하세요",
         "Msg_Landing": "시작하려면 [값] 필드에 측정값을 추가하세요.",
-        "Msg_LandingHint": "차이에는 이전 기간 · 목표 추적에는 목표 · 여러 카드에는 작은 배수 (Pro)",
         "OO_Arrow": "화살표 표시",
         "OO_Background": "배경",
         "OO_Bold": "굵게",
@@ -496,7 +495,8 @@ export const STRINGS: Record<string, Record<string, string>> = {
         "Status_Good": "정상",
         "Status_OfPrior": "이전의 {0}",
         "Status_OfTarget": "목표의 {0}",
-        "Status_Warn": "경고"
+        "Status_Warn": "경고",
+        "UI_Points": "%p"
     },
     "nl-NL": {
         "Aria_Variance": "Afwijking",
@@ -541,7 +541,6 @@ export const STRINGS: Record<string, Record<string, string>> = {
         "Msg_And": "en",
         "Msg_Empty": "Voeg een meting toe aan het veld Waarde",
         "Msg_Landing": "Voeg een meting toe aan het veld Waarde om te beginnen.",
-        "Msg_LandingHint": "Vorige periode voor afwijking · Doel voor doelbewaking · Kleine veelvouden voor meerdere kaarten (Pro)",
         "OO_Arrow": "Pijl weergeven",
         "OO_Background": "Achtergrond",
         "OO_Bold": "Vet",
@@ -622,7 +621,6 @@ export const STRINGS: Record<string, Record<string, string>> = {
         "Msg_And": "i",
         "Msg_Empty": "Dodaj miarę do pola Wartość",
         "Msg_Landing": "Aby rozpocząć, dodaj miarę do pola Wartość.",
-        "Msg_LandingHint": "Poprzedni okres dla odchylenia · Cel do śledzenia realizacji · Małe wykresy wielokrotne dla wielu kart (Pro)",
         "OO_Arrow": "Pokaż strzałkę",
         "OO_Background": "Tło",
         "OO_Bold": "Pogrubienie",
@@ -656,7 +654,8 @@ export const STRINGS: Record<string, Record<string, string>> = {
         "Status_Good": "Zgodnie z planem",
         "Status_OfPrior": "{0} poprzedniego",
         "Status_OfTarget": "{0} celu",
-        "Status_Warn": "Ostrzeżenie"
+        "Status_Warn": "Ostrzeżenie",
+        "UI_Points": "p.p."
     },
     "pt-BR": {
         "Aria_Trend": "Tendência",
@@ -704,7 +703,6 @@ export const STRINGS: Record<string, Record<string, string>> = {
         "Msg_And": "e",
         "Msg_Empty": "Adicione uma medida ao campo Valor",
         "Msg_Landing": "Adicione uma medida ao campo Valor para começar.",
-        "Msg_LandingHint": "Período anterior para a variação · Meta para o acompanhamento de metas · Múltiplos pequenos para vários cartões (Pro)",
         "OO_Arrow": "Mostrar seta",
         "OO_Background": "Plano de fundo",
         "OO_Bold": "Negrito",
@@ -738,7 +736,8 @@ export const STRINGS: Record<string, Record<string, string>> = {
         "Status_Good": "No alvo",
         "Status_OfPrior": "{0} do anterior",
         "Status_OfTarget": "{0} da meta",
-        "Status_Warn": "Alerta"
+        "Status_Warn": "Alerta",
+        "UI_Points": "p.p."
     },
     "pt-PT": {
         "Aria_Trend": "Tendência",
@@ -786,7 +785,6 @@ export const STRINGS: Record<string, Record<string, string>> = {
         "Msg_And": "e",
         "Msg_Empty": "Adicione uma medida ao campo Valor",
         "Msg_Landing": "Adicione uma medida ao campo Valor para começar.",
-        "Msg_LandingHint": "Período anterior para a variação · Meta para o acompanhamento de metas · Múltiplos pequenos para vários cartões (Pro)",
         "OO_Arrow": "Mostrar seta",
         "OO_Background": "Fundo",
         "OO_Bold": "Negrito",
@@ -820,7 +818,8 @@ export const STRINGS: Record<string, Record<string, string>> = {
         "Status_Good": "No alvo",
         "Status_OfPrior": "{0} do anterior",
         "Status_OfTarget": "{0} da meta",
-        "Status_Warn": "Alerta"
+        "Status_Warn": "Alerta",
+        "UI_Points": "p.p."
     },
     "zh-CN": {
         "Aria_Trend": "趋势",
@@ -869,7 +868,6 @@ export const STRINGS: Record<string, Record<string, string>> = {
         "Msg_And": "和",
         "Msg_Empty": "向“值”字段添加度量值",
         "Msg_Landing": "向“值”字段添加度量值以开始使用。",
-        "Msg_LandingHint": "上期用于差异 · 目标用于目标跟踪 · 小型序列图用于多卡片布局 (Pro)",
         "OO_Arrow": "显示箭头",
         "OO_Background": "背景",
         "OO_Bold": "加粗",
@@ -903,6 +901,7 @@ export const STRINGS: Record<string, Record<string, string>> = {
         "Status_Good": "正常",
         "Status_OfPrior": "上期的 {0}",
         "Status_OfTarget": "目标的 {0}",
-        "Status_Warn": "警告"
+        "Status_Warn": "警告",
+        "UI_Points": "个百分点"
     }
 };

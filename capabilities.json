@@ -487,6 +487,13 @@
           "type": {
             "numeric": true
           }
+        },
+        "asPoints": {
+          "displayName": "Percentage points for % measures",
+          "displayNameKey": "Prop_Variance_AsPoints",
+          "type": {
+            "bool": true
+          }
         }
       }
     },
@@ -1087,7 +1094,7 @@
           "objectName": "subTotals",
           "propertyName": "perRowLevel"
         },
-        "defaultValue": false
+        "defaultValue": true
       },
       "columnSubtotals": {
         "propertyIdentifier": {

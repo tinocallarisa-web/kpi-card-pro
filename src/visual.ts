@@ -1462,8 +1462,18 @@ export class Visual implements IVisual {
     private nodeOrChildrenValue(node: powerbi.DataViewMatrixNode | undefined, idx: number): number | null {
         const own = this.getNodeValue(node?.values ?? {}, idx);
         if (own !== null) return own;
+        // With Trend bound the node brings no value of its own. Its total is the subtotal child,
+        // the only figure that is right for a percentage or a distinct count: adding the months
+        // gave a margin of 455.9%.
+        const sub = (node?.children ?? []).find(k => (k as any).isSubtotal);
+        const total = sub ? this.getNodeValue(sub.values ?? {}, idx) : null;
+        if (total !== null) return total;
         const kids = this.realChildren(node);
         if (kids.length === 0) return null;
+        // No subtotal, because the report turned them off. A percentage cannot be added: better
+        // to show nothing than a false figure.
+        const fmt = this.lastDataView?.matrix?.valueSources?.[idx]?.format ?? "";
+        if (fmt.indexOf("%") >= 0) return null;
         let sum = 0;
         let seen = false;
         for (const k of kids) {
@@ -3031,6 +3041,10 @@ export class Visual implements IVisual {
         }
     }
 
+    private pointsFormatter(): Intl.NumberFormat {
+        return new Intl.NumberFormat(String(this.host.locale || "en-US"), { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+    }
+
     private buildVariancePill(current: number | null, base: number | null, hc: boolean, format?: string): HTMLElement | null {
         if (current === null || base === null || base === 0) return null;
 
@@ -3063,7 +3077,11 @@ export class Visual implements IVisual {
 
         const arrow   = s.showArrow.value ? (isNeutral ? "→" : (diff > 0 ? "▲" : "▼")) : "";
         // El porcentaje de variacion en el idioma del informe: 12,5 % en español, 12.5% en inglés.
-        const pctStr  = `${arrow} ${this.pctFormatter().format(Math.abs(pct) / 100)}`;
+        // A measure that is already a percentage varies in points: 25% to 27% is +2.0 pp, not +8%.
+        const asPoints = s.asPoints.value && (format ?? "").indexOf("%") >= 0;
+        const pctStr  = asPoints
+            ? `${arrow} ${this.pointsFormatter().format(Math.abs(diff) * 100)} ${this.t("UI_Points", "pp")}`
+            : `${arrow} ${this.pctFormatter().format(Math.abs(pct) / 100)}`;
         const usePill = this.previewOf("variance pill") && s.showPill.value;
 
         const pill = document.createElement("div");

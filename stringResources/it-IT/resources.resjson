@@ -208,5 +208,7 @@
   "Landing_Start": "Inizia in 3 passi",
   "Landing_Help": "Aiuto",
   "Landing_Pro": "Linea di tendenza, Small Multiples, regole di colore e formattazione condizionale, KPI secondari.",
-  "Landing_ProShort": "Tendenza, Small Multiples, regole di colore."
+  "Landing_ProShort": "Tendenza, Small Multiples, regole di colore.",
+  "Prop_Variance_AsPoints": "Punti percentuali per misure %",
+  "UI_Points": "p.p."
 }

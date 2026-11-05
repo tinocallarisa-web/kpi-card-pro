@@ -208,5 +208,7 @@
   "Landing_Start": "3 步开始",
   "Landing_Help": "帮助",
   "Landing_Pro": "趋势线、小型序列图、颜色规则和条件格式、次要 KPI。",
-  "Landing_ProShort": "趋势、小型序列图、颜色规则。"
+  "Landing_ProShort": "趋势、小型序列图、颜色规则。",
+  "Prop_Variance_AsPoints": "% 度量值使用百分点",
+  "UI_Points": "个百分点"
 }

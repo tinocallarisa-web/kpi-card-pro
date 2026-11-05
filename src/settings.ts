@@ -152,6 +152,9 @@ class VarianceSettings extends FormattingSettingsCard {
     showArrow = new formattingSettings.ToggleSwitch({
         name: "showArrow", displayName: "Show Arrow", value: true
     });
+    asPoints = new formattingSettings.ToggleSwitch({
+        name: "asPoints", displayName: "Percentage points for % measures", displayNameKey: "Prop_Variance_AsPoints", value: true
+    } as any);
     showPill = new formattingSettings.ToggleSwitch({
         name: "showPill", displayName: "Show as Pill (Pro)", value: true
     });
@@ -161,7 +164,7 @@ class VarianceSettings extends FormattingSettingsCard {
     });
     name = "variance";
     displayName = "Variance";
-    slices = [this.show, this.positiveColor, this.negativeColor, this.neutralColor, this.invertColors, this.showArrow, this.showPill, this.fontSize];
+    slices = [this.show, this.positiveColor, this.negativeColor, this.neutralColor, this.invertColors, this.asPoints, this.showArrow, this.showPill, this.fontSize];
 }
 
 // ─── Card: Small Multiples ───────────────────────────────────────────────────

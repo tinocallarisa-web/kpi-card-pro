@@ -208,5 +208,7 @@
   "Landing_Start": "3단계로 시작",
   "Landing_Help": "도움말",
   "Landing_Pro": "추세선, 작은 배수, 색 규칙과 조건부 서식, 보조 KPI.",
-  "Landing_ProShort": "추세, 작은 배수, 색 규칙."
+  "Landing_ProShort": "추세, 작은 배수, 색 규칙.",
+  "Prop_Variance_AsPoints": "% 측정값에 퍼센트 포인트 사용",
+  "UI_Points": "%p"
 }

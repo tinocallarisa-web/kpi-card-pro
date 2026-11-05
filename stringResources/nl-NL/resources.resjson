@@ -208,5 +208,7 @@
   "Landing_Start": "Begin in 3 stappen",
   "Landing_Help": "Help",
   "Landing_Pro": "Trendlijn, Small Multiples, kleurregels en voorwaardelijke opmaak, secundaire KPI’s.",
-  "Landing_ProShort": "Trend, Small Multiples, kleurregels."
+  "Landing_ProShort": "Trend, Small Multiples, kleurregels.",
+  "Prop_Variance_AsPoints": "Procentpunten voor %-metingen",
+  "UI_Points": "pp"
 }

@@ -1,7 +1,7 @@
 {
   "name": "kpiCardPro",
   "description": "Multi-metric KPI card with trend, target and variance for Power BI executive dashboards.",
-  "version": "2.3.0",
+  "version": "2.4.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/tinocallarisa-web/kpi-card-pro"
@@ -27,5 +27,11 @@
     "eslint-plugin-powerbi-visuals": "^1.0.0",
     "powerbi-visuals-tools": "^7.2.1",
     "typescript": "5.5.4"
+  },
+  "overrides": {
+    "@typescript-eslint/typescript-estree": {
+      "minimatch": ">=11.0.1"
+    },
+    "uuid": "^11.1.1"
   }
 }

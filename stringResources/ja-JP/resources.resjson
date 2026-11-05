@@ -208,5 +208,7 @@
   "Landing_Start": "3 ステップで開始",
   "Landing_Help": "ヘルプ",
   "Landing_Pro": "傾向線、スモール マルチプル、色ルールと条件付き書式、補助 KPI。",
-  "Landing_ProShort": "傾向、スモール マルチプル、色ルール。"
+  "Landing_ProShort": "傾向、スモール マルチプル、色ルール。",
+  "Prop_Variance_AsPoints": "% メジャーはパーセント ポイント",
+  "UI_Points": "pt"
 }
