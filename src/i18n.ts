@@ -14,12 +14,19 @@ export const I18N: Record<string, I18nCard> = {
                 "k": "Prop_Style_Template",
                 "d": undefined,
                 "e": {
+                    "report": "Enum_Style_Report",
                     "classic": "Enum_Style_Classic",
                     "clean": "Enum_Style_Clean",
                     "bold": "Enum_Style_Bold",
                     "minimal": "Enum_Style_Minimal",
                     "soft": "Enum_Style_Soft",
-                    "midnight": "Enum_Style_Midnight"
+                    "midnight": "Enum_Style_Midnight",
+                    "boardroom": "Enum_Style_Boardroom",
+                    "ledger": "Enum_Style_Ledger",
+                    "editorial": "Enum_Style_Editorial",
+                    "signal": "Enum_Style_Signal",
+                    "aurora": "Enum_Style_Aurora",
+                    "terrace": "Enum_Style_Terrace"
                 }
             },
             "guide": {
@@ -146,6 +153,11 @@ export const I18N: Record<string, I18nCard> = {
         "k": "Object_Variance",
         "d": undefined,
         "p": {
+            "asPoints": {
+                "k": "Prop_Variance_AsPoints",
+                "d": undefined,
+                "e": {}
+            },
             "show": {
                 "k": "Prop_Show",
                 "d": undefined,
@@ -192,6 +204,11 @@ export const I18N: Record<string, I18nCard> = {
         "k": "Object_SmallMultiples",
         "d": undefined,
         "p": {
+            "titleAlign": {
+                "k": "Prop_SM_TitleAlign",
+                "d": undefined,
+                "e": {"left": "Enum_al_left", "center": "Enum_al_center"}
+            },
             "columns": {
                 "k": "Prop_SM_Columns",
                 "d": undefined,
@@ -326,6 +343,11 @@ export const I18N: Record<string, I18nCard> = {
         "k": "Object_Trend",
         "d": undefined,
         "p": {
+            "position": {
+                "k": "Prop_SecKpi_Position",
+                "d": undefined,
+                "e": {"bottom": "Enum_SecKpi_Bottom", "right": "Enum_SecKpi_Right", "auto": "Enum_SecKpi_Auto"}
+            },
             "show": {
                 "k": "Prop_Trend_Show",
                 "d": undefined,

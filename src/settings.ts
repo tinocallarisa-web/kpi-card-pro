@@ -175,14 +175,14 @@ class SmallMultiplesSettings extends FormattingSettingsCard {
         options: { minValue: { type: powerbi.visuals.ValidatorType.Min, value: 1 }, maxValue: { type: powerbi.visuals.ValidatorType.Max, value: 6 } }
     });
     gap = new formattingSettings.NumUpDown({
-        name: "gap", displayName: "Gap (px)", value: 12,
+        name: "gap", displayName: "Space between panels", value: 12,
         options: { minValue: { type: powerbi.visuals.ValidatorType.Min, value: 0 }, maxValue: { type: powerbi.visuals.ValidatorType.Max, value: 48 } }
     });
     showTitle = new formattingSettings.ToggleSwitch({
         name: "showTitle", displayName: "Show Category Title", value: true
     });
     titleFontSize = new formattingSettings.NumUpDown({
-        name: "titleFontSize", displayName: "Title Font Size", value: 11,
+        name: "titleFontSize", displayName: "Title size", value: 11,
         options: { minValue: { type: powerbi.visuals.ValidatorType.Min, value: 8 }, maxValue: { type: powerbi.visuals.ValidatorType.Max, value: 20 } }
     });
     titleColor = new formattingSettings.ColorPicker({
@@ -195,11 +195,16 @@ class SmallMultiplesSettings extends FormattingSettingsCard {
         value: "Segoe UI, wf_segoe-ui_normal, helvetica, arial, sans-serif"
     });
     titleBold = new formattingSettings.ToggleSwitch({
-        name: "titleBold", displayName: "Title Bold", value: false
+        name: "titleBold", displayName: "Bold title", value: false
     });
     name = "smallMultiplesLayout";
+    titleAlign = new formattingSettings.ItemDropdown({
+        name: "titleAlign", displayName: "Title alignment",
+        items: [{ value: "left", displayName: "Left" }, { value: "center", displayName: "Center" }],
+        value: { value: "left", displayName: "Left" }
+    });
     displayName = "Small Multiples (Pro)";
-    slices = [this.columns, this.gap, this.showTitle, this.titleFontFamily, this.titleFontSize, this.titleBold, this.titleColor];
+    slices = [this.columns, this.gap, this.showTitle, this.titleFontFamily, this.titleAlign, this.titleFontSize, this.titleBold, this.titleColor];
 }
 
 // ─── Card: Prior & Target ────────────────────────────────────────────────────
@@ -355,6 +360,15 @@ class TrendSettings extends FormattingSettingsCard {
     show = new formattingSettings.ToggleSwitch({
         name: "show", displayName: "Show", value: true
     });
+    position = new formattingSettings.ItemDropdown({
+        name: "position", displayName: "Position",
+        items: [
+            { value: "bottom", displayName: "Bottom" },
+            { value: "right",  displayName: "Right" },
+            { value: "auto",   displayName: "Auto" }
+        ],
+        value: { value: "bottom", displayName: "Bottom" }
+    });
     type = new formattingSettings.ItemDropdown({
         name: "type", displayName: "Chart Type",
         items: [
@@ -390,7 +404,7 @@ class TrendSettings extends FormattingSettingsCard {
     });
     name = "trend";
     displayName = "Trend (Pro)";
-    slices = [this.show, this.type, this.color, this.lineWidth, this.areaOpacity,
+    slices = [this.show, this.position, this.type, this.color, this.lineWidth, this.areaOpacity,
               this.height, this.showDot, this.showTargetLine, this.targetColor];
 }
 
@@ -462,14 +476,21 @@ class StyleSettings extends FormattingSettingsCard {
     template = new formattingSettings.ItemDropdown({
         name: "template", displayName: "Template",
         items: [
+            { value: "report",   displayName: "Report theme" },
             { value: "classic",  displayName: "Classic" },
             { value: "clean",    displayName: "Clean" },
             { value: "bold",     displayName: "Bold" },
             { value: "minimal",  displayName: "Minimal" },
             { value: "soft",     displayName: "Soft" },
-            { value: "midnight", displayName: "Midnight" }
+            { value: "midnight", displayName: "Midnight" },
+            { value: "boardroom", displayName: "Boardroom (Pro)" },
+            { value: "ledger",   displayName: "Ledger (Pro)" },
+            { value: "editorial", displayName: "Editorial (Pro)" },
+            { value: "signal",   displayName: "Signal (Pro)" },
+            { value: "aurora",   displayName: "Aurora (Pro)" },
+            { value: "terrace",  displayName: "Terrace (Pro)" }
         ],
-        value: { value: "classic", displayName: "Classic" }
+        value: { value: "report", displayName: "Report theme" }
     });
     guide = new formattingSettings.ToggleSwitch({
         name: "guide", displayName: "Setup guide",

@@ -179,6 +179,11 @@
           "type": {
             "enumeration": [
               {
+                "value": "report",
+                "displayName": "Report theme",
+                "displayNameKey": "Enum_Style_Report"
+              },
+              {
                 "value": "classic",
                 "displayName": "Classic",
                 "displayNameKey": "Enum_Style_Classic"
@@ -207,6 +212,36 @@
                 "value": "midnight",
                 "displayName": "Midnight",
                 "displayNameKey": "Enum_Style_Midnight"
+              },
+              {
+                "value": "boardroom",
+                "displayName": "Boardroom (Pro)",
+                "displayNameKey": "Enum_Style_Boardroom"
+              },
+              {
+                "value": "ledger",
+                "displayName": "Ledger (Pro)",
+                "displayNameKey": "Enum_Style_Ledger"
+              },
+              {
+                "value": "editorial",
+                "displayName": "Editorial (Pro)",
+                "displayNameKey": "Enum_Style_Editorial"
+              },
+              {
+                "value": "signal",
+                "displayName": "Signal (Pro)",
+                "displayNameKey": "Enum_Style_Signal"
+              },
+              {
+                "value": "aurora",
+                "displayName": "Aurora (Pro)",
+                "displayNameKey": "Enum_Style_Aurora"
+              },
+              {
+                "value": "terrace",
+                "displayName": "Terrace (Pro)",
+                "displayNameKey": "Enum_Style_Terrace"
               }
             ]
           }
@@ -509,7 +544,7 @@
           }
         },
         "gap": {
-          "displayName": "Gap (px)",
+          "displayName": "Space between panels",
           "displayNameKey": "Prop_SM_Gap",
           "type": {
             "numeric": true
@@ -523,7 +558,7 @@
           }
         },
         "titleFontSize": {
-          "displayName": "Title Font Size",
+          "displayName": "Title size",
           "displayNameKey": "Prop_SM_TitleFontSize",
           "type": {
             "numeric": true
@@ -550,11 +585,29 @@
           "displayNameKey": "Prop_SM_TitleFontFamily"
         },
         "titleBold": {
-          "displayName": "Title Bold",
+          "displayName": "Bold title",
           "type": {
             "bool": true
           },
           "displayNameKey": "Prop_SM_TitleBold"
+        },
+        "titleAlign": {
+          "displayName": "Title alignment",
+          "displayNameKey": "Prop_SM_TitleAlign",
+          "type": {
+            "enumeration": [
+              {
+                "value": "left",
+                "displayName": "Left",
+                "displayNameKey": "Enum_al_left"
+              },
+              {
+                "value": "center",
+                "displayName": "Center",
+                "displayNameKey": "Enum_al_center"
+              }
+            ]
+          }
         }
       }
     },
@@ -809,6 +862,29 @@
             }
           },
           "displayNameKey": "Prop_Trend_TargetColor"
+        },
+        "position": {
+          "displayName": "Position",
+          "displayNameKey": "Prop_SecKpi_Position",
+          "type": {
+            "enumeration": [
+              {
+                "value": "bottom",
+                "displayName": "Bottom",
+                "displayNameKey": "Enum_SecKpi_Bottom"
+              },
+              {
+                "value": "right",
+                "displayName": "Right",
+                "displayNameKey": "Enum_SecKpi_Right"
+              },
+              {
+                "value": "auto",
+                "displayName": "Auto",
+                "displayNameKey": "Enum_SecKpi_Auto"
+              }
+            ]
+          }
         }
       },
       "displayNameKey": "Object_Trend"

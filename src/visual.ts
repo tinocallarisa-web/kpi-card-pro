@@ -89,6 +89,8 @@ function towardWhite(hex: string, t: number): string {
  * gana. Solo propiedades gratuitas: una plantilla no puede regalar el estilo Pro de la tarjeta.
  */
 const TEMPLATES: Record<string, [string, string, unknown][]> = {
+    // Filled from the report's theme: the default since 2.4, as in a native visual.
+    report: [],
     classic: [],
     clean: [["card", "borderColor", "#FFFFFF"], ["mainValue", "fontSize", 32], ["mainValue", "bold", true],
             ["mainValue", "color", "#1F2937"], ["label", "color", "#6B7280"],
@@ -104,8 +106,18 @@ const TEMPLATES: Record<string, [string, string, unknown][]> = {
            ["trend", "color", "#2B6CB0"], ["trend", "areaOpacity", 25]],
     midnight: [["card", "background", "#1F2A37"], ["card", "borderColor", "#1F2A37"], ["mainValue", "bold", true],
                ["mainValue", "color", "#FFFFFF"], ["label", "color", "#A7B4C2"], ["secondary", "color", "#C9D3DD"],
-               ["trend", "color", "#5FA8F5"], ["trend", "areaOpacity", 25], ["trend", "targetColor", "#7B8794"]]
+               ["trend", "color", "#5FA8F5"], ["trend", "areaOpacity", 25], ["trend", "targetColor", "#7B8794"]],
+    // Pro since 2.4: the look of the whole TCViz collection. Colours only: choosing one draws it at once.
+    boardroom: [["card", "background", "#16263D"], ["card", "borderColor", "#2A3E5C"], ["mainValue", "bold", true], ["mainValue", "color", "#F2F0E8"], ["label", "color", "#9FB0C6"], ["secondary", "color", "#C5D3E3"], ["smallMultiplesLayout", "titleColor", "#9FB0C6"], ["trend", "color", "#C9A45C"], ["trend", "targetColor", "#6FCF97"], ["trend", "areaOpacity", 28]],
+    ledger: [["card", "background", "#FBF8EF"], ["card", "borderColor", "#D9D2BE"], ["mainValue", "bold", true], ["mainValue", "color", "#231F16"], ["label", "color", "#6E6652"], ["secondary", "color", "#6E6652"], ["smallMultiplesLayout", "titleColor", "#6E6652"], ["trend", "color", "#7A1F1F"], ["trend", "targetColor", "#946A10"], ["trend", "areaOpacity", 14]],
+    editorial: [["card", "background", "#FFFFFF"], ["card", "borderColor", "#E2E2E2"], ["mainValue", "bold", true], ["mainValue", "color", "#111111"], ["label", "color", "#5F5F5F"], ["secondary", "color", "#5F5F5F"], ["smallMultiplesLayout", "titleColor", "#5F5F5F"], ["trend", "color", "#D7263D"], ["trend", "targetColor", "#111111"], ["trend", "areaOpacity", 10]],
+    signal: [["card", "background", "#FFFFFF"], ["card", "borderColor", "#D9DEE4"], ["mainValue", "bold", true], ["mainValue", "color", "#14202B"], ["label", "color", "#566472"], ["secondary", "color", "#566472"], ["smallMultiplesLayout", "titleColor", "#566472"], ["trend", "color", "#1F7A4D"], ["trend", "targetColor", "#B7791F"], ["trend", "areaOpacity", 16]],
+    aurora: [["card", "background", "#10395E"], ["card", "borderColor", "#3A5C7E"], ["mainValue", "bold", true], ["mainValue", "color", "#FFFFFF"], ["label", "color", "#C5D3E3"], ["secondary", "color", "#C5D3E3"], ["smallMultiplesLayout", "titleColor", "#C5D3E3"], ["trend", "color", "#7CE7D0"], ["trend", "targetColor", "#FFD27D"], ["trend", "areaOpacity", 30]],
+    terrace: [["card", "background", "#FBF5EC"], ["card", "borderColor", "#E5D6C2"], ["mainValue", "bold", true], ["mainValue", "color", "#3A2A1E"], ["label", "color", "#7A6450"], ["secondary", "color", "#7A6450"], ["smallMultiplesLayout", "titleColor", "#7A6450"], ["trend", "color", "#B5532A"], ["trend", "targetColor", "#5E7128"], ["trend", "areaOpacity", 22]],
 };
+const PRO_STYLES = ["boardroom", "ledger", "editorial", "signal", "aurora", "terrace"];
+const STYLE_GRADIENT: Record<string, string> = { aurora: "linear-gradient(135deg, #1B1147, #10395E 50%, #0B5A5E)" };
+const STYLE_FONT: Record<string, string> = { ledger: "Georgia, serif", editorial: "Georgia, serif" };
 
 const SERVICE_PLAN_ID = "kpi-card-pro-tcviz";
 
@@ -371,9 +383,35 @@ export class Visual implements IVisual {
         }
     }
 
+    /** The stored style, or the report's theme: a Pro style without a licence or preview does not apply. */
+    private templateName(objects: powerbi.DataViewObjects | undefined): string {
+        const stored = (objects?.["style"]?.["template"] as string) || "report";
+        return PRO_STYLES.indexOf(stored) >= 0 && !this.previewOf("style templates") ? "report" : stored;
+    }
+
+    private reportTemplate(): [string, string, unknown][] {
+        const p: any = this.host.colorPalette;
+        const bg = p.background?.value ?? "#FFFFFF";
+        const fg = p.foreground?.value ?? "#252423";
+        const soft = p.foregroundNeutralSecondary?.value ?? "#6B6B6B";
+        const lum = luminance(bg);
+        const border = lum !== null && lum < 0.18 ? towardWhite(bg, 0.25) : "#E0E0E0";
+        const trend = p.getColor?.("kpi-trend")?.value ?? "#0078D4";
+        return [["card", "background", bg], ["card", "borderColor", border], ["mainValue", "color", fg],
+                ["label", "color", soft], ["secondary", "color", soft], ["smallMultiplesLayout", "titleColor", soft],
+                ["trend", "color", trend]];
+    }
+
+    /** A gradient background belongs to the style, unless the user chose a background. */
+    private styleGradient(): string | null {
+        const objects = this.lastDataView?.metadata?.objects;
+        if ((objects as any)?.card?.background !== undefined) return null;
+        return STYLE_GRADIENT[this.templateName(objects)] ?? null;
+    }
+
     private applyTemplate(objects: powerbi.DataViewObjects | undefined): void {
-        const name = (objects?.["style"]?.["template"] as string) || "classic";
-        const list = TEMPLATES[name] || [];
+        TEMPLATES.report = this.reportTemplate();
+        const list = TEMPLATES[this.templateName(objects)] || [];
         const cards: any[] = (this.formattingSettings as any).cards || [];
         for (const [cardName, prop, val] of list) {
             if (objects?.[cardName]?.[prop] !== undefined) { continue; }
@@ -712,6 +750,12 @@ export class Visual implements IVisual {
             const n = smKids.length;
             labels.push("small multiples");
             parts.push(`role.smallMultiples=${n}`);
+        }
+
+        const tplPedida = String(objs?.style?.template ?? "");
+        if (PRO_STYLES.indexOf(tplPedida) >= 0) {
+            labels.push("style templates");
+            parts.push(`style.template=${tplPedida}`);
         }
 
         for (const [label, card, props] of groups) {
@@ -1381,7 +1425,8 @@ export class Visual implements IVisual {
             pie.appendChild(boton(this.t("Guide_Next", "Next"), true, () => { this.guideStep = 3; this.repaint(); }));
         } else {
             titulo.textContent = this.t("Guide_Style", "Pick a style");
-            const actual = String((this.formattingSettings.style.template.value as any)?.value ?? "classic");
+            const actual = String((this.formattingSettings.style.template.value as any)?.value ?? "report");
+            TEMPLATES.report = this.reportTemplate();
             const rejilla = document.createElement("div");
             rejilla.style.cssText = "display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:6px;";
             for (const nombre of Object.keys(TEMPLATES)) {
@@ -1397,7 +1442,9 @@ export class Visual implements IVisual {
                 num.style.cssText = `font:${val("mainValue", "bold", "true") === "false" ? 400 : 700} 15px 'Segoe UI',sans-serif;`
                     + `color:${val("mainValue", "color", "#252423")};`;
                 const etq = document.createElement("div");
-                etq.textContent = nombre.charAt(0).toUpperCase() + nombre.slice(1);
+                const capital = nombre.charAt(0).toUpperCase() + nombre.slice(1);
+                const nombreVisible = this.t("Enum_Style_" + capital, capital);
+                etq.textContent = PRO_STYLES.indexOf(nombre) >= 0 && !this.isPro ? `${nombreVisible} (Pro)` : nombreVisible;
                 etq.style.cssText = `font:11px 'Segoe UI',sans-serif;color:${val("label", "color", "#6B6B6B")};`;
                 chip.appendChild(num); chip.appendChild(etq);
                 chip.addEventListener("click", () => {
@@ -2154,6 +2201,7 @@ export class Visual implements IVisual {
         const themeFg    = palette.foreground?.value ?? "#252423";
         const themeMuted = (palette as any).foregroundNeutralSecondary?.value ?? "#6B6B6B";
 
+        const degradado = hc ? null : this.styleGradient();
         const root = document.createElement("div");
         root.className = "kpi-root" + (hc ? " high-contrast" : "");
         this.subSelectable(root, "card", this.t("OO_Card", "Card"), powerbi.visuals.SubSelectionStylesType.Shape);
@@ -2161,6 +2209,7 @@ export class Visual implements IVisual {
         const fxOn       = this.previewOf("conditional formatting (fx)");
         const cardBg     = hc ? this.hcBg : ((fxOn && metrics.length === 1 ? metrics[0]?.fxBg : null) ?? s.card.background.value?.value ?? themeBg);
         const cardBorder = hc ? this.hcFg  : (s.card.borderColor.value?.value ?? "#E0E0E0");
+        const fondoRaiz = degradado && !(fxOn && metrics.length === 1 && metrics[0]?.fxBg) ? degradado : cardBg;
         const bw  = this.previewOf("card styling") ? (s.card.borderWidth.value ?? 1) : 1;
         const br  = this.previewOf("card styling") ? (s.card.borderRadius.value ?? 8) : 8;
         const pad = this.previewOf("card styling") ? (s.card.padding.value ?? 16) : 16;
@@ -2171,7 +2220,7 @@ export class Visual implements IVisual {
         const vpH = this.viewport.height > 0 ? `${this.viewport.height}px` : "100%";
 
         root.style.cssText = `
-            background: ${cardBg};
+            background: ${fondoRaiz};
             border: ${bw}px solid ${cardBorder};
             border-radius: ${br}px;
             padding: ${pad}px;
@@ -2186,9 +2235,10 @@ export class Visual implements IVisual {
             this.renderEmpty(root, hc);
         } else if (metrics.length === 1) {
             const marco = this.ruleFrame(metrics[0], hc, cardBg, cardBorder, bw);
-            root.style.background = marco.bg;
+            root.style.background = marco.bg === cardBg ? fondoRaiz : marco.bg;
             root.style.borderColor = marco.border;
             root.style.borderWidth = `${marco.bw}px`;
+            this.cellWidth = this.viewport.width;
             const cell = this.buildMetricCell(metrics[0], hc, true, themeFg, themeMuted, 0);
             // Tarjeta unica: el ancho minimo solo cuenta si hay sparkline, que es lo
             // que de verdad necesita anchura. Sin ella el valor ocupa lo que ocupa y
@@ -2200,6 +2250,8 @@ export class Visual implements IVisual {
         } else {
             this.renderGrid(root, metrics, hc, themeFg, themeMuted);
         }
+        const fuente = hc ? null : STYLE_FONT[this.templateName(this.lastDataView?.metadata?.objects)];
+        if (fuente) root.querySelectorAll(".kpi-value, .kpi-label").forEach(e => { (e as HTMLElement).style.fontFamily = fuente; });
 
         // The "Free" badge used to be drawn here. Removed: Microsoft's guidance is
         // that a visual "shouldn't display its own licensing UX", and this one put
@@ -2296,6 +2348,7 @@ export class Visual implements IVisual {
             ? Math.floor((this.viewport.width - gap * (cols - 1)) / cols)
             : 0;
 
+        this.cellWidth = anchoCelda;
         metrics.forEach((metric, idx) => {
             const s2 = this.formattingSettings;
             const palette = this.host.colorPalette;
@@ -2516,6 +2569,9 @@ export class Visual implements IVisual {
             labelEl.textContent = metric.name;
             labelEl.title = metric.name;
             labelEl.setAttribute("aria-hidden", "true");
+            if (isGridMode && this.previewOf("small multiples layout")) {
+                labelEl.style.textAlign = String((s.smallMultiples.titleAlign.value as any)?.value ?? "left");
+            }
             const labelFontSize = isGridMode && this.previewOf("small multiples layout")
                 ? (s.smallMultiples.titleFontSize.value ?? 11)
                 : (s.label.fontSize.value ?? 12);
@@ -2681,7 +2737,21 @@ export class Visual implements IVisual {
             const spark = this.buildSparkline(metric, hc);
             if (spark) {
                 this.subSelectable(spark, "trend", this.t("OO_Trend", "Trend line"), powerbi.visuals.SubSelectionStylesType.Shape);
-                cell.appendChild(spark);
+                if (this.trendOnRight(metric)) {
+                    const texto = document.createElement("div");
+                    texto.style.cssText = "display:flex;flex-direction:column;flex:1 1 auto;min-width:0;gap:2px;justify-content:center;";
+                    while (cell.firstChild) texto.appendChild(cell.firstChild);
+                    const fila = document.createElement("div");
+                    fila.style.cssText = "display:flex;flex-direction:row;align-items:center;gap:12px;flex:1;min-height:0;";
+                    spark.style.width = "45%";
+                    spark.style.flex = "0 0 45%";
+                    spark.style.marginTop = "0";
+                    fila.appendChild(texto);
+                    fila.appendChild(spark);
+                    cell.appendChild(fila);
+                } else {
+                    cell.appendChild(spark);
+                }
             }
         }
 
@@ -2827,6 +2897,17 @@ export class Visual implements IVisual {
      * En la rejilla el ancho minimo sigue retirandolos en cualquier modo: ahi la
      * regla es de densidad, no de sitio.
      */
+    /** Width of the card being built: a narrow one always has its trend below. */
+    private cellWidth = 0;
+
+    private trendOnRight(metric: MetricData): boolean {
+        if (!this.hasSparkline(metric) || this.cellWidth < 260) return false;
+        const t = this.formattingSettings.trend.position;
+        const modo = String((t.value as any)?.value ?? t.value ?? "bottom");
+        if (modo === "right") return true;
+        return modo === "auto" && this.cellWidth >= 360;
+    }
+
     private mountSecondary(card: HTMLElement, cell: HTMLElement, metric: MetricData,
                            hc: boolean, ancho: number, gap: number, rejilla: boolean): void {
         const s = this.formattingSettings.secondaryKpis;
@@ -2839,6 +2920,8 @@ export class Visual implements IVisual {
         // con Position = Right explicito se retiran por debajo del ancho minimo.
         let orient: "right" | "bottom" = modo === "bottom" ? "bottom" : "right";
         if (modo === "auto" && ancho > 0 && ancho < minimo) orient = "bottom";
+        // With the trend on the right, that side is taken: the secondary KPIs go below.
+        if (this.trendOnRight(metric)) orient = "bottom";
         const anchoRegla = orient === "bottom" ? 0 : ancho;
         void rejilla;
 
