@@ -628,6 +628,8 @@ export class Visual implements IVisual {
             // dependia de la licencia. Ahora si.
             if (this.computePreview() && this.lastDataView && this.formattingSettings) {
                 try {
+                    // A Pro style applies only once the preview is known: its colours were not set yet.
+                    this.applyTemplate(this.lastDataView.metadata?.objects);
                     this.render(this.parseDataView(this.lastDataView));
                 } catch (_) { /* keep current display */ }
             }
@@ -637,6 +639,7 @@ export class Visual implements IVisual {
         this.clearLicenseNotice();
         if (this.lastDataView && this.formattingSettings) {
             try {
+                this.applyTemplate(this.lastDataView.metadata?.objects);
                 this.render(this.parseDataView(this.lastDataView));
             } catch (_) { /* keep current display */ }
         }
