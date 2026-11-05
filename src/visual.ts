@@ -2226,7 +2226,7 @@ export class Visual implements IVisual {
             background: ${fondoRaiz};
             border: ${bw}px solid ${cardBorder};
             border-radius: ${br}px;
-            padding: ${pad}px;
+            padding: ${(this.lastDataView?.metadata?.objects as any)?.card?.padding !== undefined && this.previewOf("card styling") ? pad : 10}px ${pad}px;
             box-shadow: ${shadow ? "0 2px 8px rgba(0,0,0,0.10)" : "none"};
             width: ${vpW}; height: ${vpH};
             box-sizing: border-box;
@@ -2366,7 +2366,7 @@ export class Visual implements IVisual {
                 background: ${marco.bg};
                 border: ${marco.bw}px solid ${marco.border};
                 border-radius: ${cellBr}px;
-                padding: 12px;
+                padding: 10px 12px;
                 box-sizing: border-box;
                 display: flex;
                 flex-direction: column;
@@ -2666,7 +2666,18 @@ export class Visual implements IVisual {
             color: ${valueColor};
             line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         `;
-        cell.appendChild(valueEl);
+        // With no label above it, the image shares the row with the number: a row of its own
+        // only pushed the figure down and left the top of the card empty.
+        const cabecera = cell.querySelector(".kpi-header") as HTMLElement | null;
+        if (cabecera && !cabecera.querySelector(".kpi-label")) {
+            cabecera.querySelector("span")?.remove();
+            cabecera.style.alignItems = "center";
+            valueEl.style.flex = "1";
+            valueEl.style.minWidth = "0";
+            cabecera.insertBefore(valueEl, cabecera.firstChild);
+        } else {
+            cell.appendChild(valueEl);
+        }
         if (st && !hc && (stApply === "both" || stApply === "accent")) {
             cell.style.borderLeft = `4px solid ${st.color}`;
             cell.style.paddingLeft = "8px";
@@ -2736,6 +2747,8 @@ export class Visual implements IVisual {
 
         // Trend line (Pro). Free renders the card without it; the notification
         // path explains why, so nothing disappears without a word.
+        // Without a trend to fill the card, the content sits in the middle: same space above and below.
+        if (!this.hasSparkline(metric)) cell.style.justifyContent = "center";
         if (this.hasSparkline(metric)) {
             const spark = this.buildSparkline(metric, hc);
             if (spark) {
