@@ -87,6 +87,7 @@
   "Object_Trend": "Tendencia (Pro)",
   "Object_Variance": "Variación",
   "Pro_card_styling": "el estilo de tarjeta",
+  "Pro_style_templates": "las plantillas de estilo",
   "Pro_extra_tooltip_fields": "los campos adicionales de información sobre herramientas",
   "Pro_prefix_suffix": "el prefijo y el sufijo",
   "Pro_secondary_KPIs": "los KPI secundarios",

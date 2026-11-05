@@ -75,13 +75,14 @@ point** (against the previous point, or 12 back for the same month last year) or
 | Feature | Free | Pro |
 |---|---|---|
 | Value, variance, target, your number formats, images | ✅ | ✅ |
-| Style templates, setup guide, size-adaptive layout | ✅ | ✅ |
+| Report theme and six style templates, setup guide, size-adaptive layout | ✅ | ✅ |
+| Six more styles: Boardroom, Ledger, Editorial, Signal, Aurora, Terrace | ❌ | ✅ |
 | Format on the canvas, 12 languages | ✅ | ✅ |
-| Cross-filtering, bookmarks, keyboard, screen readers, high contrast | ✅ | ✅ |
+| Bookmarks, keyboard, screen readers, high contrast | ✅ | ✅ |
 | **Color rules** | ❌ | ✅ |
 | **Conditional formatting (fx)** on value colour and card background | ❌ | ✅ |
-| **Trend line** and period comparisons | ❌ | ✅ |
-| Small Multiples (up to 50) | ❌ | ✅ |
+| **Trend line**, below or beside the figures, clickable points and period comparisons | ❌ | ✅ |
+| Small Multiples (up to 50), filtering by card | ❌ | ✅ |
 | Secondary KPIs | ❌ | ✅ |
 | Prefix / suffix, variance pill and colours, extra tooltips | ❌ | ✅ |
 | Card border width, radius, padding, shadow | ❌ | ✅ |

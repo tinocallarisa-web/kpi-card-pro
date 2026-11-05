@@ -4,21 +4,25 @@
 
 ### Changed
 - **The default look now follows the report's theme.** A card with no style of its own takes its colours from the theme, as a native visual does. **This also applies to reports already built:** if yours relied on the old look, choose *Format → Style template → Classic*, which stays free.
-- **A percentage now varies in points.** A measure formatted as a percentage going from 25% to 27% shows +2.0 pp, not +8%. **Reports already built will show the new figure.** To go back, turn off *Variance → Percentage points for % measures*.
-- **A style changes how the card looks, never what fits in it.** The content sits in the same place with every style, framed or not, so changing style does not move a laid-out page. Clean, Bold and Minimal no longer set their own font size; only colours, weight and the serif of Ledger and Editorial change. A padding you chose under *Card* is kept. *Reports without a padding of their own use a tighter one: 8 px at the sides and 6 px above and below.*
+- **A percentage now varies in points.** A measure formatted as a percentage going from 25% to 27% shows ▲ 2.0 pp, not ▲ 8%. **Reports already built will show the new figure.** To go back, turn off *Variance → Percentage points for % measures*.
+- **A style changes how the card looks, never what fits in it.** The content sits in the same place with every style, framed or not, so changing style does not move a laid-out page. Clean, Bold and Minimal no longer set their own font size; a style sets colours, weight, the trend's line style and the serif of Ledger and Editorial, and a font you chose wins over that serif. A padding you chose under *Card* is kept. *Reports without a padding of their own use a tighter one: 8 px at the sides and 6 px above and below.*
 - **No frame inside the frame.** On *Report theme*, the card or grid draws no border, shadow or background of its own around it: the visual's container provides them, as with the native Card. Setting anything under *Card* brings the frame back. Each card in a grid keeps its own.
 - **A more compact card.** With no label, the image shares the row with the number. Without a trend, the content is centred vertically. The title is centred with the image and set slightly apart from the number.
 
 ### Added
 - **Six Pro styles:** Boardroom, Ledger, Editorial, Signal, Aurora and Terrace. Choosing one without a licence draws it on your own data under the Pro preview watermark; reading view shows the free look.
-- **Trend position (Pro):** below the figures, to their right, or Auto, which chooses by the width of the card. With the trend on the right, the Secondary KPIs go below.
-- **Small Multiples title alignment:** left or centre, with the same names for these settings as in the rest of the collection.
+- **Trend position (Pro):** below the figures, to their right, or Auto, which goes to the right from 360 px of card width. Below 260 px the trend stays below whatever you choose. With the trend on the right, the Secondary KPIs go below.
+- **Small Multiples title alignment (Pro):** left or centre, with the same names for these settings as in the rest of the collection.
 
 ### Fixed
-- **Percentages and other non-additive measures were summed across the months when a Trend was bound.** A gross margin could read 455.9%. The card and its Secondary KPIs now use the total Power BI calculates. If Power BI sends no total for a percentage, the card leaves the figure out instead of showing a sum.
+- **Percentages and other non-additive measures were summed across the months when a Trend was bound.** A gross margin could read 455.9%. The card, its Secondary KPIs and the cross-highlighted value now use the total Power BI calculates. If Power BI sends no total for a percentage, the card leaves the figure out instead of showing a sum. *Last N points* is a sum by definition, so a percentage keeps its total there. If Power BI sends no total for any other measure, the months are still added: an average or a distinct count needs that total.
 - **Secondary KPIs could not be read on dark styles or dark themes:** they kept their dark default colour. They now follow the value and label colours of the style, unless you chose your own. Separator lines and the scroll bar also adapt.
 - **On a card short of height, the main number could be squeezed until it disappeared.** It now never shrinks that way: the extras are withdrawn first, starting with the trend.
-- **A Pro style drew dark text on its dark background** in the moments before the licence was known.
+- **A Pro style chosen without a licence drew dark text on its dark background** until the next refresh.
+- **In high contrast the variance uses the theme's colour** instead of fixed green, red and white, and the scroll bar follows the theme.
+- **A format with a literal %** (`0.0"%"`) is no longer read as a percentage.
+- **Screen readers hear the same variance the card shows,** in points for a percentage.
+- **The tooltips of the prior value and the variance, and the licence notice for the styles,** follow the report's language.
 
 ## [2.3.0.0] — 2026-10-20
 

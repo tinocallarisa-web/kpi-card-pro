@@ -1,6 +1,6 @@
 # KPI Card Pro — Certification Notes — v2.4.0.0
 
-> 2.4.0.0 makes the report's theme the default look (Classic stays available), adds six Pro styles drawn under the preview watermark without a licence, a trend position (bottom, right, auto) and variance in points for percentage measures. With a Trend bound, values now read Power BI's subtotal (`rowSubtotalsPerLevel` is on by default) instead of summing the months. A style changes colours and weights only, never sizes or padding. Everything else below is unchanged from 2.3. Full list: CHANGELOG.md.
+> 2.4.0.0 makes the report's theme the default look (Classic stays available), adds six Pro styles drawn under the preview watermark without a licence, a trend position (bottom, right, auto) and variance in points for percentage measures. With a Trend bound, values now read Power BI's subtotal (`rowSubtotalsPerLevel` is on by default) instead of summing the months. A style changes colours, weights, the trend's line style and, in Ledger and Editorial, the serif; never font sizes or padding. Everything else below is unchanged from 2.3. Full list: CHANGELOG.md.
 
 > The text pasted into Partner Center is `docs/CERTIFICATION-NOTES-SHORT.txt` (the field caps at
 > 2,500 characters and is cleared on every resubmission). This file is the complete reference the
@@ -29,8 +29,9 @@ under a "Pro preview" watermark that names it, together with Power BI's own lice
 gating: it is how the author sees what they would be buying.
 
 In reading view, before the licence has resolved, and wherever licences cannot be read (Publish to
-Web, embedding, export), the **free** result is drawn with no watermark and no notice. A published
-report therefore never uses an unpaid Pro feature. The gate is the host view mode
+Web, embedding, export), the **free** result is drawn with no watermark. Power BI's own licence notice can still appear in
+reading view when the report asks for a Pro feature and the licence can be read. A published report
+therefore does not show an unpaid Pro feature. The gate is the host view mode
 (`options.viewMode !== 0`), not Desktop versus Service, and it is granted **per feature**.
 
 ---
@@ -125,7 +126,7 @@ the feature) → `notifyLicenseRequired` after ~10 s. No licensing UI of the vis
 
 **Free:** one KPI card with value, prior-period variance with arrow and invert logic, and target;
 the model's number formats, display units and decimals; label styling; card background and border
-colour; images; native and modern tooltips; cross-filtering, cross-highlighting, bookmarks
+colour; images; the report's theme and six style templates; the setup guide; format on the canvas; native and modern tooltips; cross-filtering, cross-highlighting, bookmarks
 (`registerOnSelectCallback`); keyboard navigation, ARIA labels, high contrast; context menu.
 
 **Pro:** Color rules and conditional formatting (fx); the trend line with its target and hover values, and the value modes it enables;
@@ -138,14 +139,14 @@ padding and drop shadow.
 1. Import the `.pbiviz` (Insert → More visuals → Import from file) and open the sample `.pbix`,
    which includes a "Tips & Hints" page.
 2. **Free, no licence.** A measure in Value renders one card. Add Prior Period and Target: the
-   variance pill and the "Prior: / Target:" line appear. With Small Multiples, click a card: the report cross-filters. A single card has nothing to filter by, like the native Card; with Trend it filters through its points.
+   variance with its arrow and the "Prior: / Target:" line appear. With Small Multiples, click a card: the report cross-filters. A single card has nothing to filter by, like the native Card; with Trend it filters through its points.
    Right-click: the Power BI context menu opens.
 3. Format the Value measure as a percentage in the model: the card shows it as a percentage, in
    the report's language.
 4. In **edit mode**, turn on Color rules, bind Small Multiples or Trend, or add Secondary KPIs: each
    renders working under the "Pro preview" watermark, a banner names the feature, and after about
    10 seconds the Upgrade bar appears. Remove the feature and both go.
-5. Switch to **reading view**: the free result, no watermark, no notice.
+5. Switch to **reading view**: the free result, no watermark; Power BI's own licence notice may appear.
 6. With Small Multiples and 6 columns: the secondary KPIs move below the value — in a list if the
    figures do not fit in a row — identically on every card, with no horizontal scrollbar.
 7. Switch to another report page and back: the state is kept.

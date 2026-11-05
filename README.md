@@ -61,12 +61,14 @@ format pane.
 | KPI card with value, variance, arrow, invert logic and target | ✓ | ✓ |
 | Model number formats, display units, decimal places, label styling | ✓ | ✓ |
 | Card background and border colour, images | ✓ | ✓ |
-| Native and modern tooltips, cross-filtering, cross-highlighting, bookmarks, context menu | ✓ | ✓ |
+| Native and modern tooltips, cross-highlighting, bookmarks, context menu | ✓ | ✓ |
 | Keyboard navigation, screen-reader summaries, high contrast | ✓ | ✓ |
-| Style templates, setup guide, size-adaptive layout, format on the canvas | ✓ | ✓ |
+| Report theme and six style templates, setup guide, size-adaptive layout, format on the canvas | ✓ | ✓ |
+| **Six more styles:** Boardroom, Ledger, Editorial, Signal, Aurora, Terrace | ✗ | **✓** |
+| **Conditional formatting (fx)** on the value colour and card background | ✗ | **✓** |
 | **Color rules** — on track / warning / off track on target, prior or the value itself | ✗ | **✓** |
-| **Trend line** — area, line or bars, target per period, hover values, period comparisons | ✗ | **✓** |
-| **Small Multiples** — up to 50 cards, 1–6 columns, category titles | ✗ | **✓** |
+| **Trend line** — area, line or bars, below or beside the figures, target per period, clickable points, period comparisons | ✗ | **✓** |
+| **Small Multiples** — up to 50 cards, 1–6 columns, category titles, filtering by card | ✗ | **✓** |
 | **Secondary KPIs** — up to 3, auto layout | ✗ | **✓** |
 | **Prefix and suffix** on the main value | ✗ | **✓** |
 | **Variance pill** and custom variance colours | ✗ | **✓** |
@@ -81,15 +83,15 @@ Power BI shows its licence notification. Reading view shows the free result.
 - **Card** — Background, Border Colour · *(Pro)* Border Width, Border Radius, Padding, Drop Shadow
 - **Main Value** — Font family, size, bold, colour, display units, decimal places · *(Pro)* Prefix, Suffix
 - **Label (single card)** — Show, font family, size, bold, colour
-- **Variance** — Show, invert, show arrow, font size · *(Pro)* positive / negative / neutral colours, Show as Pill
+- **Variance** — Show, invert, percentage points for % measures, show arrow, font size · *(Pro)* positive / negative / neutral colours, Show as Pill
 - **Color rules (Pro)** — Show, compare with target, prior or the value itself, lower and upper threshold, lower is better, colours, apply to the value, an accent bar, the background or the border, show status text
 - **Style template** — Report theme (default), Classic, Clean, Bold, Minimal, Soft, Midnight; Pro: Boardroom, Ledger, Editorial, Signal, Aurora, Terrace; setup guide on or off
 - **Prior & Target** — Show, font family, size, colour
 - **Value & comparison** — Value shows (total, latest point, last N points), window size, compare against, show period label
 - **Secondary KPIs (Pro)** — Show, position (auto / right / bottom), min width beside value, show variance, text sizes and colours
 - **Image** — Show, height, corner radius
-- **Trend (Pro)** — Show, chart type, colour, line width, area opacity, height, last-point marker, target line and colour
-- **Small Multiples (Pro)** — Columns, gap, category title font, size, bold, colour
+- **Trend (Pro)** — Show, position (bottom / right / auto), chart type, colour, line width, area opacity, height, last-point marker, target line and colour
+- **Small Multiples (Pro)** — Columns, space between panels, category title font, alignment, size, bold, colour
 - **Accessibility** — High contrast handling, visual title announced to screen readers
 
 ## Build from source
@@ -115,7 +117,7 @@ kpiCardPro/
 ├── src/
 │   ├── visual.ts          # rendering, formatting, licensing, interactions
 │   └── settings.ts        # formatting model
-├── stringResources/       # en-US and es-ES
+├── stringResources/       # 12 languages
 ├── assets/
 ├── docs/                  # served by GitHub Pages: support, privacy, terms, changelog,
 │                          # infographic and release deliverables

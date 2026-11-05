@@ -470,8 +470,8 @@ class StatusSettings extends FormattingSettingsCard {
 
 // ─── Card: Style template (2.2.0.0) ──────────────────────────────────────────
 
-/** Plantillas de estilo. Gratis, y por eso solo tocan ajustes gratuitos: colores, fuentes y
- *  el tamaño del número; nunca el borde, el radio, el relleno o la sombra, que son Pro. */
+/** Plantillas de estilo: colores, grosores y tipo de línea, nunca tamaños de letra ni relleno.
+ *  Las de PRO_STYLES son Pro y sin licencia se dibujan bajo la marca de agua. */
 class StyleSettings extends FormattingSettingsCard {
     template = new formattingSettings.ItemDropdown({
         name: "template", displayName: "Template",

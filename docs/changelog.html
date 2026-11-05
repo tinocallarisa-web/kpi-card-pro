@@ -52,23 +52,27 @@
       <h4><span class="tag tag-chg">Changed</span></h4>
     <ul>
       <li><strong>The default look now follows the report's theme.</strong> A card with no style of its own takes its colours from the theme, as a native visual does. <strong>This also applies to reports already built:</strong> if yours relied on the old look, choose *Format → Style template → Classic*, which stays free.</li>
-      <li><strong>A percentage now varies in points.</strong> A measure formatted as a percentage going from 25% to 27% shows +2.0 pp, not +8%. <strong>Reports already built will show the new figure.</strong> To go back, turn off *Variance → Percentage points for % measures*.</li>
-      <li><strong>A style changes how the card looks, never what fits in it.</strong> The content sits in the same place with every style, framed or not, so changing style does not move a laid-out page. Clean, Bold and Minimal no longer set their own font size; only colours, weight and the serif of Ledger and Editorial change. A padding you chose under *Card* is kept. *Reports without a padding of their own use a tighter one: 8 px at the sides and 6 px above and below.*</li>
+      <li><strong>A percentage now varies in points.</strong> A measure formatted as a percentage going from 25% to 27% shows ▲ 2.0 pp, not ▲ 8%. <strong>Reports already built will show the new figure.</strong> To go back, turn off *Variance → Percentage points for % measures*.</li>
+      <li><strong>A style changes how the card looks, never what fits in it.</strong> The content sits in the same place with every style, framed or not, so changing style does not move a laid-out page. Clean, Bold and Minimal no longer set their own font size; a style sets colours, weight, the trend's line style and the serif of Ledger and Editorial, and a font you chose wins over that serif. A padding you chose under *Card* is kept. *Reports without a padding of their own use a tighter one: 8 px at the sides and 6 px above and below.*</li>
       <li><strong>No frame inside the frame.</strong> On *Report theme*, the card or grid draws no border, shadow or background of its own around it: the visual's container provides them, as with the native Card. Setting anything under *Card* brings the frame back. Each card in a grid keeps its own.</li>
       <li><strong>A more compact card.</strong> With no label, the image shares the row with the number. Without a trend, the content is centred vertically. The title is centred with the image and set slightly apart from the number.</li>
     </ul>
       <h4><span class="tag tag-add">Added</span></h4>
     <ul>
       <li><strong>Six Pro styles:</strong> Boardroom, Ledger, Editorial, Signal, Aurora and Terrace. Choosing one without a licence draws it on your own data under the Pro preview watermark; reading view shows the free look.</li>
-      <li><strong>Trend position (Pro):</strong> below the figures, to their right, or Auto, which chooses by the width of the card. With the trend on the right, the Secondary KPIs go below.</li>
-      <li><strong>Small Multiples title alignment:</strong> left or centre, with the same names for these settings as in the rest of the collection.</li>
+      <li><strong>Trend position (Pro):</strong> below the figures, to their right, or Auto, which goes to the right from 360 px of card width. Below 260 px the trend stays below whatever you choose. With the trend on the right, the Secondary KPIs go below.</li>
+      <li><strong>Small Multiples title alignment (Pro):</strong> left or centre, with the same names for these settings as in the rest of the collection.</li>
     </ul>
       <h4><span class="tag tag-fix">Fixed</span></h4>
     <ul>
-      <li><strong>Percentages and other non-additive measures were summed across the months when a Trend was bound.</strong> A gross margin could read 455.9%. The card and its Secondary KPIs now use the total Power BI calculates. If Power BI sends no total for a percentage, the card leaves the figure out instead of showing a sum.</li>
+      <li><strong>Percentages and other non-additive measures were summed across the months when a Trend was bound.</strong> A gross margin could read 455.9%. The card, its Secondary KPIs and the cross-highlighted value now use the total Power BI calculates. If Power BI sends no total for a percentage, the card leaves the figure out instead of showing a sum. *Last N points* is a sum by definition, so a percentage keeps its total there. If Power BI sends no total for any other measure, the months are still added: an average or a distinct count needs that total.</li>
       <li><strong>Secondary KPIs could not be read on dark styles or dark themes:</strong> they kept their dark default colour. They now follow the value and label colours of the style, unless you chose your own. Separator lines and the scroll bar also adapt.</li>
       <li><strong>On a card short of height, the main number could be squeezed until it disappeared.</strong> It now never shrinks that way: the extras are withdrawn first, starting with the trend.</li>
-      <li><strong>A Pro style drew dark text on its dark background</strong> in the moments before the licence was known.</li>
+      <li><strong>A Pro style chosen without a licence drew dark text on its dark background</strong> until the next refresh.</li>
+      <li><strong>In high contrast the variance uses the theme's colour</strong> instead of fixed green, red and white, and the scroll bar follows the theme.</li>
+      <li><strong>A format with a literal %</strong> (<code>0.0"%"</code>) is no longer read as a percentage.</li>
+      <li><strong>Screen readers hear the same variance the card shows,</strong> in points for a percentage.</li>
+      <li><strong>The tooltips of the prior value and the variance, and the licence notice for the styles,</strong> follow the report's language.</li>
     </ul>
     <div class="rel">
       <div class="rel-head">

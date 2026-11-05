@@ -90,13 +90,13 @@ TEXT BOX 7 — Free vs Pro
 FREE VS PRO
 
 Free: value, variance with arrow and invert, target, your number formats,
-images, style templates, the setup guide, the layout that adapts to the
-size of the visual, format on the canvas, cross-filtering, bookmarks,
+images, the report's theme and six style templates, the setup guide, the
+layout that adapts to the size of the visual, format on the canvas, bookmarks,
 keyboard, screen readers, high contrast, 12 languages.
 
-Pro: color rules, conditional formatting (fx) on the value colour and the
-card background, the trend line and its period comparisons, Small
-Multiples, Secondary KPIs, prefix and suffix, variance pill and colours,
+Pro: six more styles, color rules, conditional formatting (fx) on the value colour and the
+card background, the trend line with clickable points and its period comparisons, Small
+Multiples with filtering by card, Secondary KPIs, prefix and suffix, variance pill and colours,
 extra tooltip measures, card border, radius, padding and shadow.
 
 Without a licence, Pro features are drawn working in edit mode under a

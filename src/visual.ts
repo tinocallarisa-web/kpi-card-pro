@@ -86,7 +86,7 @@ function towardWhite(hex: string, t: number): string {
 /**
  * Plantillas de estilo (2.2.0.0): [tarjeta, propiedad, valor]. Solo se aplican a lo que el
  * autor no ha tocado (lo que no está en metadata.objects), así que un ajuste a mano siempre
- * gana. Solo propiedades gratuitas: una plantilla no puede regalar el estilo Pro de la tarjeta.
+ * gana. Nunca tocan tamaños de letra ni relleno: cambiar de estilo no mueve una página montada.
  */
 const TEMPLATES: Record<string, [string, string, unknown][]> = {
     // A style sets colours and weights, never sizes: changing it must not move a laid-out page.
@@ -119,6 +119,11 @@ const TEMPLATES: Record<string, [string, string, unknown][]> = {
 const PRO_STYLES = ["boardroom", "ledger", "editorial", "signal", "aurora", "terrace"];
 const STYLE_GRADIENT: Record<string, string> = { aurora: "linear-gradient(135deg, #1B1147, #10395E 50%, #0B5A5E)" };
 const STYLE_FONT: Record<string, string> = { ledger: "Georgia, serif", editorial: "Georgia, serif" };
+
+/** A real percentage format: a % inside quotes or escaped is literal text, the value is not a ratio. */
+function esPorcentaje(format: string | undefined): boolean {
+    return (format ?? "").replace(/"[^"]*"|'[^']*'|\\./g, "").indexOf("%") >= 0;
+}
 
 const SERVICE_PLAN_ID = "kpi-card-pro-tcviz";
 
@@ -445,7 +450,11 @@ export class Visual implements IVisual {
         if (metric.periodLabel) partes.push(metric.periodLabel);
         if (v !== null && metric.priorPeriod !== null && metric.priorPeriod !== 0) {
             const pct = (v - metric.priorPeriod) / Math.abs(metric.priorPeriod);
-            partes.push(`${pct >= 0 ? "+" : "-"}${this.pctFormatter().format(Math.abs(pct))} `
+            const enPuntos = this.formattingSettings.variance.asPoints.value && esPorcentaje(metric.formats.value);
+            const cifra = enPuntos
+                ? `${this.pointsFormatter().format(Math.abs(v - metric.priorPeriod) * 100)} ${this.t("UI_Points", "pp")}`
+                : this.pctFormatter().format(Math.abs(pct));
+            partes.push(`${pct >= 0 ? "+" : "-"}${cifra} `
                 + `${this.t("Aria_VsPrior", "vs prior")} (${this.formatMetricValue(metric.priorPeriod, metric.formats.prior)})`);
         }
         if (metric.target !== null) {
@@ -551,7 +560,6 @@ export class Visual implements IVisual {
                 VisualFormattingSettingsModel,
                 dataView
             ) as VisualFormattingSettingsModel;
-            this.applyTemplate(dataView?.metadata?.objects);
             this.localizeModel();
 
             // lastDataView se asigna ANTES de parsear. attemptedProFeatures() lo lee, y
@@ -561,6 +569,8 @@ export class Visual implements IVisual {
             // siguiente update. Con isPro, que era un booleano estable, no se notaba.
             const anterior = this.lastDataView;
             this.lastDataView = dataView;
+            // After lastDataView: whether a Pro style may be drawn is decided from the current settings.
+            this.applyTemplate(dataView?.metadata?.objects);
             const metrics = this.parseDataView(dataView);
 
             // If parsing yields nothing but we already displayed real data, this is a
@@ -686,7 +696,7 @@ export class Visual implements IVisual {
 
         const groups: [string, string, string[]][] = [
             ["card styling",   "card",                 ["borderWidth", "borderRadius", "padding", "shadow"]],
-            ["small multiples layout","smallMultiplesLayout", ["columns", "gap", "showTitle", "titleFontSize", "titleColor"]],
+            ["small multiples layout","smallMultiplesLayout", ["columns", "gap", "showTitle", "titleFontFamily", "titleAlign", "titleFontSize", "titleBold", "titleColor"]],
             ["prefix/suffix",  "mainValue",            ["prefix", "suffix"]],
             ["variance pill", "variance",          ["showPill"]],
             // Bloqueadas en el render desde siempre, pero nunca anunciadas: el usuario
@@ -1455,8 +1465,8 @@ export class Visual implements IVisual {
                     + `color:${val("mainValue", "color", "#252423")};`;
                 const etq = document.createElement("div");
                 const capital = nombre.charAt(0).toUpperCase() + nombre.slice(1);
-                const nombreVisible = this.t("Enum_Style_" + capital, capital);
-                etq.textContent = PRO_STYLES.indexOf(nombre) >= 0 && !this.isPro ? `${nombreVisible} (Pro)` : nombreVisible;
+                const nombreVisible = this.t("Enum_Style_" + capital, PRO_STYLES.indexOf(nombre) >= 0 ? `${capital} (Pro)` : capital);
+                etq.textContent = nombreVisible;   // its name in capabilities already says (Pro)
                 etq.style.cssText = `font:11px 'Segoe UI',sans-serif;color:${val("label", "color", "#6B6B6B")};`;
                 chip.appendChild(num); chip.appendChild(etq);
                 chip.addEventListener("click", () => {
@@ -1531,8 +1541,7 @@ export class Visual implements IVisual {
         if (kids.length === 0) return null;
         // No subtotal, because the report turned them off. A percentage cannot be added: better
         // to show nothing than a false figure.
-        const fmt = this.lastDataView?.matrix?.valueSources?.[idx]?.format ?? "";
-        if (fmt.indexOf("%") >= 0) return null;
+        if (esPorcentaje(this.lastDataView?.matrix?.valueSources?.[idx]?.format)) return null;
         let sum = 0;
         let seen = false;
         for (const k of kids) {
@@ -1753,32 +1762,35 @@ export class Visual implements IVisual {
         const suma = (desde: number, hasta: number) =>
             serie.slice(Math.max(0, desde), hasta).reduce((a, b) => a + b, 0);
 
-        const iniAct = Math.max(0, n - N);
-        m.value = suma(iniAct, n);
-        m.periodLabel = labels.length
-            ? `${labels[iniAct] ?? ""} – ${labels[n - 1] ?? ""}`
-            : "";
-
-        // Solo se compara si la ventana anterior esta COMPLETA.
-        const iniPrev = n - 2 * N;
-        if (iniPrev >= 0) {
-            if (!priorExplicito) { m.priorPeriod = suma(iniPrev, n - N); }
-            m.comparePeriodLabel = labels.length
-                ? `${labels[iniPrev] ?? ""} – ${labels[n - N - 1] ?? ""}`
+        // A window is a sum, and a percentage cannot be added: it keeps the total of the period.
+        if (!esPorcentaje(m.formats.value)) {
+            const iniAct = Math.max(0, n - N);
+            m.value = suma(iniAct, n);
+            m.periodLabel = labels.length
+                ? `${labels[iniAct] ?? ""} – ${labels[n - 1] ?? ""}`
                 : "";
-        } else if (!priorExplicito) {
-            m.priorPeriod = null;
-        }
 
-        if (m.targetData.length) {
-            m.target = m.targetData.slice(Math.max(0, m.targetData.length - N))
-                                   .reduce((a, b) => a + b, 0);
+            // Solo se compara si la ventana anterior esta COMPLETA.
+            const iniPrev = n - 2 * N;
+            if (iniPrev >= 0) {
+                if (!priorExplicito) { m.priorPeriod = suma(iniPrev, n - N); }
+                m.comparePeriodLabel = labels.length
+                    ? `${labels[iniPrev] ?? ""} – ${labels[n - N - 1] ?? ""}`
+                    : "";
+            } else if (!priorExplicito) {
+                m.priorPeriod = null;
+            }
+
+            if (m.targetData.length) {
+                m.target = m.targetData.slice(Math.max(0, m.targetData.length - N))
+                                       .reduce((a, b) => a + b, 0);
+            }
         }
 
         // Misma ventana para los secundarios, por la misma razon.
         for (const k of m.secondary) {
             const ks = k.series;
-            if (ks.length === 0) continue;
+            if (ks.length === 0 || esPorcentaje(k.format)) continue;
             const sumaK = (d: number, h: number) =>
                 ks.slice(Math.max(0, d), h).reduce((a, b) => a + b, 0);
             k.value = sumaK(Math.max(0, ks.length - N), ks.length);
@@ -2025,6 +2037,11 @@ export class Visual implements IVisual {
     private nodeOrChildrenHighlight(node: powerbi.DataViewMatrixNode | undefined, idx: number): number | null {
         const own = this.getNodeHighlight(node?.values ?? {}, idx);
         if (own !== null) return own;
+        // Same rule as nodeOrChildrenValue: the subtotal child first, and a percentage is never added.
+        const sub = (node?.children ?? []).find(k => (k as any).isSubtotal);
+        const total = sub ? this.getNodeHighlight(sub.values ?? {}, idx) : null;
+        if (total !== null) return total;
+        if (esPorcentaje(this.lastDataView?.matrix?.valueSources?.[idx]?.format)) return null;
 
         let sum = 0;
         let seen = false;
@@ -2275,7 +2292,13 @@ export class Visual implements IVisual {
             this.renderGrid(root, metrics, hc, themeFg, themeMuted);
         }
         const fuente = hc ? null : STYLE_FONT[this.templateName(this.lastDataView?.metadata?.objects)];
-        if (fuente) root.querySelectorAll(".kpi-value, .kpi-label").forEach(e => { (e as HTMLElement).style.fontFamily = fuente; });
+        if (fuente) {
+            // A font the author chose wins, as any other setting does.
+            const propios = (this.lastDataView?.metadata?.objects ?? {}) as any;
+            const sel = [propios.mainValue?.fontFamily === undefined ? ".kpi-value" : "",
+                         propios.label?.fontFamily === undefined ? ".kpi-label" : ""].filter(x => x).join(", ");
+            if (sel) root.querySelectorAll(sel).forEach(e => { (e as HTMLElement).style.fontFamily = fuente; });
+        }
 
         // The "Free" badge used to be drawn here. Removed: Microsoft's guidance is
         // that a visual "shouldn't display its own licensing UX", and this one put
@@ -2362,7 +2385,7 @@ export class Visual implements IVisual {
                intento) la rejilla perdia el alto minimo de contenido de las tarjetas y las
                aplastaba hasta cortarlas; el recorte horizontal va aqui, en la rejilla. */
             overflow-x: hidden; overflow-y: auto;
-            color-scheme: ${this.cardOscura() ? "dark" : "light"};
+            color-scheme: ${(hc ? (luminance(this.hcBg) ?? 1) < 0.18 : this.cardOscura()) ? "dark" : "light"};
         `;
 
         // Ancho real de una celda: el mismo criterio de ancho minimo que en la tarjeta
@@ -2594,9 +2617,8 @@ export class Visual implements IVisual {
             labelEl.textContent = metric.name;
             labelEl.title = metric.name;
             labelEl.setAttribute("aria-hidden", "true");
-            if (isGridMode && this.previewOf("small multiples layout")) {
-                labelEl.style.textAlign = String((s.smallMultiples.titleAlign.value as any)?.value ?? "left");
-            }
+            const labelAlign = isGridMode && this.previewOf("small multiples layout")
+                ? String((s.smallMultiples.titleAlign.value as any)?.value ?? "left") : "left";
             const labelFontSize = isGridMode && this.previewOf("small multiples layout")
                 ? (s.smallMultiples.titleFontSize.value ?? 11)
                 : (s.label.fontSize.value ?? 12);
@@ -2617,6 +2639,7 @@ export class Visual implements IVisual {
                 font-size: ${labelFontSize}px;
                 color: ${labelColor};
                 line-height: 1.3;
+                text-align: ${labelAlign};
                 ${isGridMode
                     ? "white-space: normal; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; word-break: break-word;"
                     : "white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"}
@@ -2758,7 +2781,7 @@ export class Visual implements IVisual {
                 const ppSpan = document.createElement("span");
                 const ppFormatted = this.formatMetricValue(metric.priorPeriod, metric.formats.prior);
                 ppSpan.textContent = `${this.t("Label_Prior", "Prior")}: ${ppFormatted}`;
-                ppSpan.title = `Prior Period: ${ppFormatted}`;
+                ppSpan.title = `${this.t("Role_PriorPeriod", "Prior Period")}: ${ppFormatted}`;
                 subRow.appendChild(ppSpan);
             }
             if (metric.target !== null) {
@@ -3187,7 +3210,7 @@ export class Visual implements IVisual {
 
         let color: string;
         if (hc) {
-            color = isNeutral ? "#FFFFFF" : (isPositive ? "#00FF00" : "#FF0000");
+            color = this.hcFg;   // the theme's colour; the arrow and the sign carry the direction
         } else if (this.previewOf("variance colours")) {
             // Color Palette: use host palette sentiment colors as fallback
             const positiveDefault = (palette as any).foregroundNeutralLight?.value ?? "#107C10";
@@ -3208,7 +3231,7 @@ export class Visual implements IVisual {
         const arrow   = s.showArrow.value ? (isNeutral ? "→" : (diff > 0 ? "▲" : "▼")) : "";
         // El porcentaje de variacion en el idioma del informe: 12,5 % en español, 12.5% en inglés.
         // A measure that is already a percentage varies in points: 25% to 27% is +2.0 pp, not +8%.
-        const asPoints = s.asPoints.value && (format ?? "").indexOf("%") >= 0;
+        const asPoints = s.asPoints.value && esPorcentaje(format);
         const pctStr  = asPoints
             ? `${arrow} ${this.pointsFormatter().format(Math.abs(diff) * 100)} ${this.t("UI_Points", "pp")}`
             : `${arrow} ${this.pctFormatter().format(Math.abs(pct) / 100)}`;
@@ -3218,7 +3241,7 @@ export class Visual implements IVisual {
         pill.className = "kpi-variance-pill";
         this.subSelectable(pill, "variance", this.t("OO_Variance", "Variance"), powerbi.visuals.SubSelectionStylesType.Text);
         pill.textContent = pctStr;
-        pill.title = `Variance: ${pctStr} (${diff >= 0 ? "+" : ""}${this.formatMetricValue(diff, format)})`;
+        pill.title = `${this.t("Aria_Variance", "Variance")}: ${pctStr} (${diff >= 0 ? "+" : ""}${this.formatMetricValue(diff, format)})`;
         pill.setAttribute("aria-label", `${this.t("Aria_Variance", "Variance")} ${pctStr}`);
 
         pill.style.cssText = usePill

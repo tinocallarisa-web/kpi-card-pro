@@ -5,9 +5,8 @@ Content for the four tabs of the TCViz product page. Current version: **2.4.0.0*
 The live page is generated from `src/data.jsx` in the **tcviz-web** repository
 (https://tcviz.com/product/horizon-kpi/). This file is the draft: copy the changes there.
 
-**Hero image:** the country grid with Status on — green, amber and red accent bars, each card with
-its flag, value, variance, prior and target, and its own trend line. It shows the whole product,
-including what is new in 2.1, in one glance.
+**Hero image:** the country grid with Color rules on: green, amber and red accent bars, each card with
+its flag, value, variance, prior and target, and its own trend line.
 
 **Video:** https://www.youtube.com/watch?v=4fP7zYKnhWo
 
@@ -39,7 +38,7 @@ commercial reporting by channel, operations by site, finance by cost centre.
 
 **At a glance**
 - Value, prior-period variance and target in a single card, in your model's number formats
-- **New in 2.2:** click a trend point to filter by that period; setup guide; six style templates; color rules on the background or border
+- **New in 2.4:** follows the report's theme by default; six Pro styles; the trend below or beside the figures; a percentage varies in points
 - Up to three secondary KPIs beside the headline, placed automatically
 - A trend line inside the card, with the target drawn period by period
 - One card per category, up to 50, each with its own line
@@ -116,11 +115,14 @@ Everything below is free except the items marked **(Pro)**.
 | Your model's number formats, display units, decimals, fonts and colours | ✓ | ✓ |
 | Variance arrow and the invert logic | ✓ | ✓ |
 | Image per card | ✓ | ✓ |
-| Cross-filtering, bookmarks, keyboard, high contrast | ✓ | ✓ |
+| The report's theme and six style templates | ✓ | ✓ |
+| Bookmarks, keyboard, high contrast | ✓ | ✓ |
+| **Six more styles** | — | **✓** |
+| **Conditional formatting (fx)** on the value colour and card background | — | **✓** |
 | **Color rules: on track / warning / off track** | — | **✓** |
-| **Trend line inside the card**, hover values, period comparisons | — | **✓** |
+| **Trend line inside the card**, below or beside the figures, clickable points, period comparisons | — | **✓** |
 | **Secondary KPIs**, up to 3 | — | **✓** |
-| **Small Multiples**, up to 50 cards | — | **✓** |
+| **Small Multiples**, up to 50 cards, filtering by card | — | **✓** |
 | Prefix and suffix | — | **✓** |
 | Variance pill and custom colours | — | **✓** |
 | Extra tooltip measures | — | **✓** |
@@ -136,8 +138,8 @@ free result. A 30-day free trial is available on AppSource.
 
 **Specs**
 - API version: 5.11.0
-- Platform: Power BI Desktop, Service and mobile
-- Interface languages: English, Spanish
+- Platform: Power BI Desktop, Service and mobile. Where Power BI cannot read licences, the free result is drawn
+- Interface languages: twelve
 
 **Field wells**
 - **Value** (measure, required) — the number on the card
@@ -181,6 +183,15 @@ buy what they already own.
 ---
 
 ## TAB 4: CHANGELOG
+
+### 2.4.0.0 — November 2026
+- **Changed:** the default look follows the report's theme; a percentage varies in points; a style never moves the layout
+- **Added:** six Pro styles; trend position; title alignment in Small Multiples
+- **Fixed:** percentages summed across months with a Trend; Secondary KPIs unreadable on dark cards
+
+### 2.3.0.0 — October 2026
+- **Added:** conditional formatting (fx) on the value colour and the card background
+- **Changed:** a single card fills the visual; long titles wrap; new start screen
 
 ### 2.2.0.0 — October 2026
 - **Added:** click a trend point to filter the report by that period (and card); selection drawn on the card

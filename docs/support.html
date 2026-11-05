@@ -274,7 +274,7 @@
   <h2 id="secondary">Secondary KPIs (Pro)</h2>
   <div class="card">
     <p>Up to three supporting measures with their own variance. <strong>Right</strong> puts them in a column beside the value,
-    <strong>Bottom</strong> below it (in a row when they fit, otherwise a list), <strong>Auto</strong> chooses by width. In small
+    <strong>Bottom</strong> below it (in a row when they fit, otherwise a list), <strong>Auto</strong> chooses by width. With the trend on the right they go below. In small
     multiples every card uses the same layout, so they stay comparable.</p>
   </div>
 
@@ -285,8 +285,8 @@
     Free: <strong>Classic</strong>, <strong>Clean</strong>, <strong>Bold</strong>, <strong>Minimal</strong>, <strong>Soft</strong> and <strong>Midnight</strong>.
     Pro: <strong>Boardroom</strong>, <strong>Ledger</strong>, <strong>Editorial</strong>, <strong>Signal</strong>, <strong>Aurora</strong> and <strong>Terrace</strong>.
     Choose a Pro style without a licence and it is drawn on your data under the Pro preview watermark; reading view shows the free look.</p>
-    <p>A style only fills what you have not set yourself: any colour you change wins. It changes colours and weights, and Ledger and Editorial use a serif;
-    it never changes sizes or padding, so a laid-out page does not move. On dark cards the variance colours lighten and the Secondary KPIs follow the style to stay readable.</p>
+    <p>A style only fills what you have not set yourself: any colour you change wins. It changes colours, weights and the trend's line style, and Ledger and Editorial use a serif unless you chose a font;
+    it never changes font sizes or padding, so a laid-out page does not move. On dark cards the variance colours lighten and the Secondary KPIs follow the style to stay readable.</p>
     <p>On Report theme the visual's own container is the frame: the card draws no border, shadow or background around itself. Setting anything under <em>Card</em> brings them back.</p>
   </div>
 
@@ -324,10 +324,10 @@
       <li><strong>Card</strong> — background, border colour; (Pro) border width, radius, padding, drop shadow.</li>
       <li><strong>Main Value</strong> — font, size, bold, colour, display units, decimal places; (Pro) prefix and suffix.</li>
       <li><strong>Label</strong> — show, font, size, bold, colour.</li>
-      <li><strong>Variance</strong> — show, invert (lower is better), arrow, size; (Pro) colours and pill.</li>
+      <li><strong>Variance</strong> — show, invert (lower is better), percentage points for % measures, arrow, size; (Pro) colours and pill.</li>
       <li><strong>Color rules</strong> (Pro) — compare with, thresholds, lower is better, three colours, apply to, status text.</li>
       <li><strong>Prior &amp; Target</strong>, <strong>Value &amp; comparison</strong>, <strong>Secondary KPIs</strong> (Pro), <strong>Image</strong>,
-      <strong>Trend</strong> (Pro), <strong>Small Multiples</strong> (Pro), <strong>Accessibility</strong>.</li>
+      <strong>Trend</strong> (Pro: position below, right or auto, type, colours), <strong>Small Multiples</strong> (Pro: columns, space, title alignment, font and colour), <strong>Accessibility</strong>.</li>
     </ul>
     <p>The Format pane, the setup guide and the messages of the visual follow the language of Power BI: English, Spanish,
     French, German, Italian, Portuguese (Brazil and Portugal), Dutch, Polish, Japanese, Simplified Chinese and Korean.</p>
@@ -360,9 +360,11 @@
 
   <!-- FAQ -->
   <h2 id="faq">FAQ</h2>
-  <details><summary>After the update the card looks different.</summary><div class="faq-body"><p>Since 2.4 a card with no style of its own follows the report's theme and draws no frame inside the visual's container. Choose <em>Format → Style template → Classic</em> for the previous look.</p></div></details>
-  <details><summary>My percentage shows “pp” in the variance.</summary><div class="faq-body"><p>A measure formatted as a percentage varies in points: 25% to 27% is +2.0 pp, not +8%. For the relative change, turn off <em>Variance → Percentage points for % measures</em>.</p></div></details>
-  <details><summary>With a Trend, a percentage is empty.</summary><div class="faq-body"><p>The card uses the total Power BI calculates for each card, because adding up monthly percentages gives a wrong figure. If Power BI sends no total, the card leaves the percentage out. Check that the row subtotals are not turned off for the visual.</p></div></details>
+  <details><summary>After the update the card looks different.</summary><div class="faq-body"><p>Since 2.4 a card with no style of its own follows the report's theme and draws no frame inside the visual's container. Choose <em>Format → Style template → Classic</em> for the previous colours and frame; the padding stays tighter unless you set your own (Pro).</p></div></details>
+  <details><summary>My percentage shows “pp” in the variance.</summary><div class="faq-body"><p>A measure formatted as a percentage varies in points: 25% to 27% is ▲ 2.0 pp, not ▲ 8%. For the relative change, turn off <em>Variance → Percentage points for % measures</em>.</p></div></details>
+  <details><summary>With a Trend, a percentage is empty.</summary><div class="faq-body"><p>The card uses the total Power BI calculates for each card, because adding up monthly percentages gives a wrong figure. If Power BI sends no total, the card leaves the percentage out. Without a Trend field the card shows the measure directly.</p></div></details>
+  <details><summary>I chose Right and the trend stays below.</summary><div class="faq-body"><p>Below 260 px of card width the trend stays below the figures, because beside them neither would be readable. <em>Auto</em> moves it to the right from 360 px.</p></div></details>
+  <details><summary>Last N points does not change my percentage.</summary><div class="faq-body"><p>Last N points adds up the points, and percentages cannot be added: a percentage keeps the total of the period. Use <em>Latest point</em>, or a measure that computes the rolling figure.</p></div></details>
   <details><summary>My percentage shows as 0.3.</summary><div class="faq-body"><p>The card uses the format of the measure in your model. Format the measure as a percentage (Measure tools → Format → Percentage) and the card shows 30%. Do not add a “%” suffix to a raw ratio: it would read 0.3%.</p></div></details>
   <details><summary>The card shows a different number of decimals from my measure.</summary><div class="faq-body"><p>Check <em>Main Value → Decimal places</em>: once you change it, it overrides the measure's format. With display units (K, M) the decimals are chosen to fit the scaled number.</p></div></details>
   <details><summary>Conditional formatting (fx): where does it work?</summary><div class="faq-body"><p>The fx button is on <em>Main value → Color</em> and <em>Card → Background color</em> (Pro): rules, gradient or field value. Power BI evaluates the rule <strong>card by card in Small Multiples</strong>. On a single card Power BI does not pass the result of a rule to custom visuals, so there use <strong>Color rules</strong> (Pro): thresholds on the target, the prior period or the value itself, applied to the number, an accent bar, the background or the border.</p></div></details>
@@ -381,8 +383,8 @@
   <details><summary>The variance shows the wrong direction.</summary><div class="faq-body"><p>For metrics where lower is better — cost, defects, churn — switch on <em>Variance → Invert</em> (free), and <em>Lower is better</em> in Color rules if you use them.</p></div></details>
   <details><summary>The Format pane is in English.</summary><div class="faq-body"><p>It follows the language of Power BI Desktop (File → Options → Regional settings) or of the Service. Twelve languages are included; others fall back to English.</p></div></details>
   <details><summary>Does the visual send my data anywhere?</summary><div class="faq-body"><p>No. Everything is calculated and drawn inside Power BI and the visual makes no network calls of any kind. The only host API it uses is Microsoft's licence check, which carries no report data. See the <a href="privacy.html">Privacy Policy</a>.</p></div></details>
-  <details><summary>Does it work in Power BI Service and mobile?</summary><div class="faq-body"><p>Yes: Desktop, Service, Embedded and the mobile apps.</p></div></details>
-  <details><summary>How is the variance calculated?</summary><div class="faq-body"><p>(Value − Prior period) ÷ |Prior period|, shown as a percentage with an arrow. When the prior period is zero or blank no percentage is shown, because a change from nothing has no meaningful ratio. <em>Variance → Invert</em> swaps the colours for metrics where lower is better.</p></div></details>
+  <details><summary>Does it work in Power BI Service and mobile?</summary><div class="faq-body"><p>Yes: Desktop, Service, Embedded and the mobile apps. Where Power BI cannot read licences, such as Publish to Web, embedding or export, the free result is drawn.</p></div></details>
+  <details><summary>How is the variance calculated?</summary><div class="faq-body"><p>(Value − Prior period) ÷ |Prior period|, shown as a percentage with an arrow; a measure formatted as a percentage shows the difference in points instead. When the prior period is zero or blank no percentage is shown, because a change from nothing has no meaningful ratio. <em>Variance → Invert</em> swaps the colours for metrics where lower is better.</p></div></details>
   <details><summary>Do I need DAX or a date table to compare with the previous period?</summary><div class="faq-body"><p>No, if you bind a date field to <strong>Trend</strong> (Pro): the card reads the comparison off the series it draws. <em>Value &amp; comparison → Value shows</em> chooses what the number shows — the <strong>total</strong> of the period, the <strong>latest point</strong> (against the one before, or the same point a year earlier) or the <strong>last N points</strong> against the N before them — and the card prints what it compares, such as “Dec 2025 vs Nov 2025”. Without Trend, put any prior-period measure you already have in <strong>Prior Period</strong>.</p></div></details>
   <details><summary>How do I show a target?</summary><div class="faq-body"><p>Drag the target measure to <strong>Target</strong>. The card shows it under the value, the trend line draws it period by period as a dashed line, and Color rules (Pro) can compare the value with it as % achieved.</p></div></details>
   <details><summary>How many cards can Small Multiples show?</summary><div class="faq-body"><p>Up to 50 with Pro, one per category value; the free version shows one card. Columns adapt to the width: below about 150 px per card fewer columns are used, and the grid scrolls when there are more cards than fit.</p></div></details>
@@ -391,7 +393,7 @@
   <details><summary>Do bookmarks keep my selection?</summary><div class="faq-body"><p>Bookmarks keep the card or the trend points you selected and the filters of the page. Like every Power BI visual, they do not keep formatting.</p></div></details>
   <details><summary>Can I use it with the keyboard and a screen reader?</summary><div class="faq-body"><p>Yes. Tab enters the visual, arrow keys and Home/End move between cards, Enter or Space selects; clicking empty space clears. The trend line works as a slider: arrow keys step through the points, each one announced, and Enter filters by it. Screen readers hear the whole card — value, period, variance, target and status.</p></div></details>
   <details><summary>Does it support high contrast?</summary><div class="faq-body"><p>Yes. With a Windows high-contrast theme the card uses the theme’s colours, and the status (on track, warning, off track) is written as text so it never depends on colour.</p></div></details>
-  <details><summary>What does the free version include?</summary><div class="faq-body"><p>A complete card: value, variance with its arrow and invert logic, target, your number formats, images, style templates, the setup guide, the automatic size, format on the canvas, cross-filtering, bookmarks, keyboard, screen readers and high contrast. See <a href="#free-pro">Free and Pro</a> for the full list.</p></div></details>
+  <details><summary>What does the free version include?</summary><div class="faq-body"><p>A complete card: value, variance with its arrow and invert logic, target, your number formats, images, the report's theme and six style templates, the setup guide, the automatic size, format on the canvas, bookmarks, keyboard, screen readers and high contrast. See <a href="#free-pro">Free and Pro</a> for the full list.</p></div></details>
   <details><summary>How do I get Pro or the free trial?</summary><div class="faq-body"><p>On the visual’s Microsoft AppSource page choose <strong>Buy now</strong>, not “Install free” — the first month is free. Buy with the same account you use in Power BI and restart Power BI Desktop; the Pro features unlock by themselves. If you see “Billing country mismatch”, change the country with the globe icon at the top of the page. See <a href="https://tcviz.com/licensing.html">tcviz.com/licensing.html</a>.</p></div></details>
 
   <!-- Contact -->

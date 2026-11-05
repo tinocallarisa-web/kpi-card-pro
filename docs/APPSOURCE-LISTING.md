@@ -36,8 +36,8 @@ WHAT IS NEW IN 2.4
 • Six Pro styles you can try on your own data: Boardroom, Ledger, Editorial, Signal, Aurora and Terrace
 • A style never moves your layout: the content stays in the same place
 • The trend line below the figures or beside them
-• A percentage varies in points: 25% to 27% is +2.0 pp, not +8%
-• Percentages stay right with a date in Trend: the card uses Power BI's total, it does not add up the months
+• A percentage varies in points: 25% to 27% is 2.0 pp up, not 8%
+• Percentages stay right with a date in Trend: the card uses Power BI's total instead of adding up the months
 
 NO DATE TABLE, NO DAX
 
@@ -57,7 +57,7 @@ WHAT YOU GET
 
 • Variance against a prior period, with a direction arrow and invert logic for costs
 • A target, on the card and drawn on the trend line period by period
-• Color rules with three states, written under the value too, so meaning never depends on colour alone
+• Color rules with three states, written under the value by default, so meaning does not depend on colour alone
 • Conditional formatting (fx) on the value colour and the card background, per card in a grid
 • A trend line: area, line or bars, below or beside the figures, over any date or ordered period
 • One card per category, in up to six columns that adapt to the width
@@ -72,13 +72,13 @@ No network calls of any kind: no telemetry, no analytics, no CDN. Everything hap
 
 FREE AND PRO
 
-The card is complete without a licence: value, variance with its arrow and invert logic, target, your number formats, images, the report's theme, Classic and five more styles, the setup guide, the size-adaptive layout, format on the canvas, cross-filtering, bookmarks, keyboard, screen readers and high contrast.
+The card is complete without a licence: value, variance with its arrow and invert logic, target, your number formats, images, the report's theme, Classic and five more styles, the setup guide, the size-adaptive layout, format on the canvas, bookmarks, keyboard, screen readers and high contrast.
 
-Pro adds the context: six more styles, color rules and conditional formatting (fx), the trend line with clickable points and its period comparisons, Small Multiples, Secondary KPIs, prefix and suffix, the variance pill and colours, extra tooltip measures, and the card border, radius, padding and shadow.
+Pro adds the context: six more styles, color rules and conditional formatting (fx), the trend line with clickable points and its period comparisons, Small Multiples with filtering by card and by point, Secondary KPIs, prefix and suffix, the variance pill and colours, extra tooltip measures, and the card border, radius, padding and shadow.
 
 SEE IT BEFORE YOU BUY
 
-While you edit a report without a licence, every Pro feature you turn on is drawn working, under a "Pro preview" watermark naming it. Reading view shows the free result, so a published report never uses a feature you have not paid for.
+While you edit a report without a licence, every Pro feature you turn on is drawn working, under a "Pro preview" watermark naming it. Reading view shows the free result, so a published report does not show those features unless the reader has a licence.
 
 30-day free trial on AppSource.
 
@@ -128,7 +128,7 @@ Editing this file changes nothing in the offer.
 
 - [ ] Long description (the short description does not change)
 - [ ] Screenshots: the two infographics above, replacing the current ones
-- [ ] Video field unchanged: `https://www.youtube.com/watch?v=4fP7zYKnhWo` (canonical form only)
+- [ ] Video field: `https://www.youtube.com/watch?v=4fP7zYKnhWo` unless a new one is recorded (canonical form only)
 - [ ] Certification notes from `docs/CERTIFICATION-NOTES-SHORT.txt` — the field is cleared on every resubmission
 - [ ] Version 2.4.0.0 is above the one currently published (check Partner Center)
 - [ ] Support, privacy and terms URLs checked with a real request
