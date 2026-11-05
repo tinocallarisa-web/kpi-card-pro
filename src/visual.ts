@@ -2212,11 +2212,11 @@ export class Visual implements IVisual {
         const fxOn       = this.previewOf("conditional formatting (fx)");
         const cardBg     = hc ? this.hcBg : ((fxOn && metrics.length === 1 ? metrics[0]?.fxBg : null) ?? s.card.background.value?.value ?? themeBg);
         const cardBorder = hc ? this.hcFg  : (s.card.borderColor.value?.value ?? "#E0E0E0");
-        // A single card on the report's theme sits in the visual's own container, as a native card
+        // Cards on the report's theme sit in the visual's own container, as a native card
         // does: a frame of ours inside the container's added its padding and border to theirs.
         // Anything the author set on the card brings the frame back.
         const objCard = (this.lastDataView?.metadata?.objects as any)?.card ?? {};
-        const sinMarco = !hc && metrics.length === 1 && Object.keys(objCard).length === 0
+        const sinMarco = !hc && metrics.length >= 1 && Object.keys(objCard).length === 0
             && this.templateName(this.lastDataView?.metadata?.objects) === "report";
         const conFx = fxOn && metrics.length === 1 && !!metrics[0]?.fxBg;
         const fondoRaiz = degradado && !conFx ? degradado : (sinMarco && !conFx ? "transparent" : cardBg);
