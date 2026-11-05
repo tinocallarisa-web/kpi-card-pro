@@ -2212,11 +2212,18 @@ export class Visual implements IVisual {
         const fxOn       = this.previewOf("conditional formatting (fx)");
         const cardBg     = hc ? this.hcBg : ((fxOn && metrics.length === 1 ? metrics[0]?.fxBg : null) ?? s.card.background.value?.value ?? themeBg);
         const cardBorder = hc ? this.hcFg  : (s.card.borderColor.value?.value ?? "#E0E0E0");
-        const fondoRaiz = degradado && !(fxOn && metrics.length === 1 && metrics[0]?.fxBg) ? degradado : cardBg;
-        const bw  = this.previewOf("card styling") ? (s.card.borderWidth.value ?? 1) : 1;
+        // A single card on the report's theme sits in the visual's own container, as a native card
+        // does: a frame of ours inside the container's added its padding and border to theirs.
+        // Anything the author set on the card brings the frame back.
+        const objCard = (this.lastDataView?.metadata?.objects as any)?.card ?? {};
+        const sinMarco = !hc && metrics.length === 1 && Object.keys(objCard).length === 0
+            && this.templateName(this.lastDataView?.metadata?.objects) === "report";
+        const conFx = fxOn && metrics.length === 1 && !!metrics[0]?.fxBg;
+        const fondoRaiz = degradado && !conFx ? degradado : (sinMarco && !conFx ? "transparent" : cardBg);
+        const bw  = sinMarco ? 0 : (this.previewOf("card styling") ? (s.card.borderWidth.value ?? 1) : 1);
         const br  = this.previewOf("card styling") ? (s.card.borderRadius.value ?? 8) : 8;
-        const pad = this.previewOf("card styling") ? (s.card.padding.value ?? 16) : 16;
-        const shadow = this.previewOf("card styling") ? s.card.shadow.value : true;
+        const pad = sinMarco ? 4 : (this.previewOf("card styling") ? (s.card.padding.value ?? 16) : 16);
+        const shadow = sinMarco ? false : (this.previewOf("card styling") ? s.card.shadow.value : true);
 
         // Explicit pixel sizing from the Power BI viewport, with a 100% fallback.
         const vpW = this.viewport.width  > 0 ? `${this.viewport.width}px`  : "100%";
@@ -2226,7 +2233,7 @@ export class Visual implements IVisual {
             background: ${fondoRaiz};
             border: ${bw}px solid ${cardBorder};
             border-radius: ${br}px;
-            padding: ${(this.lastDataView?.metadata?.objects as any)?.card?.padding !== undefined && this.previewOf("card styling") ? pad : 10}px ${pad}px;
+            padding: ${sinMarco ? 2 : (objCard.padding !== undefined && this.previewOf("card styling") ? pad : 10)}px ${pad}px;
             box-shadow: ${shadow ? "0 2px 8px rgba(0,0,0,0.10)" : "none"};
             width: ${vpW}; height: ${vpH};
             box-sizing: border-box;
@@ -2621,7 +2628,7 @@ export class Visual implements IVisual {
             const header = cell.querySelector(".kpi-header") as HTMLElement | null ?? (() => {
                 const hd = document.createElement("div");
                 hd.className = "kpi-header";
-                hd.style.cssText = "display:flex;align-items:flex-start;justify-content:space-between;gap:8px;";
+                hd.style.cssText = "display:flex;align-items:center;justify-content:space-between;gap:8px;";
                 // Move the label inside the header so the two share a row.
                 const existing = cell.querySelector(".kpi-label");
                 if (existing) {
@@ -2676,6 +2683,9 @@ export class Visual implements IVisual {
             valueEl.style.minWidth = "0";
             cabecera.insertBefore(valueEl, cabecera.firstChild);
         } else {
+            // A little air between the title, with or without an image, and the figure.
+            const encima = cabecera ?? (cell.querySelector(".kpi-label") as HTMLElement | null);
+            if (encima) encima.style.marginBottom = "4px";
             cell.appendChild(valueEl);
         }
         if (st && !hc && (stApply === "both" || stApply === "accent")) {
