@@ -1006,8 +1006,11 @@ export class Visual implements IVisual {
         // fuera del area y pareceria que la opcion no hace nada.
         const tgt = t.showTargetLine.value ? metric.targetData : [];
         const all = tgt.length === data.length ? data.concat(tgt) : data;
-        const minV = Math.min(...all);
-        const maxV = Math.max(...all);
+        // A bar's length is its value, so bars start at zero. From the lowest value, the lowest month
+        // had no bar at all and the others looked several times larger than they were.
+        const enBarras = String((t.type.value as any)?.value ?? t.type.value) === "bar";
+        const minV = enBarras ? Math.min(0, ...all) : Math.min(...all);
+        const maxV = enBarras ? Math.max(0, ...all) : Math.max(...all);
         const range = maxV - minV || 1;
         const y = (v: number) => height - ((v - minV) / range) * (height * 0.8) - height * 0.1;
         const pts: Array<[number, number]> = data.map((v, i) => [
@@ -1046,11 +1049,11 @@ export class Visual implements IVisual {
             const barW = (100 / data.length) * 0.7;
             data.forEach((v, i) => {
                 const rect = document.createElementNS(svgNS, "rect");
-                const h = ((v - minV) / range) * (height * 0.8);
+                const h = Math.abs(y(v) - y(0));
                 rect.setAttribute("x", String((i / data.length) * 100 + barW * 0.2));
-                rect.setAttribute("y", String(height - h - height * 0.1));
+                rect.setAttribute("y", String(Math.min(y(v), y(0))));
                 rect.setAttribute("width", String(barW));
-                rect.setAttribute("height", String(Math.max(0, h)));
+                rect.setAttribute("height", String(h));
                 rect.setAttribute("fill", color);
                 const fuerte = elegidos.size === 0 || elegidos.has(i);
                 rect.setAttribute("fill-opacity", String(fuerte ? Math.min(1, opacity + 0.4) : 0.15));

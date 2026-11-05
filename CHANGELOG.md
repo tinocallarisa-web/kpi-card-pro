@@ -18,6 +18,7 @@
 
 ### Fixed
 - **Percentages and other non-additive measures were summed across the months when a Trend was bound.** A gross margin could read 455.9%. The card, its Secondary KPIs and the cross-highlighted value now use the total Power BI calculates. If Power BI sends no total for a percentage, the card leaves the figure out instead of showing a sum. *Last N points* is a sum by definition, so a percentage keeps its total there. If Power BI sends no total for any other measure, the months are still added: an average or a distinct count needs that total.
+- **Trend bars did not start at zero.** They started at the lowest value of the series, so the lowest month had no bar and the differences looked larger than they were. Bars now start at zero, and negative values go below it. *Trends drawn as bars will look flatter after the update.* Line and area keep their scale.
 - **Secondary KPIs could not be read on dark styles or dark themes:** they kept their dark default colour. They now follow the value and label colours of the style, unless you chose your own. Separator lines and the scroll bar also adapt.
 - **On a card short of height, the main number could be squeezed until it disappeared.** It now never shrinks that way: the extras are withdrawn first, starting with the trend.
 - **A Pro style chosen without a licence drew dark text on its dark background** until the next refresh.
