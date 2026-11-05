@@ -2412,9 +2412,12 @@ export class Visual implements IVisual {
             const cellBr     = this.previewOf("card styling") ? (s2.card.borderRadius.value ?? 8) : 8;
 
             const marco = this.ruleFrame(metric, hc, cardBg, cardBorder, 1);
+            // On a gradient style the cards let the gradient through: a solid fill hid it everywhere but
+            // the gaps. A rule or fx colour keeps its own fill.
+            const sobreDegradado = !hc && !!this.styleGradient() && marco.bg === s2.card.background.value?.value;
             const wrapper = document.createElement("div");
             wrapper.style.cssText = `
-                background: ${marco.bg};
+                background: ${sobreDegradado ? "rgba(255,255,255,0.07)" : marco.bg};
                 border: ${marco.bw}px solid ${marco.border};
                 border-radius: ${cellBr}px;
                 padding: 10px 12px;
