@@ -128,7 +128,7 @@ Everything below is free except the items marked **(Pro)**.
 | Extra tooltip measures | — | **✓** |
 | Card border, radius, padding, shadow | — | **✓** |
 
-While you edit without a licence, a Pro feature you turn on is drawn working under a "Pro preview"
+While you edit without a licence, a Pro feature you turn on is drawn working (Small Multiples: first five cards) under a "Pro preview"
 watermark, and Power BI shows its own notification with the link to get one. Reading view shows the
 free result. A 30-day free trial is available on AppSource.
 
@@ -185,7 +185,7 @@ buy what they already own.
 ## TAB 4: CHANGELOG
 
 ### 2.4.0.0 — November 2026
-- **Changed:** the default look follows the report's theme; a percentage varies in points; a style never moves the layout
+- **Changed:** Latest point and Last N points require Pro; the Small Multiples preview shows five cards; the default look follows the report's theme; a percentage varies in points; a style never moves the layout
 - **Added:** six Pro styles; trend position; title alignment in Small Multiples
 - **Fixed:** percentages summed across months with a Trend; Secondary KPIs unreadable on dark cards
 

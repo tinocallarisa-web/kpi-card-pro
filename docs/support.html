@@ -260,7 +260,7 @@
   <!-- Periods -->
   <h2 id="periods">Comparing periods without DAX</h2>
   <div class="card">
-    <p>With a date in Trend, <em>Value &amp; comparison → Value shows</em> chooses what the big number is:</p>
+    <p>With a date in Trend (Pro), <em>Value &amp; comparison → Value shows</em> chooses what the big number is:</p>
     <ul>
       <li><strong>Total of the period</strong> — the whole range (default).</li>
       <li><strong>Latest point</strong> — the last point, compared with the one <em>Compare against (points back)</em> earlier:
@@ -326,7 +326,7 @@
       <li><strong>Label</strong> — show, font, size, bold, colour.</li>
       <li><strong>Variance</strong> — show, invert (lower is better), percentage points for % measures, arrow, size; (Pro) colours and pill.</li>
       <li><strong>Color rules</strong> (Pro) — compare with, thresholds, lower is better, three colours, apply to, status text.</li>
-      <li><strong>Prior &amp; Target</strong>, <strong>Value &amp; comparison</strong>, <strong>Secondary KPIs</strong> (Pro), <strong>Image</strong>,
+      <li><strong>Prior &amp; Target</strong>, <strong>Value &amp; comparison</strong> (Pro), <strong>Secondary KPIs</strong> (Pro), <strong>Image</strong>,
       <strong>Trend</strong> (Pro: position below, right or auto, type, colours), <strong>Small Multiples</strong> (Pro: columns, space, title alignment, font and colour), <strong>Accessibility</strong>.</li>
     </ul>
     <p>The Format pane, the setup guide and the messages of the visual follow the language of Power BI: English, Spanish,
@@ -355,7 +355,7 @@
     Small Multiples (up to 50 cards, 1 to 6 columns); Secondary KPIs; prefix and suffix; variance pill and colours; extra
     tooltip measures; card border width, radius, padding and shadow.</p>
     <p><strong>See it before you buy.</strong> While you edit without a licence, every Pro feature you turn on is drawn working under
-    a “Pro preview” watermark naming it. Reading view shows the free result. Pro comes with a 30-day free trial on AppSource.</p>
+    a “Pro preview” watermark naming it; Small Multiples shows the first five cards. Reading view shows the free result. Pro comes with a 30-day free trial on AppSource.</p>
   </div>
 
   <!-- FAQ -->
@@ -378,7 +378,7 @@
   <details><summary>The number got smaller, or the trend line disappeared.</summary><div class="faq-body"><p>The visual is smaller than the content. The number shrinks to stay whole, and on a short card the extras are withdrawn — trend first. Make the visual taller or lower <em>Trend → Height</em>.</p></div></details>
   <details><summary>My secondary KPIs moved below the value, or disappeared.</summary><div class="faq-body"><p>With <em>Position: Auto</em> they move below when the card is narrower than <em>Min width beside value</em>, and switch to a list when the figures do not fit in a row. With <em>Right</em> they are withdrawn below that width. Lower the minimum width, use fewer columns, or choose Bottom.</p></div></details>
   <details><summary>My image does not appear.</summary><div class="faq-body"><p>The Image well only accepts Base64 data URIs (<code>data:image/png;base64,…</code>). A link to an image on a web server is rejected on purpose: honouring it would make the visual fetch from the network, which it never does. Set the field's aggregation to <em>First</em>.</p></div></details>
-  <details><summary>I added a field to Small Multiples and still see one card.</summary><div class="faq-body"><p>Small Multiples is a Pro feature. Without a licence it is drawn working only in edit mode, under the Pro preview watermark; in reading view the first category renders and Power BI shows its licence notification.</p></div></details>
+  <details><summary>I added a field to Small Multiples and still see one card.</summary><div class="faq-body"><p>Small Multiples is a Pro feature. Without a licence it is drawn working only in edit mode, with the first five cards, under the Pro preview watermark; in reading view the first category renders and Power BI shows its licence notification.</p></div></details>
   <details><summary>I bought Pro but the Pro features do not appear.</summary><div class="faq-body"><p>The licence is checked after the card first paints, so for a moment the free result shows; it re-renders a second later. If it persists, check you are signed in with the account that holds the licence and that it is assigned in the Microsoft 365 admin center.</p></div></details>
   <details><summary>The variance shows the wrong direction.</summary><div class="faq-body"><p>For metrics where lower is better — cost, defects, churn — switch on <em>Variance → Invert</em> (free), and <em>Lower is better</em> in Color rules if you use them.</p></div></details>
   <details><summary>The Format pane is in English.</summary><div class="faq-body"><p>It follows the language of Power BI Desktop (File → Options → Regional settings) or of the Service. Twelve languages are included; others fall back to English.</p></div></details>

@@ -952,7 +952,7 @@
       "displayNameKey": "Object_Image"
     },
     "period": {
-      "displayName": "Value & comparison",
+      "displayName": "Value & comparison (Pro)",
       "displayNameKey": "Obj_Period",
       "description": "What the big number shows when a field is bound to Trend.",
       "properties": {

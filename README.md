@@ -75,7 +75,7 @@ format pane.
 | **Extra measures in tooltips** | ✗ | **✓** |
 | **Border width, radius, padding, drop shadow** | ✗ | **✓** |
 
-Without a licence, in edit mode, a Pro feature is drawn working under a "Pro preview" watermark and
+Without a licence, in edit mode, a Pro feature is drawn working (Small Multiples: first five cards) under a "Pro preview" watermark and
 Power BI shows its licence notification. Reading view shows the free result.
 
 ## Formatting pane reference
@@ -87,7 +87,7 @@ Power BI shows its licence notification. Reading view shows the free result.
 - **Color rules (Pro)** — Show, compare with target, prior or the value itself, lower and upper threshold, lower is better, colours, apply to the value, an accent bar, the background or the border, show status text
 - **Style template** — Report theme (default), Classic, Clean, Bold, Minimal, Soft, Midnight; Pro: Boardroom, Ledger, Editorial, Signal, Aurora, Terrace; setup guide on or off
 - **Prior & Target** — Show, font family, size, colour
-- **Value & comparison** — Value shows (total, latest point, last N points), window size, compare against, show period label
+- **Value & comparison (Pro)** — Value shows (total, latest point, last N points), window size, compare against, show period label
 - **Secondary KPIs (Pro)** — Show, position (auto / right / bottom), min width beside value, show variance, text sizes and colours
 - **Image** — Show, height, corner radius
 - **Trend (Pro)** — Show, position (bottom / right / auto), chart type, colour, line width, area opacity, height, last-point marker, target line and colour

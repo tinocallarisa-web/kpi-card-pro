@@ -55,7 +55,7 @@ KPI Card Pro — How to use this visual
 
 ## TEXT BOX 5 — No date table, no DAX
 
-With a date in Trend, *Format → Value & comparison → Value shows*: **Total of the period**, **Latest
+With a date in Trend, *Format → Value & comparison (Pro) → Value shows*: **Total of the period**, **Latest
 point** (against the previous point, or 12 back for the same month last year) or **Last N points**
 (the rolling twelve months). The card prints what it compares — "Dec 2025 vs Nov 2025".
 
@@ -87,7 +87,7 @@ point** (against the previous point, or 12 back for the same month last year) or
 | Prefix / suffix, variance pill and colours, extra tooltips | ❌ | ✅ |
 | Card border width, radius, padding, shadow | ❌ | ✅ |
 
-Without a licence, Pro features are drawn working in edit mode under a "Pro preview" watermark; reading
+Without a licence, Pro features are drawn working in edit mode (Small Multiples: first five cards) under a "Pro preview" watermark; reading
 view shows the free result.
 
 ---

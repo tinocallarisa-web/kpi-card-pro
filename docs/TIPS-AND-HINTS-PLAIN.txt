@@ -66,7 +66,7 @@ TEXT BOX 5 — No date table, no DAX
 ----------------------------------------------------------------
 NO DATE TABLE, NO DAX
 
-With a date in Trend, Format > Value & comparison > Value shows:
+With a date in Trend, Format > Value & comparison (Pro) > Value shows:
 - Total of the period — the whole range.
 - Latest point — the last month against the previous one, or against the
   same month last year (Compare against = 12 on a monthly series).

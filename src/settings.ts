@@ -271,7 +271,7 @@ class PeriodSettings extends FormattingSettingsCard {
         name: "showPeriodLabel", displayName: "Show period label", value: true
     });
     name = "period";
-    displayName = "Value & comparison";
+    displayName = "Value & comparison (Pro)";
     slices = [this.valueMode, this.windowSize, this.compareOffset, this.showPeriodLabel];
 }
 

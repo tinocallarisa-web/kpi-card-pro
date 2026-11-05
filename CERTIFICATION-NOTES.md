@@ -1,6 +1,6 @@
 # KPI Card Pro — Certification Notes — v2.4.0.0
 
-> 2.4.0.0 makes the report's theme the default look (Classic stays available), adds six Pro styles drawn under the preview watermark without a licence, a trend position (bottom, right, auto) and variance in points for percentage measures. With a Trend bound, values now read Power BI's subtotal (`rowSubtotalsPerLevel` is on by default) instead of summing the months. A style changes colours, weights, the trend's line style and, in Ledger and Editorial, the serif; never font sizes or padding. Everything else below is unchanged from 2.3. Full list: CHANGELOG.md.
+> 2.4.0.0 enforces Latest point and Last N points as Pro, limits the Small Multiples preview to five cards, makes the report's theme the default look (Classic stays available), adds six Pro styles drawn under the preview watermark without a licence, a trend position (bottom, right, auto) and variance in points for percentage measures. With a Trend bound, values now read Power BI's subtotal (`rowSubtotalsPerLevel` is on by default) instead of summing the months. A style changes colours, weights, the trend's line style and, in Ledger and Editorial, the serif; never font sizes or padding. Everything else below is unchanged from 2.3. Full list: CHANGELOG.md.
 
 > The text pasted into Partner Center is `docs/CERTIFICATION-NOTES-SHORT.txt` (the field caps at
 > 2,500 characters and is cleared on every resubmission). This file is the complete reference the
@@ -26,7 +26,8 @@
 Without a licence, **in edit mode only**, a Pro feature the user turns on is drawn *working*
 under a "Pro preview" watermark that names it, together with Power BI's own licence notification
 (banner naming the feature, then the persistent Upgrade bar). This is intentional, not missing
-gating: it is how the author sees what they would be buying.
+gating: it is how the author sees what they would be buying. The Small Multiples preview draws the
+first five cards, and the watermark says so.
 
 In reading view, before the licence has resolved, and wherever licences cannot be read (Publish to
 Web, embedding, export), the **free** result is drawn with no watermark. Power BI's own licence notice can still appear in

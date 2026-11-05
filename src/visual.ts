@@ -125,6 +125,9 @@ function esPorcentaje(format: string | undefined): boolean {
     return (format ?? "").replace(/"[^"]*"|'[^']*'|\\./g, "").indexOf("%") >= 0;
 }
 
+/** Without a licence the Small Multiples preview shows this many cards: enough to judge it, not to use it. */
+const PREVIEW_CARDS = 5;
+
 const SERVICE_PLAN_ID = "kpi-card-pro-tcviz";
 
 /**
@@ -236,6 +239,7 @@ export class Visual implements IVisual {
      * published report ships an unpaid feature.
      */
     private proPreview = false;
+    private previewRecortada = false;
     /** Ultimo calculo hecho sobre un dataView con roles, para el retorno de pagina. */
     private ultimasProFeatures: { labels: string[]; signature: string } | null = null;
     private watermarkEl: HTMLDivElement | null = null;
@@ -860,6 +864,7 @@ export class Visual implements IVisual {
             const corta = labels.length <= 2
                 ? labels
                 : labels.slice(0, 2).concat([`+${labels.length - 2}`]);
+            if (this.previewRecortada) corta.unshift(this.t("Preview_FirstCards", "First 5 cards"));
             this.watermarkWhy.textContent = corta.join(" · ");
         }
         const w = this.container.clientWidth  || 0;
@@ -1923,7 +1928,7 @@ export class Visual implements IVisual {
                 image: this.nodeOrChildrenText(valueNode, imageIdx)
             }];
             const modo = this.formattingSettings.period.valueMode.value;
-            if (trendBound && (modo === "latest" || modo === "window")) {
+            if (trendBound && (modo === "latest" || modo === "window") && this.previewOf("trend line")) {
                 const etiquetas = this.seriesLabelsFrom(rows?.root);
                 if (modo === "latest") { this.aplicarUltimoPunto(unica[0], etiquetas, priorIdx >= 0, secPriorIdxs.length > 0); }
                 else                   { this.aplicarVentana(unica[0], etiquetas, priorIdx >= 0, secPriorIdxs.length > 0); }
@@ -1933,11 +1938,12 @@ export class Visual implements IVisual {
 
         // Small multiples — one card per row
         const metrics: MetricData[] = [];
-        const limit = this.previewOf("small multiples") ? 50 : 1;
+        const limit = this.isPro ? 50 : (this.previewOf("small multiples") ? PREVIEW_CARDS : 1);
 
         // Subtotal nodes are not cards: without this the grid would show an extra
         // "Total" card, and it would eat one of the 50 Pro slots.
         const cardNodes = this.realChildren(rows.root);
+        this.previewRecortada = !this.isPro && limit === PREVIEW_CARDS && cardNodes.length > limit;
         for (let i = 0; i < Math.min(cardNodes.length, limit); i++) {
             const child = cardNodes[i];
             const categoryName = child.value != null ? String(child.value) : `${this.t("Label_Item", "Item")} ${i + 1}`;
@@ -1991,7 +1997,7 @@ export class Visual implements IVisual {
                 image: this.nodeOrChildrenText(child, imageIdx)
             });
             const modo = this.formattingSettings.period.valueMode.value;
-            if (trendBound && (modo === "latest" || modo === "window")) {
+            if (trendBound && (modo === "latest" || modo === "window") && this.previewOf("trend line")) {
                 const m = metrics[metrics.length - 1];
                 const etiquetas = this.seriesLabelsFrom(child);
                 if (modo === "latest") { this.aplicarUltimoPunto(m, etiquetas, priorIdx >= 0, secPriorIdxs.length > 0); }
@@ -2367,7 +2373,7 @@ export class Visual implements IVisual {
         const gap  = this.previewOf("small multiples layout") ? (s.gap.value ?? 12) : 12;
         // Las columnas elegidas son un máximo: si no caben con un ancho mínimo legible por
         // tarjeta, se usan menos (2.2.0.0). Con 3 columnas en 300 px cada tarjeta medía 70.
-        const pedidas = this.previewOf("small multiples layout") ? (s.columns.value ?? 3) : 1;
+        const pedidas = this.previewOf("small multiples") ? (s.columns.value ?? 3) : 1;
         const ANCHO_MIN = 150;
         const caben = this.viewport.width > 0
             ? Math.max(1, Math.floor((this.viewport.width + gap) / (ANCHO_MIN + gap)))

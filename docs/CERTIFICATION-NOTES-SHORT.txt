@@ -21,10 +21,11 @@ FILTER OUT (note 1180.2.2.3 on 2.1.0.0 - fixed)
    like the native Card; with Trend it filters through its points.
 
 WHAT IS NEW IN 2.4
-The default look follows the report's theme (Classic remains). Six Pro styles in
-Format > Style template: without a licence one is drawn under the watermark and
-reading view shows the free look. Trend position: bottom, right or auto. A %
-measure varies in points. With Trend, values read Power BI's subtotal.
+Default look: the report's theme (Classic remains). Six Pro styles in Format >
+Style template: no licence, drawn under the watermark; reading view, free look.
+Trend position: bottom, right, auto. A % measure varies in points. With Trend,
+values read Power BI's subtotal. Small Multiples preview: first 5 cards. Latest
+point and Last N are Pro: reading view without a licence shows the period total.
 
 ALSO TEST
 - Edit mode: the setup guide lists the wells; pick a template; Finish hides it.

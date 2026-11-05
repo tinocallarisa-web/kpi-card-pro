@@ -78,7 +78,7 @@ Pro adds the context: six more styles, color rules and conditional formatting (f
 
 SEE IT BEFORE YOU BUY
 
-While you edit a report without a licence, every Pro feature you turn on is drawn working, under a "Pro preview" watermark naming it. Reading view shows the free result, so a published report does not show those features unless the reader has a licence.
+While you edit a report without a licence, every Pro feature you turn on is drawn working, under a "Pro preview" watermark naming it; Small Multiples shows the first five cards. Reading view shows the free result, so a published report does not show those features unless the reader has a licence.
 
 30-day free trial on AppSource.
 
@@ -99,8 +99,8 @@ Support: support@tcviz.com
 | Repository (certification branch) | https://github.com/tinocallarisa-web/kpi-card-pro/tree/certification |
 | Demo video | https://www.youtube.com/watch?v=4fP7zYKnhWo |
 
-No new video for 2.2 (decision 12-10-2026). For 2.4 the default look changes, so the existing video
-no longer matches the first thing a viewer sees: decide before submitting.
+No new video for 2.2 (decision 12-10-2026) nor, for now, for 2.4 (decision 05-11-2026): the current
+one does not show the theme default or the Pro styles.
 
 **The certification notes field caps at 2,500 characters** (counting CRLF) and truncates without
 warning, mid-word. Paste `docs/CERTIFICATION-NOTES-SHORT.txt`. The full notes live in
@@ -128,7 +128,7 @@ Editing this file changes nothing in the offer.
 
 - [ ] Long description (the short description does not change)
 - [ ] Screenshots: the two infographics above, replacing the current ones
-- [ ] Video field: `https://www.youtube.com/watch?v=4fP7zYKnhWo` unless a new one is recorded (canonical form only)
+- [ ] Video field unchanged: `https://www.youtube.com/watch?v=4fP7zYKnhWo` (canonical form only)
 - [ ] Certification notes from `docs/CERTIFICATION-NOTES-SHORT.txt` — the field is cleared on every resubmission
 - [ ] Version 2.4.0.0 is above the one currently published (check Partner Center)
 - [ ] Support, privacy and terms URLs checked with a real request
