@@ -89,17 +89,18 @@ function towardWhite(hex: string, t: number): string {
  * gana. Solo propiedades gratuitas: una plantilla no puede regalar el estilo Pro de la tarjeta.
  */
 const TEMPLATES: Record<string, [string, string, unknown][]> = {
+    // A style sets colours and weights, never sizes: changing it must not move a laid-out page.
     // Filled from the report's theme: the default since 2.4, as in a native visual.
     report: [],
     classic: [],
-    clean: [["card", "borderColor", "#FFFFFF"], ["mainValue", "fontSize", 32], ["mainValue", "bold", true],
+    clean: [["card", "borderColor", "#FFFFFF"], ["mainValue", "bold", true],
             ["mainValue", "color", "#1F2937"], ["label", "color", "#6B7280"],
             ["trend", "color", "#2B6CB0"], ["trend", "areaOpacity", 12]],
-    bold: [["mainValue", "fontSize", 40], ["mainValue", "bold", true], ["mainValue", "color", "#1F4E80"],
-           ["label", "fontSize", 13], ["label", "bold", true], ["label", "color", "#1F4E80"],
+    bold: [["mainValue", "bold", true], ["mainValue", "color", "#1F4E80"],
+           ["label", "bold", true], ["label", "color", "#1F4E80"],
            ["trend", "color", "#1F4E80"], ["trend", "areaOpacity", 30], ["trend", "lineWidth", 3]],
-    minimal: [["card", "borderColor", "#FFFFFF"], ["mainValue", "fontSize", 34], ["mainValue", "bold", false],
-              ["label", "fontSize", 11], ["label", "color", "#8A8886"],
+    minimal: [["card", "borderColor", "#FFFFFF"], ["mainValue", "bold", false],
+              ["label", "color", "#8A8886"],
               ["trend", "type", "line"], ["trend", "lineWidth", 1], ["trend", "color", "#605E5C"]],
     soft: [["card", "background", "#F3F7FC"], ["card", "borderColor", "#DCE7F5"], ["mainValue", "bold", true],
            ["mainValue", "color", "#1F4E80"], ["label", "color", "#4A6A8F"], ["secondary", "color", "#4A6A8F"],
@@ -413,7 +414,15 @@ export class Visual implements IVisual {
         TEMPLATES.report = this.reportTemplate();
         const list = TEMPLATES[this.templateName(objects)] || [];
         const cards: any[] = (this.formattingSettings as any).cards || [];
-        for (const [cardName, prop, val] of list) {
+        // The secondary KPIs read as the main value and its label do: left at their own defaults
+        // they stayed dark on the dark styles and could not be read.
+        const deLista = (card: string, prop: string) => list.find(t => t[0] === card && t[1] === prop)?.[2];
+        const valorSec = deLista("mainValue", "color");
+        const etiquetaSec = deLista("label", "color") ?? deLista("secondary", "color");
+        const derivados: [string, string, unknown][] = [];
+        if (valorSec !== undefined) derivados.push(["secondaryKpis", "color", valorSec]);
+        if (etiquetaSec !== undefined) derivados.push(["secondaryKpis", "labelColor", etiquetaSec]);
+        for (const [cardName, prop, val] of list.concat(derivados)) {
             if (objects?.[cardName]?.[prop] !== undefined) { continue; }
             const card = cards.find(c => c.name === cardName);
             const slice = card?.slices?.find((s: any) => s.name === prop);
@@ -2222,7 +2231,12 @@ export class Visual implements IVisual {
         const fondoRaiz = degradado && !conFx ? degradado : (sinMarco && !conFx ? "transparent" : cardBg);
         const bw  = sinMarco ? 0 : (this.previewOf("card styling") ? (s.card.borderWidth.value ?? 1) : 1);
         const br  = this.previewOf("card styling") ? (s.card.borderRadius.value ?? 8) : 8;
-        const pad = sinMarco ? 4 : (this.previewOf("card styling") ? (s.card.padding.value ?? 16) : 16);
+        // The content sits at the same place with every style, framed or not: a style changes how
+        // the card looks, never how much fits in it, so a laid-out page does not move. Only a
+        // padding the author chose changes it.
+        const paddingPropio = objCard.padding !== undefined && this.previewOf("card styling");
+        const padX = paddingPropio ? (s.card.padding.value ?? 16) : Math.max(0, 8 - bw);
+        const padY = paddingPropio ? padX : Math.max(0, 6 - bw);
         const shadow = sinMarco ? false : (this.previewOf("card styling") ? s.card.shadow.value : true);
 
         // Explicit pixel sizing from the Power BI viewport, with a 100% fallback.
@@ -2233,7 +2247,7 @@ export class Visual implements IVisual {
             background: ${fondoRaiz};
             border: ${bw}px solid ${cardBorder};
             border-radius: ${br}px;
-            padding: ${sinMarco ? 2 : (objCard.padding !== undefined && this.previewOf("card styling") ? pad : 10)}px ${pad}px;
+            padding: ${padY}px ${padX}px;
             box-shadow: ${shadow ? "0 2px 8px rgba(0,0,0,0.10)" : "none"};
             width: ${vpW}; height: ${vpH};
             box-sizing: border-box;
@@ -2348,6 +2362,7 @@ export class Visual implements IVisual {
                intento) la rejilla perdia el alto minimo de contenido de las tarjetas y las
                aplastaba hasta cortarlas; el recorte horizontal va aqui, en la rejilla. */
             overflow-x: hidden; overflow-y: auto;
+            color-scheme: ${this.cardOscura() ? "dark" : "light"};
         `;
 
         // Ancho real de una celda: el mismo criterio de ancho minimo que en la tarjeta
@@ -2672,6 +2687,7 @@ export class Visual implements IVisual {
             font-weight: ${s.mainValue.bold.value ? "700" : "400"};
             color: ${valueColor};
             line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            flex-shrink: 0;
         `;
         // With no label above it, the image shares the row with the number: a row of its own
         // only pushed the figure down and left the top of the card empty.
@@ -2817,7 +2833,7 @@ export class Visual implements IVisual {
         const minimo = s.minWidth.value ?? 320;
         if (anchoTarjeta > 0 && anchoTarjeta < minimo) return null;
 
-        const linea = hc ? this.hcFg : "#EDEBE9";
+        const linea = hc ? this.hcFg : (this.cardOscura() ? "rgba(255,255,255,0.22)" : "#EDEBE9");
         const col = document.createElement("div");
         col.className = orient === "right" ? "kpi-secondary-col"
                       : orient === "bottom" ? "kpi-secondary-row"
@@ -2902,6 +2918,11 @@ export class Visual implements IVisual {
             col.appendChild(fila);
         });
         return col;
+    }
+
+    private cardOscura(): boolean {
+        const lum = luminance(this.formattingSettings.card.background.value?.value);
+        return lum !== null && lum < 0.18;
     }
 
     /** Mismas condiciones que buildMetricCell para dibujar la sparkline. */
