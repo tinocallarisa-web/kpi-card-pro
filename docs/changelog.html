@@ -39,14 +39,29 @@
   <header>
     <a class="brand" href="https://tcviz.com">TCViz</a>
     <h1>Changelog</h1>
-    <p class="meta">KPI Card Pro &nbsp;·&nbsp; current version 2.4.0.0</p>
+    <p class="meta">KPI Card Pro &nbsp;·&nbsp; current version 2.5.0.0</p>
   </header>
 
   <main>
     <div class="rel">
       <div class="rel-head">
-        <span class="rel-ver">2.4.0.0</span>
+        <span class="rel-ver">2.5.0.0</span>
         <span class="tag tag-cur">Current</span>
+        <span class="rel-date">2026-11</span>
+      </div>
+      <h4><span class="tag tag-chg">Changed</span></h4>
+    <ul>
+      <li><strong>New Pro preview watermark,</strong> the same across TCViz visuals: "Pro preview" and the Pro features in use, centred, without covering your data. As before, it only appears while you edit without a licence; reading view shows the free result.</li>
+      <li><strong>The example report shows filtering from the first page.</strong> *Filter out*: click a Small Multiples card and the bar chart beside it filters. *Trend*: click a point of the line and the table filters. Filtering itself works as in 2.4: a card filters by its category, a point by its period, Ctrl+click adds and a click on empty space clears.</li>
+    </ul>
+      <h4><span class="tag tag-fix">Fixed</span></h4>
+    <ul>
+      <li><strong>Conditional formatting (fx)</strong> on *Card → Background color* and *Main value → Color* is declared the way Power BI expects for visuals that read data as a matrix. Nothing changes in how it works.</li>
+      <li><strong>Dependencies updated:</strong> <code>npm audit</code> reports no vulnerabilities.</li>
+    </ul>
+    <div class="rel">
+      <div class="rel-head">
+        <span class="rel-ver">2.4.0.0</span>
         <span class="rel-date">2026-11-05</span>
       </div>
       <h4><span class="tag tag-chg">Changed</span></h4>

@@ -179,7 +179,7 @@
 
 <div class="wrap">
 
-  <div class="verpill">Visual v2.4.0.0 &nbsp;·&nbsp; docs updated 5 Nov 2026 &nbsp;·&nbsp; <a href="changelog.html">what's new</a></div>
+  <div class="verpill">Visual v2.5.0.0 &nbsp;·&nbsp; docs updated 19 Nov 2026 &nbsp;·&nbsp; <a href="changelog.html">what's new</a></div>
 
   <p class="lead"><strong>A KPI card that puts the answer on the card:</strong> the value, its variance, the target, a trend
   line and a status that says on track, warning or off track. Add a category and the single card becomes a grid of up to
@@ -188,6 +188,18 @@
   <strong>format on the canvas</strong> (on-object) · <strong>setup guide</strong> inside the visual · keyboard navigation and
   screen-reader summaries · high contrast · <strong>number formats from the model</strong> and dynamic format strings ·
   <strong>12 panel languages</strong> · the report's theme and 12 style templates · a layout that adapts to the size of the visual.</p>
+
+  <!-- What's new -->
+  <h2 id="whatsnew">What's new in 2.5.0.0</h2>
+  <div class="card">
+    <ul>
+      <li><strong>New Pro preview watermark</strong>, the same across TCViz visuals: “Pro preview” and the Pro features in use,
+      centred, without covering your data. It only appears while you edit without a licence.</li>
+      <li><strong>Filtering explained:</strong> the example report opens on a <em>Filter out</em> page (click a card, the bar chart
+      filters) and a <em>Trend</em> page (click a point, the table filters). See <a href="#interaction">Selecting and filtering</a>.</li>
+      <li>Conditional formatting (fx) works as before; dependencies updated. Full list in the <a href="changelog.html">changelog</a>.</li>
+    </ul>
+  </div>
 
   <!-- Video -->
   <div class="video-wrap">
@@ -299,7 +311,10 @@
       March of Spain, not March of everyone. Selected points are marked with a ring.</li>
       <li><strong>Ctrl+click</strong> adds to the selection; click again to remove; click empty space to clear.</li>
       <li><strong>Bookmarks</strong> restore the selection; <strong>Edit interactions</strong> is respected; right-click opens the Power BI context menu.</li>
-      <li>A single card with no Trend has nothing to filter by, like Power BI's own card.</li>
+      <li>A single card with no Small Multiples and no Trend has no category to filter by, like Power BI's own card.</li>
+      <li>Without a licence, in <strong>edit mode</strong> Small Multiples (first five cards) and Trend are drawn under the Pro preview
+      watermark and the clicks filter there too. In reading view without a licence Small Multiples shows one card, the first
+      category, and the trend line is not drawn.</li>
     </ul>
   </div>
 
@@ -371,6 +386,7 @@
   <details><summary>A gradient (fx) paints every card with the maximum colour.</summary><div class="faq-body"><p>With a <strong>Trend</strong> field, Power BI works out <em>Lowest value</em> and <em>Highest value</em> over the periods (each month), not over the cards, so every card total sits above the "highest value". Set <em>Minimum</em> and <em>Maximum</em> to <strong>Number</strong> and type the range of your card totals (for example 2,000,000 and 11,000,000). Without Trend, Lowest and Highest value work over the cards as they are. Rules with fixed thresholds are not affected.</p></div></details>
   <details><summary>The number is very large, or I want a fixed size.</summary><div class="faq-body"><p>A single card sizes its number to the visual until you choose one yourself. Set <em>Main value → Font size</em> and that size is kept exactly; <em>Reset to default</em> brings back the automatic size. In a grid every card uses the size of the one that needs it most.</p></div></details>
   <details><summary>The color rules do not appear.</summary><div class="faq-body"><p>They need <em>Show</em> on, a target (or a prior period, if you compare with it — not needed for <em>Value itself</em>) and a licence, or edit mode, where they are drawn under the Pro preview watermark.</p></div></details>
+  <details><summary>How do I filter other visuals from the card?</summary><div class="faq-body"><p>Bind a category to <strong>Small Multiples</strong> and click a card: the other visuals on the page filter by that category and the other cards dim. Bind a date to <strong>Trend</strong> and click a point of the line: the page filters by that period (and that card). Ctrl+click adds; clicking empty space clears. A single card with no Small Multiples and no Trend has no category to filter by, like the native Card. Without a licence, edit mode draws Small Multiples and Trend under the Pro preview watermark and the clicks work there too. The example report shows both on its first two pages.</p></div></details>
   <details><summary>How do I filter the report by one month?</summary><div class="faq-body"><p>Bind a date to Trend and click that point of the line, or move to it with the arrow keys and press Enter. Ctrl+click adds more months; clicking empty space clears.</p></div></details>
   <details><summary>Clicking a single card does nothing.</summary><div class="faq-body"><p>A single card has no category to filter by, like Power BI's own card. Add a field to Small Multiples to filter by card, or to Trend to filter by period.</p></div></details>
   <details><summary>The setup guide is in the way. How do I hide it — or get it back?</summary><div class="faq-body"><p>Click ✕ or Finish. It only shows while you edit and never in reading view. To bring it back: <em>Format → Style template → Setup guide</em>.</p></div></details>

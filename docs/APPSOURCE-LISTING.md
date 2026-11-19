@@ -1,12 +1,12 @@
-# AppSource listing copy — KPI Card Pro v2.4.0.0
+# AppSource listing copy — KPI Card Pro v2.5.0.0
 
 Copy ready to paste into Partner Center. **The marketplace description is the documentation most
 people read and the one that goes stale fastest** — update it on every release, not only when the
 code changes.
 
-**This version changes what the buyer sees** (the report's theme by default, six Pro styles, the trend
-on the right, variance in points): the description and the "What's new" block change, the styles
-infographic changes, and the certification notes must be pasted again. The short description does not.
+**2.5 changes little that the buyer sees** (the new Pro preview watermark; filtering explained in the
+example report): only the "What's new" block of the description changes. Infographics and short
+description stay. The certification notes must be pasted again (FILTER OUT block first).
 
 Rules for this listing: no comparisons with other marketplace visuals, not even implied; compare
 only with Power BI's own card. "Power BI" always with that capitalisation (rejection 100.7.1).
@@ -30,14 +30,12 @@ A number on a dashboard is only half an answer. 9.7M in revenue — is that good
 
 KPI Card Pro puts the answer on the card: the value, its variance, the target, a trend line and a color that says on track, warning or off track. Add a category and the single card becomes a grid — up to fifty cards, one per country, product or team, each with its own figures and line.
 
-WHAT IS NEW IN 2.4
+WHAT'S NEW IN 2.5.0.0
 
-• Follows your report's theme by default, like a native visual
-• Six Pro styles you can try on your own data: Boardroom, Ledger, Editorial, Signal, Aurora and Terrace
-• A style never moves your layout: the content stays in the same place
-• The trend line below the figures or beside them
-• A percentage varies in points: 25% to 27% is 2.0 pp up, not 8%
-• Percentages stay right with a date in Trend: the card uses Power BI's total instead of adding up the months
+• A clearer Pro preview watermark: "Pro preview" and the features in use, centred, never over your data
+• Filtering other visuals, explained: click a card to filter the page by its category, or a point of the trend line to filter by that period. The example report shows both on its first two pages
+
+Since 2.4: follows your report's theme by default, six Pro styles, the trend below or beside the figures, and percentages that vary in points.
 
 NO DATE TABLE, NO DAX
 
@@ -126,9 +124,9 @@ from Partner Center, so correcting it in `pbiviz.json` alone changes nothing.
 
 Editing this file changes nothing in the offer.
 
-- [ ] Long description (the short description does not change)
-- [ ] Screenshots: the two infographics above, replacing the current ones
+- [ ] Long description (only the "What's new" block changes; the short description does not)
+- [ ] Screenshots unchanged in 2.5
 - [ ] Video field unchanged: `https://www.youtube.com/watch?v=4fP7zYKnhWo` (canonical form only)
 - [ ] Certification notes from `docs/CERTIFICATION-NOTES-SHORT.txt` — the field is cleared on every resubmission
-- [ ] Version 2.4.0.0 is above the one currently published (check Partner Center)
+- [ ] Version 2.5.0.0 is above the one currently published (check Partner Center)
 - [ ] Support, privacy and terms URLs checked with a real request

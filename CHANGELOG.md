@@ -1,5 +1,15 @@
 # Changelog — KPI Card Pro
 
+## [2.5.0.0] — 2026-11
+
+### Changed
+- **New Pro preview watermark,** the same across TCViz visuals: "Pro preview" and the Pro features in use, centred, without covering your data. As before, it only appears while you edit without a licence; reading view shows the free result.
+- **The example report shows filtering from the first page.** *Filter out*: click a Small Multiples card and the bar chart beside it filters. *Trend*: click a point of the line and the table filters. Filtering itself works as in 2.4: a card filters by its category, a point by its period, Ctrl+click adds and a click on empty space clears.
+
+### Fixed
+- **Conditional formatting (fx)** on *Card → Background color* and *Main value → Color* is declared the way Power BI expects for visuals that read data as a matrix. Nothing changes in how it works.
+- **Dependencies updated:** `npm audit` reports no vulnerabilities.
+
 ## [2.4.0.0] — 2026-11-05
 
 ### Changed

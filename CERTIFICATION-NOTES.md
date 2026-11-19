@@ -1,5 +1,7 @@
-# KPI Card Pro — Certification Notes — v2.4.0.0
+# KPI Card Pro — Certification Notes — v2.5.0.0
 
+> **2.5.0.0** — filter out (1180.2.2.3, flagged on 2.1 and 2.4): the sample .pbix opens on a page built to show it — page 1 "Filter out" (Small Multiples by channel beside a native bar chart: click a card and the chart filters) and page 2 "Trend" (click a point of the line and a native table filters by that month). In edit mode without a licence both are drawn under the Pro preview watermark and the clicks work there too; a single card with no Small Multiples and no Trend has no category to filter by, like the native Card. Also new: conditional formatting selectors created with createDataViewWildcardSelector (same behaviour), the common TCViz Pro preview watermark, npm audit 0. See docs/CERTIFICATION-NOTES-SHORT.txt.
+>
 > 2.4.0.0 enforces Latest point and Last N points as Pro, limits the Small Multiples preview to five cards, makes the report's theme the default look (Classic stays available), adds six Pro styles drawn under the preview watermark without a licence, a trend position (bottom, right, auto) and variance in points for percentage measures. With a Trend bound, values now read Power BI's subtotal (`rowSubtotalsPerLevel` is on by default) instead of summing the months. A style changes colours, weights, the trend's line style and, in Ledger and Editorial, the serif; never font sizes or padding. Everything else below is unchanged from 2.3. Full list: CHANGELOG.md.
 
 > The text pasted into Partner Center is `docs/CERTIFICATION-NOTES-SHORT.txt` (the field caps at

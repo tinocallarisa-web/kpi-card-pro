@@ -1,4 +1,4 @@
-# KPI Card Pro 2.4 — Tips & Hints (Sample File)
+# KPI Card Pro 2.5 — Tips & Hints (Sample File)
 
 Copia estos textos como Text Boxes en Power BI Desktop dentro del archivo .pbix de muestra.
 Crea una página llamada "Tips & Hints" o "How to use" y añade un bloque por sección.
@@ -61,12 +61,16 @@ point** (against the previous point, or 12 back for the same month last year) or
 
 ---
 
-## TEXT BOX 6 — Filtering
+## TEXT BOX 6 — Filter other visuals from the card
 
-- Small Multiples: click a card to filter the page; the others dim.
-- Trend: click a point of the line to filter by that period (and card).
-- Ctrl+click adds, click again removes, click empty space to clear.
+- **Small Multiples:** click a card and the other visuals on the page filter by that category; the other cards dim.
+- **Trend:** click a point of the line and the page filters by that period (and that card).
+- **Ctrl+click** adds, click again removes, click empty space to clear.
+- A single card with no Small Multiples and no Trend has no category to filter by, like the native Card.
+  Bind a category or a date to make it filter.
 - Keyboard: arrows between cards; on the trend line, arrows between points and Enter to filter.
+- Without a licence, while you edit, Small Multiples and Trend are drawn under the Pro preview watermark
+  and the clicks filter there too.
 
 ---
 

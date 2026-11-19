@@ -1,47 +1,48 @@
-KPI Card Pro 2.4.0.0 - GUID kpiCardProTCViz
+KPI Card Pro 2.5.0.0 - GUID kpiCardProTCViz
+
+FILTER OUT (1180.2.2.3, flagged on 2.1 and 2.4) - HOW TO SEE IT
+The visual filters outwards. Open the sample .pbix:
+1. Page 1 "Filter out": click a Small Multiples card (one per channel). The
+   native bar chart beside it filters to that channel; other cards dim.
+2. Page 2 "Trend": click a point of the line. The native table filters to that
+   month. Ctrl+click adds; a click on empty space clears.
+3. A single card with no Small Multiples and no Trend has no category to filter
+   by, like the native Card.
+Edit mode without a licence draws Small Multiples and Trend under the Pro
+preview watermark; the clicks work there too.
+
+NEW IN 2.5.0.0
+- fx on Card background and Main value color now declared with
+  createDataViewWildcardSelector; same behaviour.
+- Pro preview watermark: shared TCViz component, centred, never over data;
+  only in edit mode without a licence.
+- npm audit 0, eslint 0.
 
 SOURCE CODE
-github.com/tinocallarisa-web/kpi-card-pro, branch "certification".
-PUBLIC: no credentials needed, none included here.
-Full notes: CERTIFICATION-NOTES.md. Docs: tinocallarisa-web.github.io/kpi-card-pro
+github.com/tinocallarisa-web/kpi-card-pro, branch "certification". Public.
+Support: https://tinocallarisa-web.github.io/kpi-card-pro/support.html
+Privacy: https://tinocallarisa-web.github.io/kpi-card-pro/privacy.html
+Terms: https://tinocallarisa-web.github.io/kpi-card-pro/terms.html
 
-TESTING THE PREMIUM FEATURES - NO KEY NEEDED
-There is no activation key: Pro is granted by the AppSource plan through
-IVisualLicenseManager. Import this .pbiviz and open a report in EDIT mode without a
-licence: each Pro feature you turn on is drawn WORKING under a "Pro preview"
-watermark naming it, a banner names it and the Upgrade bar follows. Reading view
-shows the free result. Intentional, not missing gating.
-
-FILTER OUT (note 1180.2.2.3 on 2.1.0.0 - fixed)
-1. Add a category to Small Multiples and a chart of the same table beside it.
-   Click a card: the chart filters, the other cards dim to 30%.
-2. Add a date to Trend. Click a point of the line: the report filters by that
-   period (and that card). Ctrl+click adds; empty space clears.
-3. A single card with no Small Multiples and no Trend has nothing to filter by,
-   like the native Card; with Trend it filters through its points.
-
-WHAT IS NEW IN 2.4
-Default look: the report's theme (Classic remains). Six Pro styles in Format >
-Style template: no licence, drawn under the watermark; reading view, free look.
-Trend position: bottom, right, auto. A % measure varies in points. With Trend,
-values read Power BI's subtotal. Small Multiples preview: first 5 cards. Latest
-point and Last N are Pro: reading view without a licence shows the period total.
+TESTING PRO - NO KEY NEEDED
+Pro comes from the AppSource plan via IVisualLicenseManager. In EDIT mode
+without a licence each Pro feature is drawn working under the watermark naming
+it, with Power BI's Upgrade bar. Reading view shows the free result (Small
+Multiples: one card). Intentional, not missing gating.
 
 ALSO TEST
-- Edit mode: the setup guide lists the wells; pick a template; Finish hides it.
-- Format mode: click the number, label, trend or card to format it there.
-- Resize to 160x90: the number shrinks, never cut; extras withdraw.
+- Setup guide in edit mode; format mode: click a part to format it.
+- Resize to 160x90: number shrinks, never cut.
 - Keyboard: Tab, arrows between cards; on the trend, arrows and Enter.
 
 RENDERING EVENTS
-Exactly one renderingStarted and one renderingFinished/Failed per update().
-Repaints after a selection or the licence go through render(), emitting none.
+One renderingStarted and one renderingFinished/Failed per update(). Repaints
+after selection or licence use render(), emitting none.
 
 PRIVACY / NETWORK
 No external calls, telemetry or CDN; privileges: []. Image accepts only
-data:image/<type>;base64 via <img> src. The visual persists only style.template
-and style.guide, from a user click.
+data:image/<type>;base64. Persists only style.template and style.guide, on a
+user click.
 
 LICENSING
-Plan kpi-card-pro-tcviz, matched on the Service ID. Requested after the first
-paint; on failure it stays Free. No licensing UI of our own.
+Plan kpi-card-pro-tcviz, matched on the Service ID; on failure it stays Free.
