@@ -11,6 +11,7 @@ import powerbi from "powerbi-visuals-api";
 import { FormattingSettingsService } from "powerbi-visuals-utils-formattingmodel";
 import { LANDING_ICON } from "./landingIcon";
 import "./../style/landing.less";
+import { createProWatermark, renderProWatermark } from "./comun/watermark";
 import { valueFormatter } from "powerbi-visuals-utils-formattingutils";
 import { VisualFormattingSettingsModel } from "./settings";
 import { I18N } from "./i18n";
@@ -243,8 +244,6 @@ export class Visual implements IVisual {
     /** Ultimo calculo hecho sobre un dataView con roles, para el retorno de pagina. */
     private ultimasProFeatures: { labels: string[]; signature: string } | null = null;
     private watermarkEl: HTMLDivElement | null = null;
-    private watermarkTitle: HTMLDivElement | null = null;
-    private watermarkWhy: HTMLDivElement | null = null;
     /** Solo para el overlay de diagnostico. */
     private dbgMeasureIdx = 0;
     /** Formato sobre el lienzo (2.2.0.0): número, etiqueta, variación, tendencia y tarjeta. */
@@ -828,54 +827,22 @@ export class Visual implements IVisual {
 
     /** La marca solo aparece si hay alguna funcion Pro realmente pedida. */
     private updateWatermark(): void {
-        if (!this.watermarkEl) {
-            this.watermarkEl = document.createElement("div");
-            this.watermarkEl.setAttribute("aria-hidden", "true");
-            this.watermarkEl.style.cssText =
-                "position:absolute;left:0;top:0;right:0;bottom:0;display:none;" +
-                "align-items:center;justify-content:center;flex-direction:column;" +
-                "text-align:center;pointer-events:none;z-index:5;" +
-                "font-family:'Segoe UI',sans-serif;font-weight:700;letter-spacing:0.06em;" +
-                "color:#FFFFFF;opacity:0.72;transform:rotate(-20deg);" +
-                "text-shadow:0 0 3px rgba(46,52,64,0.95),0 2px 6px rgba(46,52,64,0.75);";
-            this.watermarkTitle = document.createElement("div");
-            this.watermarkTitle.textContent = "Pro preview";
-            this.watermarkWhy = document.createElement("div");
-            this.watermarkEl.appendChild(this.watermarkTitle);
-            this.watermarkEl.appendChild(this.watermarkWhy);
-            if (getComputedStyle(this.container).position === "static") {
-                this.container.style.position = "relative";
-            }
-        }
-        // El render reconstruye el contenido del contenedor, asi que la marca se
-        // reinserta: encenderla sobre un nodo desconectado no pinta nada.
-        if (this.watermarkEl.parentNode !== this.container) {
-            this.container.appendChild(this.watermarkEl);
+        // Marca de agua de la vista previa Pro: la pieza común de la cartera (src/comun/watermark.ts, 2.5). El render
+        // reconstruye el contenido del contenedor, así que se crea de nuevo si se quedó fuera.
+        if (!this.watermarkEl || this.watermarkEl.parentNode !== this.container) {
+            if (getComputedStyle(this.container).position === "static") this.container.style.position = "relative";
+            this.watermarkEl = createProWatermark(this.container);
         }
         const labels = this.attemptedProFeatures().labels;
         const activa = this.computePreview() && labels.length > 0;
-        this.watermarkEl.style.display = activa ? "flex" : "none";
-        if (!activa) return;
-
-        if (this.watermarkWhy) {
-            // Con cuatro o cinco funciones activas la lista se convertia en un parrafo
-            // cruzando la tarjeta entera y tapaba justo lo que queremos enseñar. Dos y
-            // un contador bastan para saber por que esta la marca.
-            const corta = labels.length <= 2
-                ? labels
-                : labels.slice(0, 2).concat([`+${labels.length - 2}`]);
-            if (this.previewRecortada) corta.unshift(this.t("Preview_FirstCards", "First 5 cards"));
-            this.watermarkWhy.textContent = corta.join(" · ");
-        }
-        const w = this.container.clientWidth  || 0;
-        const h = this.container.clientHeight || 0;
-        const size = Math.round(Math.max(22, Math.min(80, w / 7.5, h / 3.5)));
-        this.watermarkEl.style.fontSize = `${size}px`;
-        if (this.watermarkWhy) {
-            this.watermarkWhy.style.cssText =
-                `font-size:${Math.round(size * 0.32)}px;font-weight:600;`
-                + "margin-top:0.25em;opacity:0.95;";
-        }
+        const feats = labels.slice();
+        if (activa && this.previewRecortada) feats.unshift(this.t("Preview_FirstCards", "First 5 cards"));
+        const pal: any = this.host.colorPalette;
+        renderProWatermark(this.watermarkEl, activa ? {
+            width: this.container.clientWidth || 0, height: this.container.clientHeight || 0,
+            title: this.t("UI_ProPreview", "Pro preview"), features: feats,
+            highContrast: pal?.isHighContrast ? { foreground: pal.foreground?.value ?? "#FFFFFF", background: pal.background?.value ?? "#000000" } : null,
+        } : null);
     }
 
     private cancelLicenseIcon(): void {

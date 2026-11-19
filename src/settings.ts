@@ -7,6 +7,7 @@
 
 "use strict";
 
+import { dataViewWildcard } from "powerbi-visuals-utils-dataviewutils";
 import powerbi from "powerbi-visuals-api";
 import { formattingSettings } from "powerbi-visuals-utils-formattingmodel";
 
@@ -21,7 +22,8 @@ class CardSettings extends FormattingSettingsCard {
         name: "background", displayName: "Background Color",
         value: { value: "#FFFFFF" },
         instanceKind: powerbi.VisualEnumerationInstanceKinds.ConstantOrRule,
-        selector: { data: [{ dataViewWildcard: { matchingOption: 0 } }] } as any,
+        // 2.5: selector creado con la función de Microsoft (OKviz solo reconoce el fx así; el resultado es el mismo).
+        selector: dataViewWildcard.createDataViewWildcardSelector(dataViewWildcard.DataViewWildcardMatchingOption.InstancesAndTotals),
         altConstantSelector: null as any
     });
     borderColor = new formattingSettings.ColorPicker({
@@ -69,7 +71,8 @@ class MainValueSettings extends FormattingSettingsCard {
         name: "color", displayName: "Color",
         value: { value: "#252423" },
         instanceKind: powerbi.VisualEnumerationInstanceKinds.ConstantOrRule,
-        selector: { data: [{ dataViewWildcard: { matchingOption: 0 } }] } as any,
+        // 2.5: selector creado con la función de Microsoft (OKviz solo reconoce el fx así; el resultado es el mismo).
+        selector: dataViewWildcard.createDataViewWildcardSelector(dataViewWildcard.DataViewWildcardMatchingOption.InstancesAndTotals),
         altConstantSelector: null as any
     });
     displayUnit = new formattingSettings.ItemDropdown({
