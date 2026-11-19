@@ -2,10 +2,12 @@ KPI Card Pro 2.5.0.0 - GUID kpiCardProTCViz
 
 FILTER OUT (1180.2.2.3, flagged on 2.1 and 2.4) - HOW TO SEE IT
 The visual filters outwards. Open the sample .pbix:
-1. Page 1 "Filter out": click a Small Multiples card (one per channel). The
-   native bar chart beside it filters to that channel; other cards dim.
-2. Page 2 "Trend": click a point of the line. The native table filters to that
-   month. Ctrl+click adds; a click on empty space clears.
+1. Page 2 "2 KPI Pro": click a Small Multiples card (one per country). The
+   native bar chart beside it filters to that country; other cards dim.
+   Click a point of a card's trend line: the chart filters to that month.
+   Ctrl+click adds; a click on empty space clears.
+2. Page 1 "KPI Pro": click a country card of the Small Multiples visual; the
+   other four KPI cards on the page recalculate for that country.
 3. A single card with no Small Multiples and no Trend has no category to filter
    by, like the native Card.
 Edit mode without a licence draws Small Multiples and Trend under the Pro
